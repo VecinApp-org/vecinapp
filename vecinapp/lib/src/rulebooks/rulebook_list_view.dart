@@ -36,21 +36,23 @@ class RulebookListView extends StatelessWidget {
         itemCount: rulebooks.length,
         itemBuilder: (context, index) {
           final rulebook = rulebooks[index];
-          return ListTile(
-              title: Text(rulebook.title),
-              leading: const CircleAvatar(
-                // Display the Flutter Logo image asset.
-                foregroundImage: AssetImage('assets/images/flutter_logo.png'),
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        RulebookDetailsView(rulebook: rulebook),
-                  ),
-                );
-              });
+          return Column(
+            children: [
+              ListTile(
+                  title: Text(rulebook.title),
+                  leading: const Icon(Icons.book),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            RulebookDetailsView(rulebook: rulebook),
+                      ),
+                    );
+                  }),
+              const Divider(),
+            ],
+          );
         },
       ),
     );

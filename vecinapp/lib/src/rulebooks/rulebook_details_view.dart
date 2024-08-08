@@ -12,10 +12,12 @@ class RulebookDetailsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Item Details ${rulebook.id}'),
+        title: Text(rulebook.title),
       ),
-      body: const Center(
-        child: Text('More Information Here'),
+      body: Column(
+        children: [
+          Text(rulebook.description),
+        ],
       ),
     );
   }
