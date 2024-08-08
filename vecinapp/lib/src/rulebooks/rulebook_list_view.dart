@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'rulebook.dart';
 import 'rulebook_details_view.dart';
-import '../home/drawer.dart';
+import '../home/home_drawer.dart';
 
 /// Displays a list of SampleItems.
 class RulebookListView extends StatelessWidget {

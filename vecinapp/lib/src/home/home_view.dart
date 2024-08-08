@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../settings/settings_view.dart';
-import 'drawer.dart';
+import 'home_drawer.dart';
 
 /// Displays a list of SampleItems.
 class HomeView extends StatefulWidget {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'settings_controller.dart';
 
-import '../home/drawer.dart';
+import '../home/home_drawer.dart';
 
 /// Displays the various settings that can be customized by the user.
 ///
