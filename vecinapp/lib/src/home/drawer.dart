@@ -26,11 +26,11 @@ class _HomeDrawerState extends State<HomeDrawer> {
         updateSelectedIndex(index);
         switch (index) {
           case 0:
-            Navigator.popAndPushNamed(context, '/home');
+            Navigator.pushReplacementNamed(context, '/home');
           case 1:
-            Navigator.popAndPushNamed(context, '/rulebooks');
+            Navigator.pushReplacementNamed(context, '/rulebooks');
           case 2:
-            Navigator.popAndPushNamed(context, '/settings');
+            Navigator.pushReplacementNamed(context, '/settings');
         }
       },
       selectedIndex: navigationDrawerIndex,
