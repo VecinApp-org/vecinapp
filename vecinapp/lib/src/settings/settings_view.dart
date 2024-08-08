@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'settings_controller.dart';
 
+import '../home/drawer.dart';
+
 /// Displays the various settings that can be customized by the user.
 ///
 /// When a user changes a setting, the SettingsController is updated and
@@ -19,6 +21,7 @@ class SettingsView extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Settings'),
       ),
+      drawer: const HomeDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16),
         // Glue the SettingsController to the theme selection DropdownButton.

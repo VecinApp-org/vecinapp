@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'rulebook.dart';
 import 'rulebook_details_view.dart';
+import '../home/drawer.dart';
 
 /// Displays a list of SampleItems.
 class RulebookListView extends StatelessWidget {
@@ -21,7 +22,7 @@ class RulebookListView extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Reglamentos'),
       ),
-
+      drawer: const HomeDrawer(),
       // To work with lists that may contain a large number of items, it’s best
       // to use the ListView.builder constructor.
       //

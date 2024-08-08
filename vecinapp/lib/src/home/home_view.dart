@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../settings/settings_view.dart';
+import 'drawer.dart';
 
 /// Displays a list of SampleItems.
 class HomeView extends StatefulWidget {
@@ -12,8 +13,6 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  var navigationDrawerIndex = 0;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,45 +33,7 @@ class _HomeViewState extends State<HomeView> {
             ),
           ],
         ),
-        drawer: NavigationDrawer(
-          selectedIndex: navigationDrawerIndex,
-          onDestinationSelected: (int index) {
-            //if (index == navigationDrawerIndex) {
-            //  return;
-            //}
-            setState(() {
-              navigationDrawerIndex = index;
-            });
-            switch (index) {
-              case 0:
-                Navigator.restorablePushNamed(context, HomeView.routeName);
-              case 1:
-                Navigator.pushNamed(context, '/rulebooks');
-              case 2:
-                Navigator.pushNamed(context, '/settings');
-            }
-          },
-          children: <Widget>[
-            DrawerHeader(
-              child: Text(
-                'VecinApp',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ),
-            const NavigationDrawerDestination(
-              icon: Icon(Icons.home),
-              label: Text('Inicio'),
-            ),
-            const NavigationDrawerDestination(
-              icon: Icon(Icons.book),
-              label: Text('Reglamentos'),
-            ),
-            const NavigationDrawerDestination(
-              icon: Icon(Icons.settings),
-              label: Text('Ajustes'),
-            ),
-          ],
-        ),
+        drawer: const HomeDrawer(),
         body: ListView(
           children: const <Widget>[
             Card(
