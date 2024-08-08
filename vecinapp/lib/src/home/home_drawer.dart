@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-int navigationDrawerIndex = 0;
+int _navigationDrawerIndex = 0;
+
+get index => _navigationDrawerIndex;
 
 class HomeDrawer extends StatefulWidget {
   const HomeDrawer({super.key});
@@ -11,11 +13,11 @@ class HomeDrawer extends StatefulWidget {
 
 class _HomeDrawerState extends State<HomeDrawer> {
   void updateSelectedIndex(int index) {
-    if (index == navigationDrawerIndex) {
+    if (index == _navigationDrawerIndex) {
       return;
     }
     setState(() {
-      navigationDrawerIndex = index;
+      _navigationDrawerIndex = index;
     });
   }
 
@@ -33,7 +35,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             Navigator.pushReplacementNamed(context, '/settings');
         }
       },
-      selectedIndex: navigationDrawerIndex,
+      selectedIndex: _navigationDrawerIndex,
       children: <Widget>[
         DrawerHeader(
           child: Text(
