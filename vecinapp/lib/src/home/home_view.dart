@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../settings/settings_view.dart';
-import '../sample_feature/sample_item_list_view.dart';
 
 /// Displays a list of SampleItems.
 class HomeView extends StatefulWidget {
@@ -38,6 +37,9 @@ class _HomeViewState extends State<HomeView> {
         drawer: NavigationDrawer(
           selectedIndex: navigationDrawerIndex,
           onDestinationSelected: (int index) {
+            //if (index == navigationDrawerIndex) {
+            //  return;
+            //}
             setState(() {
               navigationDrawerIndex = index;
             });
@@ -45,10 +47,9 @@ class _HomeViewState extends State<HomeView> {
               case 0:
                 Navigator.restorablePushNamed(context, HomeView.routeName);
               case 1:
-                Navigator.restorablePushNamed(
-                    context, SampleItemListView.routeName);
+                Navigator.pushNamed(context, '/rulebooks');
               case 2:
-                Navigator.restorablePushNamed(context, SettingsView.routeName);
+                Navigator.pushNamed(context, '/settings');
             }
           },
           children: <Widget>[
@@ -63,8 +64,8 @@ class _HomeViewState extends State<HomeView> {
               label: Text('Inicio'),
             ),
             const NavigationDrawerDestination(
-              icon: Icon(Icons.message),
-              label: Text('Mensajes'),
+              icon: Icon(Icons.book),
+              label: Text('Reglamentos'),
             ),
             const NavigationDrawerDestination(
               icon: Icon(Icons.settings),

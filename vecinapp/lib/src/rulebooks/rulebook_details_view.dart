@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
-/// Displays detailed information about a SampleItem.
-class SampleItemDetailsView extends StatelessWidget {
-  const SampleItemDetailsView({super.key});
+import 'rulebook.dart';
 
-  static const routeName = '/sample_item';
+/// Displays detailed information about a SampleItem.
+class RulebookDetailsView extends StatelessWidget {
+  const RulebookDetailsView({super.key, required this.rulebook});
+
+  final Rulebook rulebook;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Item Details'),
+        title: Text('Item Details ${rulebook.id}'),
       ),
       body: const Center(
         child: Text('More Information Here'),
