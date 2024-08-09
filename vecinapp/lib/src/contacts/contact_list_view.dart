@@ -8,9 +8,9 @@ class ContactListView extends StatelessWidget {
   const ContactListView({
     super.key,
     this.contacts = const [
-      Contact(1, 'Reglamento 1', 'Descripción 1'),
-      Contact(2, 'Reglamento 2', 'Descripción 2'),
-      Contact(3, 'Reglamento 3', 'Descripción 3')
+      Contact(1, 'Contacto 1', 'Descripción 1'),
+      Contact(2, 'Contacto 2', 'Descripción 2'),
+      Contact(3, 'Contacto 3', 'Descripción 3')
     ],
   });
 
@@ -20,7 +20,7 @@ class ContactListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reglamentos'),
+        title: const Text('Contactos'),
       ),
       drawer: const HomeDrawer(),
       // To work with lists that may contain a large number of items, it’s best
@@ -41,7 +41,7 @@ class ContactListView extends StatelessWidget {
             children: [
               ListTile(
                   title: Text(contact.title),
-                  leading: const Icon(Icons.book_outlined),
+                  leading: const Icon(Icons.person),
                   onTap: () {
                     Navigator.push(
                       context,
