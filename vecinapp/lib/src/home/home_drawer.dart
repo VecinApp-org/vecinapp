@@ -36,9 +36,21 @@ class _HomeDrawerState extends State<HomeDrawer> {
       selectedIndex: _navigationDrawerIndex,
       children: <Widget>[
         DrawerHeader(
-          child: Text(
-            'VecinApp',
-            style: Theme.of(context).textTheme.titleLarge,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'VecinApp',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              IconButton(
+                icon: const Icon(Icons.settings),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/settings');
+                },
+              )
+            ],
           ),
         ),
         const NavigationDrawerDestination(

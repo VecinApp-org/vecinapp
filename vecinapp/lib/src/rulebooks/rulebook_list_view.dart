@@ -41,7 +41,7 @@ class RulebookListView extends StatelessWidget {
             children: [
               ListTile(
                   title: Text(rulebook.title),
-                  leading: const Icon(Icons.book),
+                  leading: const Icon(Icons.book_outlined),
                   onTap: () {
                     Navigator.push(
                       context,
