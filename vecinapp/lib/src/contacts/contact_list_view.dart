@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'contact.dart';
 import 'contact_details_view.dart';
-import '../home/home_drawer.dart';
 
 /// Displays a list of SampleItems.
 class ContactListView extends StatelessWidget {
@@ -13,49 +12,38 @@ class ContactListView extends StatelessWidget {
       Contact(3, 'Contacto 3', 'Descripción 3')
     ],
   });
-
   final List<Contact> contacts;
+
+  static const routeName = '/contacts';
+  static const title = Text('Contactos');
+  static const icon = Icon(Icons.contacts_outlined);
+  static const selectedIcon = Icon(Icons.contacts);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Contactos'),
-      ),
-      drawer: const HomeDrawer(),
-      // To work with lists that may contain a large number of items, it’s best
-      // to use the ListView.builder constructor.
-      //
-      // In contrast to the default ListView constructor, which requires
-      // building all Widgets up front, the ListView.builder constructor lazily
-      // builds Widgets as they’re scrolled into view.
-      body: ListView.builder(
-        // Providing a restorationId allows the ListView to restore the
-        // scroll position when a user leaves and returns to the app after it
-        // has been killed while running in the background.
-        restorationId: 'contactListView',
-        itemCount: contacts.length,
-        itemBuilder: (context, index) {
-          final contact = contacts[index];
-          return Column(
-            children: [
-              ListTile(
-                  title: Text(contact.title),
-                  leading: const Icon(Icons.person),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            ContactDetailsView(contact: contact),
-                      ),
-                    );
-                  }),
-              const Divider(),
-            ],
-          );
-        },
-      ),
+    return ListView.builder(
+      restorationId: 'contactListView',
+      itemCount: contacts.length,
+      itemBuilder: (context, index) {
+        final contact = contacts[index];
+        return Column(
+          children: [
+            ListTile(
+                title: Text(contact.title),
+                leading: const Icon(Icons.person),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ContactDetailsView(contact: contact),
+                    ),
+                  );
+                }),
+            const Divider(),
+          ],
+        );
+      },
     );
   }
 }
