@@ -11,6 +11,7 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
+      restorationId: 'homeView',
       children: const <Widget>[
         Card(
           elevation: 10,
