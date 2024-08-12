@@ -3,13 +3,12 @@ import 'rulebook.dart';
 import 'rulebook_details_view.dart';
 
 /// Displays a list of SampleItems.
-class RulebookListView extends StatelessWidget {
-  static const routeName = '/rulebooks';
+class RulebookList extends StatelessWidget {
   static const title = Text('Reglamentos');
   static const icon = Icon(Icons.book_outlined);
   static const selectedIcon = Icon(Icons.book);
 
-  const RulebookListView({
+  const RulebookList({
     super.key,
     this.rulebooks = const [
       Rulebook(1, 'Reglamento 1', 'Descripción 1'),

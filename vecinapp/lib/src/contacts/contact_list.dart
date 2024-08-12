@@ -14,7 +14,6 @@ class ContactList extends StatelessWidget {
   });
   final List<Contact> contacts;
 
-  static const routeName = '/contacts';
   static const title = Text('Contactos');
   static const icon = Icon(Icons.contacts_outlined);
   static const selectedIcon = Icon(Icons.contacts);

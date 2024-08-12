@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'home_view.dart';
-import '../rulebooks/rulebook_list_view.dart';
+import '../rulebooks/rulebook_list.dart';
 import '../contacts/contact_list.dart';
 
 class HomeDrawer extends StatefulWidget {
@@ -35,13 +35,13 @@ class _HomeDrawerState extends State<HomeDrawer> {
         title: const [
           HomeView.title,
           ContactList.title,
-          RulebookListView.title,
+          RulebookList.title,
         ][_navigationDrawerIndex],
       ),
       body: const [
         HomeView(),
         ContactList(),
-        RulebookListView(),
+        RulebookList(),
       ][_navigationDrawerIndex],
       drawer: NavigationDrawer(
         onDestinationSelected: (int index) {
@@ -78,9 +78,9 @@ class _HomeDrawerState extends State<HomeDrawer> {
             label: ContactList.title,
           ),
           const NavigationDrawerDestination(
-            icon: RulebookListView.icon,
-            selectedIcon: RulebookListView.selectedIcon,
-            label: RulebookListView.title,
+            icon: RulebookList.icon,
+            selectedIcon: RulebookList.selectedIcon,
+            label: RulebookList.title,
           ),
         ],
       ),

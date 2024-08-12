@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
-  static const routeName = '/home';
-  static const title = Text('Chats');
+  static const title = Text('Inicio');
   static const icon = Icon(Icons.home_outlined);
   static const selectedIcon = Icon(Icons.home);
 
@@ -14,6 +13,8 @@ class HomeView extends StatelessWidget {
     return ListView(
       children: const <Widget>[
         Card(
+          elevation: 10,
+          margin: EdgeInsets.all(16),
           child: ListTile(
             leading: Icon(Icons.notification_important),
             title: Text('Realiza tu aportación anual'),
