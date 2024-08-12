@@ -3,8 +3,8 @@ import 'contact.dart';
 import 'contact_details_view.dart';
 
 /// Displays a list of SampleItems.
-class ContactListView extends StatelessWidget {
-  const ContactListView({
+class ContactList extends StatelessWidget {
+  const ContactList({
     super.key,
     this.contacts = const [
       Contact(1, 'Contacto 1', 'Descripción 1'),
@@ -22,7 +22,7 @@ class ContactListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      restorationId: 'contactListView',
+      restorationId: 'contactList',
       itemCount: contacts.length,
       itemBuilder: (context, index) {
         final contact = contacts[index];

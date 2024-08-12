@@ -8,9 +8,6 @@ import 'settings/settings_view.dart';
 
 import 'home/home_view.dart';
 
-import 'rulebooks/rulebook_list_view.dart';
-import 'contacts/contact_list_view.dart';
-
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {
   const MyApp({
@@ -84,8 +81,6 @@ class MyApp extends StatelessWidget {
             '/home': (context) => const HomeView(),
             '/settings': (context) =>
                 SettingsView(controller: settingsController),
-            '/rulebooks': (context) => const RulebookListView(),
-            '/contacts': (context) => const ContactListView(),
           },
         );
       },

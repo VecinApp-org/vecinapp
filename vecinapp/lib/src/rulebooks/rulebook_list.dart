@@ -23,7 +23,7 @@ class RulebookListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      restorationId: 'rulebookListView',
+      restorationId: 'rulebookList',
       itemCount: rulebooks.length,
       itemBuilder: (context, index) {
         final rulebook = rulebooks[index];

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'home_view.dart';
 import '../rulebooks/rulebook_list_view.dart';
-import '../contacts/contact_list_view.dart';
+import '../contacts/contact_list.dart';
 
 class HomeDrawer extends StatefulWidget {
   const HomeDrawer({super.key});
@@ -34,13 +34,13 @@ class _HomeDrawerState extends State<HomeDrawer> {
       appBar: AppBar(
         title: const [
           HomeView.title,
-          ContactListView.title,
+          ContactList.title,
           RulebookListView.title,
         ][_navigationDrawerIndex],
       ),
       body: const [
         HomeView(),
-        ContactListView(),
+        ContactList(),
         RulebookListView(),
       ][_navigationDrawerIndex],
       drawer: NavigationDrawer(
@@ -73,9 +73,9 @@ class _HomeDrawerState extends State<HomeDrawer> {
             label: HomeView.title,
           ),
           const NavigationDrawerDestination(
-            icon: ContactListView.icon,
-            selectedIcon: ContactListView.selectedIcon,
-            label: ContactListView.title,
+            icon: ContactList.icon,
+            selectedIcon: ContactList.selectedIcon,
+            label: ContactList.title,
           ),
           const NavigationDrawerDestination(
             icon: RulebookListView.icon,
