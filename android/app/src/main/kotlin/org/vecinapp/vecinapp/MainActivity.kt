@@ -1,4 +1,4 @@
-package com.example.vecinapp
+package org.vecinapp.vecinapp
 
 import io.flutter.embedding.android.FlutterActivity
 
