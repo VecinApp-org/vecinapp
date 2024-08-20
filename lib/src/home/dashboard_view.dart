@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 /// Displays a list of SampleItems.
-class HomeView extends StatelessWidget {
-  const HomeView({super.key});
+class DashboardView extends StatelessWidget {
+  const DashboardView({super.key});
 
   static const title = Text('Inicio');
   static const icon = Icon(Icons.home_outlined);

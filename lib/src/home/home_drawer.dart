@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import 'home_view.dart';
+import 'dashboard_view.dart';
 import '../rulebooks/rulebook_list.dart';
 import '../contacts/contact_list.dart';
 
 class HomeDrawer extends StatefulWidget {
   const HomeDrawer({super.key});
 
-  static const routeName = '/';
+  static const routeName = '/home_drawer';
 
   @override
   State<HomeDrawer> createState() => _HomeDrawerState();
@@ -33,13 +33,13 @@ class _HomeDrawerState extends State<HomeDrawer> {
       key: _scaffoldKey,
       appBar: AppBar(
         title: const [
-          HomeView.title,
+          DashboardView.title,
           ContactList.title,
           RulebookList.title,
         ][_navigationDrawerIndex],
       ),
       body: const [
-        HomeView(),
+        DashboardView(),
         ContactList(),
         RulebookList(),
       ][_navigationDrawerIndex],
@@ -68,9 +68,9 @@ class _HomeDrawerState extends State<HomeDrawer> {
             ),
           ),
           const NavigationDrawerDestination(
-            icon: HomeView.icon,
-            selectedIcon: HomeView.selectedIcon,
-            label: HomeView.title,
+            icon: DashboardView.icon,
+            selectedIcon: DashboardView.selectedIcon,
+            label: DashboardView.title,
           ),
           const NavigationDrawerDestination(
             icon: ContactList.icon,
