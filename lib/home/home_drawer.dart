@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../rulebooks/rulebook_list.dart';
-import '../contacts/contact_list.dart';
+import 'rulebooks/rulebook_list.dart';
+import 'contacts/contact_list.dart';
 import 'dart:developer' as devtools show log;
 
 class HomeDrawer extends StatefulWidget {

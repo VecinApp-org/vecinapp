@@ -50,5 +50,5 @@ pubspec.lock
 
 # TODO: find out correct way to manage keys
 firebase.json
-lib/firebase_options.dart
+firebase_options.dart
 android/app/google-services.json

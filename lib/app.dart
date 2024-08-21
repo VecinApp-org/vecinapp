@@ -2,13 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:vecinapp/src/home/home_drawer.dart';
-import 'package:vecinapp/src/login/login_view.dart';
-import 'package:vecinapp/src/login/verify_email_view.dart';
-import 'package:vecinapp/src/login/welcome_view.dart';
-
-import 'settings/settings_controller.dart';
-import 'settings/settings_view.dart';
+import 'package:vecinapp/home/home_drawer.dart';
+import 'package:vecinapp/login/login_view.dart';
+import 'package:vecinapp/login/verify_email_view.dart';
+import 'package:vecinapp/login/welcome_view.dart';
+import 'home/settings/settings_controller.dart';
+import 'home/settings/settings_view.dart';
 
 import 'login/register_view.dart';
 import 'dart:developer' as devtools show log;
@@ -52,6 +51,7 @@ class MyApp extends StatelessWidget {
 
           //Routes
           onGenerateRoute: (RouteSettings routeSettings) {
+            devtools.log('onGenerateRoute ${routeSettings.name}');
             return MaterialPageRoute<void>(
               settings: routeSettings,
               builder: (BuildContext context) {
