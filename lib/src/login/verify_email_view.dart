@@ -10,47 +10,79 @@ class VerifyEmailView extends StatefulWidget {
 }
 
 class _VerifyEmailViewState extends State<VerifyEmailView> {
-  late final TextEditingController _code;
-
-  @override
-  void initState() {
-    _code = TextEditingController();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _code.dispose();
-    super.dispose();
-  }
+  bool isEmailSent = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Column(
+          spacing: 64,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Verifica tu correo'),
-            FilledButton(
-              onPressed: () async {
-                final user = FirebaseAuth.instance.currentUser;
-                await user?.sendEmailVerification();
-              },
-              child: const Text('Enviar correo de verificación'),
+            //Title
+            const Text(
+              'Verifica tu correo',
+              style: TextStyle(fontSize: 28),
             ),
-            FilledButton(
-              onPressed: () async {
-                await FirebaseAuth.instance.currentUser?.reload();
-                if (FirebaseAuth.instance.currentUser?.emailVerified == true) {
-                  if (context.mounted) {
-                    Navigator.of(context).popAndPushNamed('/');
-                  }
-                } else {
-                  devtools.log('Still not verified');
-                }
-              },
-              child: const Text('Continuar'),
+            const SizedBox(
+              width: 300,
+              child: Text(
+                  textAlign: TextAlign.center,
+                  'Te enviamos un correo. Haz clic en el enlace y regresa aquí para continuar.'),
+            ),
+
+            //Buttons
+            Column(
+              spacing: 16,
+              children: [
+                FilledButton(
+                  onPressed: () async {
+                    await FirebaseAuth.instance.currentUser?.reload();
+                    if (FirebaseAuth.instance.currentUser?.emailVerified ==
+                        true) {
+                      if (context.mounted) {
+                        Navigator.of(context)
+                            .pushNamedAndRemoveUntil('/', (route) => false);
+                      }
+                    } else {
+                      devtools.log('Still not verified');
+                    }
+                  },
+                  child: const Text('Continuar'),
+                ),
+                /*
+                OutlinedButton(
+                  onPressed: () async {
+                    switch (isEmailSent) {
+                      case true:
+                        devtools.log('Email already sent');
+                      case false:
+                        final user = FirebaseAuth.instance.currentUser;
+                        await user?.sendEmailVerification();
+                        isEmailSent = true;
+                        devtools.log('Email sent');
+                        setState(() {});
+                        Future.delayed(
+                          const Duration(minutes: 5),
+                          () {
+                            devtools
+                                .log('Email verification button reactivated');
+                            isEmailSent = false;
+                            setState(() {});
+                          },
+                        );
+                    }
+                  },
+                  child: const Text('Enviar otro correo'),
+                ),
+                
+                const TextButton(
+                  onPressed: null, //TODO implement logout with warning dialog
+                  child: Text('Salir'),
+                )
+                */
+              ],
             ),
           ],
         ),

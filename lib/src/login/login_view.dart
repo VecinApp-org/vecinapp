@@ -31,81 +31,99 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 12,
+          spacing: 64,
           children: [
+            //Title
             const Text(
               'Iniciar sesión',
-              style: TextStyle(fontSize: 24),
+              style: TextStyle(fontSize: 28),
             ),
-            const SizedBox(
-              height: 32,
-            ),
-            TextField(
-              controller: _email,
-              enableSuggestions: false,
-              autocorrect: false,
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                hintText: 'Email',
+
+            //Email and password fields
+            SizedBox(
+              width: 300,
+              child: Column(
+                spacing: 8,
+                children: [
+                  TextField(
+                    controller: _email,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      hintText: 'Email',
+                    ),
+                  ),
+                  TextField(
+                    controller: _password,
+                    obscureText: true,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    decoration: const InputDecoration(
+                      hintText: 'Contraseña',
+                    ),
+                  ),
+                ],
               ),
             ),
-            TextField(
-              controller: _password,
-              obscureText: true,
-              enableSuggestions: false,
-              autocorrect: false,
-              decoration: const InputDecoration(
-                hintText: 'Contraseña',
-              ),
-            ),
-            const SizedBox(
-              height: 32,
-            ),
-            FilledButton(
-                onPressed: () async {
-                  final email = _email.text;
-                  final password = _password.text;
-                  try {
-                    final userCredentail =
-                        await FirebaseAuth.instance.signInWithEmailAndPassword(
-                      email: email,
-                      password: password,
-                    );
-                    devtools.log('Login exitoso $userCredentail');
-                    if (context.mounted) {
-                      devtools.log('navegando a home');
-                      Navigator.of(context).popAndPushNamed('/');
-                    }
-                  } on FirebaseAuthException catch (e) {
-                    if (e.code == 'invalid-email') {
-                      devtools.log('Email invalido');
-                    } else if (e.code == 'invalid-credential') {
-                      devtools.log('Credenciales no validas');
-                    } else if (e.code == 'network-request-failed') {
-                      devtools.log('Error de red');
-                    } else {
+
+            Column(
+              spacing: 8,
+              children: [
+                //LOGIN BUTTON
+                FilledButton(
+                  onPressed: () async {
+                    final email = _email.text;
+                    final password = _password.text;
+                    try {
+                      final userCredentail = await FirebaseAuth.instance
+                          .signInWithEmailAndPassword(
+                        email: email,
+                        password: password,
+                      );
+                      devtools.log('Login exitoso $userCredentail');
+                      if (context.mounted) {
+                        devtools.log('navegando a home');
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          '/',
+                          (route) => false,
+                        );
+                      }
+                    } on FirebaseAuthException catch (e) {
+                      if (e.code == 'invalid-email') {
+                        devtools.log('Email invalido');
+                      } else if (e.code == 'invalid-credential') {
+                        devtools.log('Credenciales no validas');
+                      } else if (e.code == 'network-request-failed') {
+                        devtools.log('Error de red');
+                      } else {
+                        devtools.log(
+                            'Error de FirebaseAuthException desconocido ${e.code}');
+                      }
+                    } catch (e) {
                       devtools.log(
-                          'Error de FirebaseAuthException desconocido ${e.code}');
+                          'Error desconocido tipo ${e.runtimeType} error: $e');
                     }
-                  } catch (e) {
-                    devtools.log(
-                        'Error desconocido tipo ${e.runtimeType} error: $e');
-                  }
-                },
-                child: const Text('Iniciar sesión')),
-            const TextButton(
-              onPressed: null,
-              child: Text('Olvidé mi contraseña'),
+                  },
+                  child: const Text('Entrar a mi cuenta'),
+                ),
+                //FORGOT PASSWORD
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushReplacementNamed('/register');
+                  },
+                  child: const Text('Crear una cuenta nueva'),
+                ),
+                //GO TO REGISTER
+                const TextButton(
+                  onPressed: null,
+                  child: Text('Olvidé mi contraseña'),
+                ),
+              ],
             ),
-            TextButton(
-                onPressed: () {
-                  Navigator.of(context).pushReplacementNamed('/register');
-                },
-                child: const Text('¿No tienes cuenta? Regístrate')),
           ],
         ),
       ),

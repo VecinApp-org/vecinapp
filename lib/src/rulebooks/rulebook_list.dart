@@ -4,10 +4,6 @@ import 'rulebook_details_view.dart';
 
 /// Displays a list of SampleItems.
 class RulebookList extends StatelessWidget {
-  static const title = Text('Reglamentos');
-  static const icon = Icon(Icons.book_outlined);
-  static const selectedIcon = Icon(Icons.book);
-
   const RulebookList({
     super.key,
     this.rulebooks = const [

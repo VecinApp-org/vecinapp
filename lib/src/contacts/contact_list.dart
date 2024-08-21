@@ -14,10 +14,6 @@ class ContactList extends StatelessWidget {
   });
   final List<Contact> contacts;
 
-  static const title = Text('Contactos');
-  static const icon = Icon(Icons.contacts_outlined);
-  static const selectedIcon = Icon(Icons.contacts);
-
   @override
   Widget build(BuildContext context) {
     return ListView.builder(

@@ -69,7 +69,10 @@ class SettingsView extends StatelessWidget {
                 devtools.log('Deleted: ${FirebaseAuth.instance.currentUser}');
                 if (context.mounted) {
                   devtools.log('Pushing home');
-                  Navigator.of(context).popAndPushNamed('/');
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/',
+                    (route) => false,
+                  );
                 }
               } on FirebaseAuthException catch (e) {
                 switch (e.code) {

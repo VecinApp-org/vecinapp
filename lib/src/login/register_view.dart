@@ -33,77 +33,98 @@ class _RegisterViewState extends State<RegisterView> {
       appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 12,
-          children: [
-            const Text(
-              'Registrar nuevo usuario',
-              style: TextStyle(fontSize: 24),
-            ),
-            const SizedBox(
-              height: 32,
-            ),
-            TextField(
-              controller: _email,
-              enableSuggestions: false,
-              autocorrect: false,
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                hintText: 'Email',
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 64,
+            children: [
+              //Title
+              const Text(
+                'Crear cuenta',
+                style: TextStyle(fontSize: 28),
               ),
-            ),
-            TextField(
-              controller: _password,
-              obscureText: true,
-              enableSuggestions: false,
-              autocorrect: false,
-              decoration: const InputDecoration(
-                hintText: 'Password',
+
+              //Email and password fields
+              SizedBox(
+                width: 300,
+                child: Column(
+                  spacing: 8,
+                  children: [
+                    TextField(
+                      controller: _email,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        hintText: 'Email',
+                      ),
+                    ),
+                    TextField(
+                      controller: _password,
+                      obscureText: true,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      decoration: const InputDecoration(
+                        hintText: 'Contraseña',
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 32,
-            ),
-            FilledButton(
-                onPressed: () async {
-                  final email = _email.text;
-                  final password = _password.text;
-                  try {
-                    devtools.log('Registrando usuario...');
-                    await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                      email: email,
-                      password: password,
-                    );
-                    devtools.log('Usuario registrado');
-                    if (context.mounted) {
-                      devtools.log('Pushing home');
-                      Navigator.of(context).popAndPushNamed('/');
-                    }
-                  } on FirebaseAuthException catch (e) {
-                    if (e.code == 'email-already-in-use') {
-                      devtools.log('Ya existe una cuenta con este correo');
-                    } else if (e.code == 'network-request-failed') {
-                      devtools.log('No hay conexión a internet');
-                    } else if (e.code == 'weak-password') {
-                      devtools.log('La contraseña es muy debil');
-                    } else if (e.code == 'invalid-email') {
-                      devtools.log('Email inválido');
-                    } else {
-                      devtools.log(e.code);
-                    }
-                  } catch (e) {
-                    devtools.log(
-                        'Error Generico tipo ${e.runtimeType.toString()} ----> ${e.toString()}');
-                  }
-                },
-                child: const Text('Registrarme')),
-            TextButton(
-                onPressed: () {
-                  Navigator.of(context).pushReplacementNamed('/login');
-                },
-                child: const Text('Ya tengo una cuenta'))
-          ],
+
+              //Buttons
+              Column(
+                spacing: 8,
+                children: [
+                  FilledButton(
+                    onPressed: () async {
+                      final email = _email.text;
+                      final password = _password.text;
+                      try {
+                        devtools.log('Registrando usuario...');
+                        await FirebaseAuth.instance
+                            .createUserWithEmailAndPassword(
+                          email: email,
+                          password: password,
+                        );
+                        devtools.log('Usuario registrado');
+                        devtools.log('Enviando email de verificación...');
+                        await FirebaseAuth.instance.currentUser
+                            ?.sendEmailVerification();
+                        devtools.log('Email enviado');
+                        if (context.mounted) {
+                          devtools.log('Pushing home');
+                          Navigator.of(context).popAndPushNamed('/');
+                        }
+                      } on FirebaseAuthException catch (e) {
+                        if (e.code == 'email-already-in-use') {
+                          devtools.log('Ya existe una cuenta con este correo');
+                        } else if (e.code == 'network-request-failed') {
+                          devtools.log('No hay conexión a internet');
+                        } else if (e.code == 'weak-password') {
+                          devtools.log('La contraseña es muy debil');
+                        } else if (e.code == 'invalid-email') {
+                          devtools.log('Email inválido');
+                        } else {
+                          devtools.log(e.code);
+                        }
+                      } catch (e) {
+                        devtools.log(
+                            'Error Generico tipo ${e.runtimeType.toString()} ----> ${e.toString()}');
+                      }
+                    },
+                    child: const Text('Crear cuenta'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushReplacementNamed('/login');
+                    },
+                    child: const Text('Ya tengo una cuenta'),
+                  )
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
