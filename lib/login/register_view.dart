@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer' as devtools show log;
 
+import 'package:vecinapp/constants/routes.dart';
+
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
 
@@ -76,6 +78,7 @@ class _RegisterViewState extends State<RegisterView> {
               Column(
                 spacing: 8,
                 children: [
+                  //Register
                   FilledButton(
                     onPressed: () async {
                       final email = _email.text;
@@ -94,7 +97,8 @@ class _RegisterViewState extends State<RegisterView> {
                         devtools.log('Email enviado');
                         if (context.mounted) {
                           devtools.log('Pushing home');
-                          Navigator.of(context).popAndPushNamed('/');
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                              appRootRouteName, (route) => false);
                         }
                       } on FirebaseAuthException catch (e) {
                         if (e.code == 'email-already-in-use') {
@@ -115,9 +119,13 @@ class _RegisterViewState extends State<RegisterView> {
                     },
                     child: const Text('Crear cuenta'),
                   ),
+
+                  //Login
                   TextButton(
                     onPressed: () {
-                      Navigator.of(context).pushReplacementNamed('/login');
+                      Navigator.of(context).pushReplacementNamed(
+                        loginRouteName,
+                      );
                     },
                     child: const Text('Ya tengo una cuenta'),
                   )

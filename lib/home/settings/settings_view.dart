@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:vecinapp/constants/routes.dart';
 
 import 'settings_controller.dart';
 import 'dart:developer' as devtools show log;
@@ -10,8 +11,6 @@ import 'dart:developer' as devtools show log;
 /// Widgets that listen to the SettingsController are rebuilt.
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key, required this.controller});
-
-  static const routeName = '/settings';
 
   final SettingsController controller;
 
@@ -24,7 +23,7 @@ class SettingsView extends StatelessWidget {
       body: Column(
         children: [
           ListTile(
-            title: const Text('Theme', style: TextStyle(fontSize: 20)),
+            title: const Text('Tema', style: TextStyle(fontSize: 20)),
             trailing: Padding(
                 padding: const EdgeInsets.all(8),
                 child: DropdownButton<ThemeMode>(
@@ -33,28 +32,27 @@ class SettingsView extends StatelessWidget {
                     items: const [
                       DropdownMenuItem(
                         value: ThemeMode.system,
-                        child: Text('System'),
+                        child: Text('Igual que el sistema'),
                       ),
                       DropdownMenuItem(
                         value: ThemeMode.light,
-                        child: Text('Light'),
+                        child: Text('Claro'),
                       ),
                       DropdownMenuItem(
                         value: ThemeMode.dark,
-                        child: Text('Dark'),
+                        child: Text('Oscuro'),
                       )
                     ])),
           ),
           const Divider(),
           TextButton(
             onPressed: () async {
-              devtools.log(
-                  'About to sign out ${FirebaseAuth.instance.currentUser}');
+              devtools.log('Logging out...');
               await FirebaseAuth.instance.signOut();
-              devtools.log('Logged out: ${FirebaseAuth.instance.currentUser}');
               if (context.mounted) {
-                devtools.log('Pushing home');
-                Navigator.of(context).popAndPushNamed('/');
+                Navigator.of(context).popAndPushNamed(
+                  appRootRouteName,
+                );
               }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -62,15 +60,12 @@ class SettingsView extends StatelessWidget {
           ),
           TextButton(
             onPressed: () async {
+              devtools.log('Deleting user...');
               try {
-                devtools.log(
-                    'About to delete ${FirebaseAuth.instance.currentUser}');
                 await FirebaseAuth.instance.currentUser!.delete();
-                devtools.log('Deleted: ${FirebaseAuth.instance.currentUser}');
                 if (context.mounted) {
-                  devtools.log('Pushing home');
                   Navigator.of(context).pushNamedAndRemoveUntil(
-                    '/',
+                    appRootRouteName,
                     (route) => false,
                   );
                 }
@@ -86,7 +81,9 @@ class SettingsView extends StatelessWidget {
                 devtools.log('Error deleting user: ${e.runtimeType}');
               }
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
             child: const Text('Eliminar cuenta'),
           ),
         ],

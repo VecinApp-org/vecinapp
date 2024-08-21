@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:vecinapp/constants/routes.dart';
 import 'dart:developer' as devtools show log;
 
 class LoginView extends StatefulWidget {
@@ -76,21 +77,18 @@ class _LoginViewState extends State<LoginView> {
                 //LOGIN BUTTON
                 FilledButton(
                   onPressed: () async {
+                    devtools.log('Logging in...');
                     final email = _email.text;
                     final password = _password.text;
                     try {
                       final userCredentail = await FirebaseAuth.instance
                           .signInWithEmailAndPassword(
-                        email: email,
-                        password: password,
-                      );
-                      devtools.log('Login exitoso $userCredentail');
+                              email: email, password: password);
+                      devtools.log('Logged in: $userCredentail');
+                      FirebaseAuth.instance.currentUser?.reload();
                       if (context.mounted) {
-                        devtools.log('navegando a home');
                         Navigator.of(context).pushNamedAndRemoveUntil(
-                          '/',
-                          (route) => false,
-                        );
+                            appRootRouteName, (route) => false);
                       }
                     } on FirebaseAuthException catch (e) {
                       if (e.code == 'invalid-email') {
@@ -113,7 +111,9 @@ class _LoginViewState extends State<LoginView> {
                 //FORGOT PASSWORD
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pushReplacementNamed('/register');
+                    Navigator.of(context).pushReplacementNamed(
+                      registerRouteName,
+                    );
                   },
                   child: const Text('Crear una cuenta nueva'),
                 ),

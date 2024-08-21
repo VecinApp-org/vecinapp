@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vecinapp/constants/routes.dart';
 
 class WelcomeView extends StatelessWidget {
   const WelcomeView({super.key});
@@ -33,13 +34,17 @@ class WelcomeView extends StatelessWidget {
               children: [
                 FilledButton(
                   onPressed: () {
-                    Navigator.of(context).pushNamed('/register');
+                    Navigator.of(context).pushNamed(
+                      registerRouteName,
+                    );
                   },
                   child: const Text('Crear cuenta'),
                 ),
                 OutlinedButton(
                   onPressed: () {
-                    Navigator.of(context).pushNamed('/login');
+                    Navigator.of(context).pushNamed(
+                      loginRouteName,
+                    );
                   },
                   child: const Text('Ya tengo cuenta'),
                 ),

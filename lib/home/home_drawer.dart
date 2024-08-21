@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:vecinapp/constants/routes.dart';
 import 'rulebooks/rulebook_list.dart';
 import 'contacts/contact_list.dart';
 import 'dart:developer' as devtools show log;
 
 class HomeDrawer extends StatefulWidget {
   const HomeDrawer({super.key});
-
-  static const routeName = '/home_drawer';
 
   @override
   State<HomeDrawer> createState() => _HomeDrawerState();
@@ -60,7 +59,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
                 IconButton(
                   icon: const Icon(Icons.settings),
                   onPressed: () {
-                    Navigator.pushNamed(context, '/settings');
+                    Navigator.pushNamed(
+                      context,
+                      settingsRouteName,
+                    );
                   },
                 )
               ],
