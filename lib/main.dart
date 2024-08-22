@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'app.dart';
+import 'vecinapp.dart';
 import 'home/settings/settings_controller.dart';
 import 'home/settings/settings_service.dart';
 import 'dart:developer' as devtools show log;
@@ -11,5 +11,5 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(MyApp(settingsController: settingsController));
+  runApp(VecinApp(settingsController: settingsController));
 }

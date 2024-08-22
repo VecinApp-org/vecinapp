@@ -16,14 +16,14 @@ import 'login/register_view.dart';
 import 'dart:developer' as devtools show log;
 
 /// The Widget that configures your application.
-class MyApp extends StatelessWidget {
-  const MyApp({super.key, required this.settingsController});
+class VecinApp extends StatelessWidget {
+  const VecinApp({super.key, required this.settingsController});
 
   final SettingsController settingsController;
 
   @override
   Widget build(BuildContext context) {
-    devtools.log('build MyApp');
+    devtools.log('build VecinApp');
     return FutureBuilder(
       future: Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform),
@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
                             .log('ThemeMode: ${settingsController.themeMode}');
                         return MaterialApp(
                           debugShowCheckedModeBanner: false,
-                          restorationScopeId: 'app',
+                          restorationScopeId: 'vecinapp',
                           //Theme
                           theme: ThemeData(useMaterial3: true),
                           darkTheme: ThemeData.dark(),
