@@ -69,6 +69,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                       //textAlign: TextAlign.center,
                       'Si no recibiste el correo, puedes enviarlo otra vez.'),
                 ),
+                // Resend email button
                 OutlinedButton(
                   onPressed: () async {
                     switch (isEmailSent) {
@@ -76,21 +77,32 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                         showErrorDialog(context,
                             'Espera un minuto para enviar otro correo');
                       case false:
-                        final user = FirebaseAuth.instance.currentUser;
-                        await user?.sendEmailVerification();
-                        isEmailSent = true;
-                        devtools.log('Email sent');
-                        setState(() {});
-                        Future.delayed(
-                          const Duration(minutes: 1),
-                          () {
-                            devtools.log(
-                              'Email verification button reactivated',
-                            );
-                            isEmailSent = false;
-                            setState(() {});
-                          },
-                        );
+                        try {
+                          final user = FirebaseAuth.instance.currentUser;
+                          await user?.sendEmailVerification();
+                          isEmailSent = true;
+                          devtools.log('Email sent');
+                          setState(() {});
+                          Future.delayed(
+                            const Duration(minutes: 1),
+                            () {
+                              devtools.log(
+                                'Email verification button reactivated',
+                              );
+                              isEmailSent = false;
+                              setState(() {});
+                            },
+                          );
+                        } on FirebaseAuthException catch (e) {
+                          if (e.code == 'network-request-failed') {
+                            if (context.mounted) {
+                              showErrorDialog(
+                                context,
+                                'No hay internet.',
+                              );
+                            }
+                          }
+                        }
                     }
                   },
                   child: const Text('Enviar otro correo'),
