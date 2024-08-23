@@ -8,6 +8,9 @@ class EmailAlreadyInUseAuthException implements Exception {}
 
 class WeakPasswordAuthException implements Exception {}
 
+// delete user exceptions
+class RequiresRecentLoginAuthException implements Exception {}
+
 // input exceptions
 class ChannelErrorAuthException implements Exception {}
 

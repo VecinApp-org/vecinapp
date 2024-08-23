@@ -42,4 +42,7 @@ class AuthService implements AuthProvider {
 
   @override
   Stream<AuthUser> userChanges() => provider.userChanges();
+
+  @override
+  Future<void> deleteAccount() => provider.deleteAccount();
 }

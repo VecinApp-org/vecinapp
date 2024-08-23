@@ -1,6 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:vecinapp/constants/routes.dart';
+import 'package:vecinapp/services/auth/auth_exceptions.dart';
+import 'package:vecinapp/services/auth/auth_service.dart';
+import 'package:vecinapp/utilities/show_error_dialog.dart';
 
 import '../../services/settings/settings_controller.dart';
 import 'dart:developer' as devtools show log;
@@ -48,7 +50,7 @@ class SettingsView extends StatelessWidget {
           TextButton(
             onPressed: () async {
               devtools.log('Logging out...');
-              await FirebaseAuth.instance.signOut();
+              await AuthService.firebase().logOut();
               if (context.mounted) {
                 Navigator.of(context).popAndPushNamed(
                   appRootRouteName,
@@ -62,22 +64,18 @@ class SettingsView extends StatelessWidget {
             onPressed: () async {
               devtools.log('Deleting user...');
               try {
-                await FirebaseAuth.instance.currentUser!.delete();
+                await AuthService.firebase().deleteAccount();
                 if (context.mounted) {
                   Navigator.of(context).pushNamedAndRemoveUntil(
                     appRootRouteName,
                     (route) => false,
                   );
                 }
-              } on FirebaseAuthException catch (e) {
-                switch (e.code) {
-                  case 'requires-recent-login':
-                    devtools.log(
-                        'The user must reauthenticate before this operation can be executed.');
-                  default:
-                    devtools.log('Unknown error deleting user: $e');
+              } on RequiresRecentLoginAuthException {
+                if (context.mounted) {
+                  showErrorDialog(context, 'Requires recent login');
                 }
-              } catch (e) {
+              } on GenericAuthException catch (e) {
                 devtools.log('Error deleting user: ${e.runtimeType}');
               }
             },

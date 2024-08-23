@@ -126,4 +126,22 @@ class FirebaseAuthProvider implements AuthProvider {
           (user) => AuthUser.fromFirebase(user!),
         );
   }
+
+  @override
+  Future<void> deleteAccount() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        await user.delete();
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'requires-recent-login') {
+          throw RequiresRecentLoginAuthException();
+        } else {
+          throw GenericAuthException();
+        }
+      }
+    } else {
+      throw UserNotLoggedInAuthException();
+    }
+  }
 }
