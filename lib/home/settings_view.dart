@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:vecinapp/constants/routes.dart';
 
-import 'settings_controller.dart';
+import '../services/settings/settings_controller.dart';
 import 'dart:developer' as devtools show log;
 
 /// Displays the various settings that can be customized by the user.

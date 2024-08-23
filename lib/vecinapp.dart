@@ -1,17 +1,14 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 //import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:vecinapp/constants/routes.dart';
-import 'package:vecinapp/firebase_options.dart';
 import 'package:vecinapp/home/home_drawer.dart';
 import 'package:vecinapp/login/login_view.dart';
 import 'package:vecinapp/login/verify_email_view.dart';
 import 'package:vecinapp/login/welcome_view.dart';
-import 'home/settings/settings_controller.dart';
-import 'home/settings/settings_view.dart';
-
+import 'package:vecinapp/services/auth/auth_service.dart';
+import 'services/settings/settings_controller.dart';
+import 'home/settings_view.dart';
 import 'login/register_view.dart';
 import 'dart:developer' as devtools show log;
 
@@ -25,14 +22,13 @@ class VecinApp extends StatelessWidget {
   Widget build(BuildContext context) {
     devtools.log('build VecinApp');
     return FutureBuilder(
-      future: Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform),
+      future: AuthService.firebase().initialize(),
       builder: (context, snapshot) {
         devtools.log('Firebase: ${snapshot.connectionState}');
         switch (snapshot.connectionState) {
           case ConnectionState.done:
             return StreamBuilder(
-              stream: FirebaseAuth.instance.userChanges(),
+              stream: AuthService.firebase().userChanges(),
               builder: (context, snapshot) {
                 devtools.log('FirebaseAuth: ${snapshot.connectionState}');
                 switch (snapshot.connectionState) {
@@ -117,10 +113,11 @@ class AppRoot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (FirebaseAuth.instance.currentUser == null) {
+    final user = AuthService.firebase().currentUser;
+    if (user == null) {
       devtools.log('User null');
       return const WelcomeView();
-    } else if (FirebaseAuth.instance.currentUser!.emailVerified) {
+    } else if (user.isEmailVerified) {
       devtools.log('User verified');
       return const HomeDrawer();
     } else {
