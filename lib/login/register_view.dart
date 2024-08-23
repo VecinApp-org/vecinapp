@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer' as devtools show log;
 
 import 'package:vecinapp/constants/routes.dart';
+import 'package:vecinapp/utilities/show_error_dialog.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -58,7 +59,7 @@ class _RegisterViewState extends State<RegisterView> {
                       autocorrect: false,
                       keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
-                        hintText: 'Email',
+                        hintText: 'Correo',
                       ),
                     ),
                     TextField(
@@ -78,7 +79,7 @@ class _RegisterViewState extends State<RegisterView> {
               Column(
                 spacing: 8,
                 children: [
-                  //Register
+                  //Register button
                   FilledButton(
                     onPressed: () async {
                       final email = _email.text;
@@ -96,31 +97,69 @@ class _RegisterViewState extends State<RegisterView> {
                             ?.sendEmailVerification();
                         devtools.log('Email enviado');
                         if (context.mounted) {
-                          devtools.log('Pushing home');
                           Navigator.of(context).pushNamedAndRemoveUntil(
                               appRootRouteName, (route) => false);
                         }
                       } on FirebaseAuthException catch (e) {
-                        if (e.code == 'email-already-in-use') {
-                          devtools.log('Ya existe una cuenta con este correo');
-                        } else if (e.code == 'network-request-failed') {
-                          devtools.log('No hay conexión a internet');
-                        } else if (e.code == 'weak-password') {
-                          devtools.log('La contraseña es muy debil');
-                        } else if (e.code == 'invalid-email') {
-                          devtools.log('Email inválido');
-                        } else {
-                          devtools.log(e.code);
+                        switch (e.code) {
+                          case 'email-already-in-use':
+                            if (context.mounted) {
+                              await showErrorDialog(
+                                context,
+                                'Ese email ya tiene una cuenta.',
+                              );
+                            }
+                          case 'network-request-failed':
+                            if (context.mounted) {
+                              showErrorDialog(
+                                context,
+                                'No hay internet.',
+                              );
+                            }
+                          case 'weak-password':
+                            if (context.mounted) {
+                              showErrorDialog(
+                                context,
+                                'La contraseña está muy débil.',
+                              );
+                            }
+                          case 'invalid-email':
+                            if (context.mounted) {
+                              showErrorDialog(
+                                context,
+                                'El correo está mal escrito.',
+                              );
+                            }
+                          case 'channel-error':
+                            if (context.mounted) {
+                              showErrorDialog(
+                                context,
+                                'Dejaste algo vacío.',
+                              );
+                            }
+                          default:
+                            if (context.mounted) {
+                              showErrorDialog(
+                                context,
+                                'Algo salió mal creando tu cuenta.',
+                              );
+                            }
                         }
                       } catch (e) {
                         devtools.log(
-                            'Error Generico tipo ${e.runtimeType.toString()} ----> ${e.toString()}');
+                            'Error Generico tipo: ${e.runtimeType.toString()} Error: ${e.toString()}');
+                        if (context.mounted) {
+                          showErrorDialog(
+                            context,
+                            'Algo salió mal.',
+                          );
+                        }
                       }
                     },
                     child: const Text('Crear cuenta'),
                   ),
 
-                  //Login
+                  //Go to login page
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).pushReplacementNamed(

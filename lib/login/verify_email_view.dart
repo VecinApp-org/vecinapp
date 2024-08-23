@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
 import 'package:vecinapp/constants/routes.dart';
+import 'package:vecinapp/utilities/show_error_dialog.dart';
 
 class VerifyEmailView extends StatefulWidget {
   const VerifyEmailView({super.key});
@@ -22,22 +23,19 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
           spacing: 64,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            //Title
             const Text(
               'Verifica tu correo',
               style: TextStyle(fontSize: 28),
             ),
-            const SizedBox(
-              width: 300,
-              child: Text(
-                  textAlign: TextAlign.center,
-                  'Te enviamos un correo. Haz clic en el enlace y regresa aquí para continuar.'),
-            ),
-
-            //Buttons
             Column(
               spacing: 16,
               children: [
+                const SizedBox(
+                  width: 300,
+                  child: Text(
+                      //textAlign: TextAlign.center,
+                      'Te enviamos un correo. Haz clic en el enlace y regresa aquí para continuar.'),
+                ),
                 FilledButton(
                   onPressed: () async {
                     await FirebaseAuth.instance.currentUser?.reload();
@@ -50,17 +48,33 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                         );
                       }
                     } else {
-                      devtools.log('Still not verified');
+                      if (context.mounted) {
+                        showErrorDialog(
+                          context,
+                          'Todavía no has verificado el correo',
+                        );
+                      }
                     }
                   },
                   child: const Text('Continuar'),
                 ),
-                /*
+              ],
+            ),
+            Column(
+              spacing: 16,
+              children: [
+                const SizedBox(
+                  width: 300,
+                  child: Text(
+                      //textAlign: TextAlign.center,
+                      'Si no recibiste el correo, puedes enviarlo otra vez.'),
+                ),
                 OutlinedButton(
                   onPressed: () async {
                     switch (isEmailSent) {
                       case true:
-                        devtools.log('Email already sent');
+                        showErrorDialog(context,
+                            'Espera un minuto para enviar otro correo');
                       case false:
                         final user = FirebaseAuth.instance.currentUser;
                         await user?.sendEmailVerification();
@@ -68,10 +82,11 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                         devtools.log('Email sent');
                         setState(() {});
                         Future.delayed(
-                          const Duration(minutes: 5),
+                          const Duration(minutes: 1),
                           () {
-                            devtools
-                                .log('Email verification button reactivated');
+                            devtools.log(
+                              'Email verification button reactivated',
+                            );
                             isEmailSent = false;
                             setState(() {});
                           },
@@ -80,12 +95,28 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                   },
                   child: const Text('Enviar otro correo'),
                 ),
-                
-                const TextButton(
-                  onPressed: null, //TODO implement logout with warning dialog
-                  child: Text('Salir'),
-                )
-                */
+              ],
+            ),
+            Column(
+              spacing: 16,
+              children: [
+                const SizedBox(
+                  width: 300,
+                  child: Text(
+                      'Si quieres usar otro correo, puedes cerrar la sesión.'),
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                  onPressed: () async {
+                    await FirebaseAuth.instance.signOut();
+                    if (context.mounted) {
+                      Navigator.of(context).popAndPushNamed(
+                        appRootRouteName,
+                      );
+                    }
+                  },
+                  child: const Text('Salir'),
+                ),
               ],
             ),
           ],

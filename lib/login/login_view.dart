@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:vecinapp/constants/routes.dart';
 import 'dart:developer' as devtools show log;
 
+import 'package:vecinapp/utilities/show_error_dialog.dart';
+
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
 
@@ -31,6 +33,7 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      restorationId: 'loginView',
       appBar: AppBar(),
       body: Center(
         child: Column(
@@ -71,10 +74,11 @@ class _LoginViewState extends State<LoginView> {
               ),
             ),
 
+            //Buttons
             Column(
               spacing: 8,
               children: [
-                //LOGIN BUTTON
+                //Login button
                 FilledButton(
                   onPressed: () async {
                     devtools.log('Logging in...');
@@ -92,23 +96,57 @@ class _LoginViewState extends State<LoginView> {
                       }
                     } on FirebaseAuthException catch (e) {
                       if (e.code == 'invalid-email') {
-                        devtools.log('Email invalido');
+                        if (context.mounted) {
+                          showErrorDialog(
+                            context,
+                            'El correo está mal escrito.',
+                          );
+                        }
                       } else if (e.code == 'invalid-credential') {
-                        devtools.log('Credenciales no validas');
+                        if (context.mounted) {
+                          showErrorDialog(
+                            context,
+                            'Algo está mal escrito o no existe esa cuenta.',
+                          );
+                        }
                       } else if (e.code == 'network-request-failed') {
-                        devtools.log('Error de red');
+                        if (context.mounted) {
+                          showErrorDialog(
+                            context,
+                            'No hay internet.',
+                          );
+                        }
+                      } else if (e.code == 'channel-error') {
+                        if (context.mounted) {
+                          showErrorDialog(
+                            context,
+                            'Dejaste algo vacío.',
+                          );
+                        }
                       } else {
-                        devtools.log(
-                            'Error de FirebaseAuthException desconocido ${e.code}');
+                        devtools.log(e.toString());
+                        if (context.mounted) {
+                          showErrorDialog(
+                            context,
+                            'Algo salió mal iniciando sesión.',
+                          );
+                        }
                       }
                     } catch (e) {
                       devtools.log(
-                          'Error desconocido tipo ${e.runtimeType} error: $e');
+                          'Error desconocido tipo: ${e.runtimeType} Error: $e');
+                      if (context.mounted) {
+                        showErrorDialog(
+                          context,
+                          'Algo salió mal.',
+                        );
+                      }
                     }
                   },
                   child: const Text('Entrar a mi cuenta'),
                 ),
-                //FORGOT PASSWORD
+
+                //go to register button
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pushReplacementNamed(
@@ -117,7 +155,8 @@ class _LoginViewState extends State<LoginView> {
                   },
                   child: const Text('Crear una cuenta nueva'),
                 ),
-                //GO TO REGISTER
+
+                //Forgot password button
                 const TextButton(
                   onPressed: null,
                   child: Text('Olvidé mi contraseña'),
