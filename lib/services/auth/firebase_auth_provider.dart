@@ -119,4 +119,11 @@ class FirebaseAuthProvider implements AuthProvider {
       throw UserNotLoggedInAuthException();
     }
   }
+
+  @override
+  Stream<AuthUser> userChanges() {
+    return FirebaseAuth.instance.userChanges().map(
+          (user) => AuthUser.fromFirebase(user!),
+        );
+  }
 }
