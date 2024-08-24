@@ -75,8 +75,15 @@ class SettingsView extends StatelessWidget {
                 if (context.mounted) {
                   showErrorDialog(context, 'Requires recent login');
                 }
+              } on NetworkRequestFailedAuthException {
+                if (context.mounted) {
+                  showErrorDialog(context, 'No hay internet.');
+                }
               } on GenericAuthException catch (e) {
                 devtools.log('Error deleting user: ${e.runtimeType}');
+                if (context.mounted) {
+                  showErrorDialog(context, 'Algo salió mal');
+                }
               }
             },
             style: TextButton.styleFrom(

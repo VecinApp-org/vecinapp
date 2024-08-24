@@ -11,6 +11,9 @@ class WeakPasswordAuthException implements Exception {}
 // delete user exceptions
 class RequiresRecentLoginAuthException implements Exception {}
 
+// send email verification exceptions
+class TooManyRequestsAuthException implements Exception {}
+
 // input exceptions
 class ChannelErrorAuthException implements Exception {}
 

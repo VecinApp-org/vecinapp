@@ -15,4 +15,5 @@ abstract class AuthProvider {
   Future<void> sendEmailVerification();
   Stream<AuthUser> userChanges();
   Future<void> deleteAccount();
+  Future<void> reload();
 }

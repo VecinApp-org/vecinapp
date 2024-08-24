@@ -1,9 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer' as devtools show log;
-
 import 'package:vecinapp/constants/routes.dart';
+import 'package:vecinapp/services/auth/auth_exceptions.dart';
+import 'package:vecinapp/services/auth/auth_service.dart';
 import 'package:vecinapp/utilities/show_error_dialog.dart';
+//import 'dart:developer' as devtools show log;
 
 class VerifyEmailView extends StatefulWidget {
   const VerifyEmailView({super.key});
@@ -13,8 +13,6 @@ class VerifyEmailView extends StatefulWidget {
 }
 
 class _VerifyEmailViewState extends State<VerifyEmailView> {
-  bool isEmailSent = false;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,27 +35,34 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                       'Te enviamos un correo. Haz clic en el enlace y regresa aquí para continuar.'),
                 ),
                 FilledButton(
-                  onPressed: () async {
-                    await FirebaseAuth.instance.currentUser?.reload();
-                    if (FirebaseAuth.instance.currentUser?.emailVerified ==
-                        true) {
-                      if (context.mounted) {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                          appRootRouteName,
-                          (route) => false,
-                        );
+                    onPressed: () async {
+                      try {
+                        await AuthService.firebase().reload();
+                        final user = AuthService.firebase().currentUser;
+                        if (user != null) {
+                          if (user.isEmailVerified) {
+                            if (context.mounted) {
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                  appRootRouteName, (route) => false);
+                            }
+                          } else {
+                            if (context.mounted) {
+                              showErrorDialog(
+                                  context, 'Aún no has verificado tu correo');
+                            }
+                          }
+                        }
+                      } on NetworkRequestFailedAuthException {
+                        if (context.mounted) {
+                          showErrorDialog(context, 'No hay internet.');
+                        }
+                      } on GenericAuthException {
+                        if (context.mounted) {
+                          showErrorDialog(context, 'Algo salio mal.');
+                        }
                       }
-                    } else {
-                      if (context.mounted) {
-                        showErrorDialog(
-                          context,
-                          'Todavía no has verificado el correo',
-                        );
-                      }
-                    }
-                  },
-                  child: const Text('Continuar'),
-                ),
+                    },
+                    child: const Text('Continuar')),
               ],
             ),
             Column(
@@ -71,42 +76,25 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                 ),
                 // Resend email button
                 OutlinedButton(
-                  onPressed: () async {
-                    switch (isEmailSent) {
-                      case true:
-                        showErrorDialog(context,
-                            'Espera un minuto para enviar otro correo');
-                      case false:
-                        try {
-                          final user = FirebaseAuth.instance.currentUser;
-                          await user?.sendEmailVerification();
-                          isEmailSent = true;
-                          devtools.log('Email sent');
-                          setState(() {});
-                          Future.delayed(
-                            const Duration(minutes: 1),
-                            () {
-                              devtools.log(
-                                'Email verification button reactivated',
-                              );
-                              isEmailSent = false;
-                              setState(() {});
-                            },
-                          );
-                        } on FirebaseAuthException catch (e) {
-                          if (e.code == 'network-request-failed') {
-                            if (context.mounted) {
-                              showErrorDialog(
-                                context,
-                                'No hay internet.',
-                              );
-                            }
-                          }
+                    onPressed: () async {
+                      try {
+                        await AuthService.firebase().sendEmailVerification();
+                      } on NetworkRequestFailedAuthException {
+                        if (context.mounted) {
+                          showErrorDialog(context, 'No hay internet.');
                         }
-                    }
-                  },
-                  child: const Text('Enviar otro correo'),
-                ),
+                      } on TooManyRequestsAuthException {
+                        if (context.mounted) {
+                          showErrorDialog(context,
+                              'Demasiados intentos. Intentalo mas tarde.');
+                        }
+                      } on GenericAuthException {
+                        if (context.mounted) {
+                          showErrorDialog(context, 'Algo salio mal.');
+                        }
+                      }
+                    },
+                    child: const Text('Enviar otro correo')),
               ],
             ),
             Column(
@@ -120,7 +108,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                 TextButton(
                   style: TextButton.styleFrom(foregroundColor: Colors.red),
                   onPressed: () async {
-                    await FirebaseAuth.instance.signOut();
+                    await AuthService.firebase().logOut();
                     if (context.mounted) {
                       Navigator.of(context).popAndPushNamed(
                         appRootRouteName,

@@ -1,6 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:vecinapp/constants/routes.dart';
+import 'package:vecinapp/services/auth/auth_exceptions.dart';
+import 'package:vecinapp/services/auth/auth_service.dart';
 import 'dart:developer' as devtools show log;
 
 import 'package:vecinapp/utilities/show_error_dialog.dart';
@@ -85,61 +86,36 @@ class _LoginViewState extends State<LoginView> {
                     final email = _email.text;
                     final password = _password.text;
                     try {
-                      final userCredentail = await FirebaseAuth.instance
-                          .signInWithEmailAndPassword(
-                              email: email, password: password);
+                      final userCredentail = await AuthService.firebase()
+                          .logIn(email: email, password: password);
                       devtools.log('Logged in: $userCredentail');
-                      FirebaseAuth.instance.currentUser?.reload();
                       if (context.mounted) {
                         Navigator.of(context).pushNamedAndRemoveUntil(
                             appRootRouteName, (route) => false);
                       }
-                    } on FirebaseAuthException catch (e) {
-                      if (e.code == 'invalid-email') {
-                        if (context.mounted) {
-                          showErrorDialog(
-                            context,
-                            'El correo está mal escrito.',
-                          );
-                        }
-                      } else if (e.code == 'invalid-credential') {
-                        if (context.mounted) {
-                          showErrorDialog(
-                            context,
-                            'Algo está mal escrito o no existe esa cuenta.',
-                          );
-                        }
-                      } else if (e.code == 'network-request-failed') {
-                        if (context.mounted) {
-                          showErrorDialog(
-                            context,
-                            'No hay internet.',
-                          );
-                        }
-                      } else if (e.code == 'channel-error') {
-                        if (context.mounted) {
-                          showErrorDialog(
-                            context,
-                            'Dejaste algo vacío.',
-                          );
-                        }
-                      } else {
-                        devtools.log(e.toString());
-                        if (context.mounted) {
-                          showErrorDialog(
-                            context,
-                            'Algo salió mal iniciando sesión.',
-                          );
-                        }
+                    } on InvalidEmailAuthException {
+                      if (context.mounted) {
+                        showErrorDialog(context, 'El correo está mal escrito.');
                       }
-                    } catch (e) {
-                      devtools.log(
-                          'Error desconocido tipo: ${e.runtimeType} Error: $e');
+                    } on NetworkRequestFailedAuthException {
+                      if (context.mounted) {
+                        showErrorDialog(context, 'No hay internet.');
+                      }
+                    } on ChannelErrorAuthException {
+                      if (context.mounted) {
+                        showErrorDialog(context, 'Dejaste algo vacío.');
+                      }
+                    } on InvalidCredentialAuthException {
+                      if (context.mounted) {
+                        showErrorDialog(context,
+                            'La contraseña es incorrecta o ese correo no existe.');
+                      }
+                    } on GenericAuthException catch (e) {
+                      devtools
+                          .log('Error logging in: ${e.runtimeType} Error: $e');
                       if (context.mounted) {
                         showErrorDialog(
-                          context,
-                          'Algo salió mal.',
-                        );
+                            context, 'Algo salió mal iniciando sesión.');
                       }
                     }
                   },

@@ -7,6 +7,8 @@ import 'package:vecinapp/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuth, FirebaseAuthException;
 
+import 'dart:developer' as devtools show log;
+
 class FirebaseAuthProvider implements AuthProvider {
   @override
   Future<void> initialize() async {
@@ -109,10 +111,14 @@ class FirebaseAuthProvider implements AuthProvider {
       try {
         await user.sendEmailVerification();
       } on FirebaseAuthException catch (e) {
-        if (e.code == 'network-request-failed') {
-          throw NetworkRequestFailedAuthException();
-        } else {
-          throw GenericAuthException();
+        switch (e.code) {
+          case 'network-request-failed':
+            throw NetworkRequestFailedAuthException();
+          case 'too-many-requests':
+            throw TooManyRequestsAuthException();
+          default:
+            devtools.log('Unexpected error while sending email: ${e.code}');
+            throw GenericAuthException();
         }
       }
     } else {
@@ -136,12 +142,30 @@ class FirebaseAuthProvider implements AuthProvider {
       } on FirebaseAuthException catch (e) {
         if (e.code == 'requires-recent-login') {
           throw RequiresRecentLoginAuthException();
+        } else if (e.code == 'network-request-failed') {
+          throw NetworkRequestFailedAuthException();
         } else {
           throw GenericAuthException();
         }
       }
     } else {
       throw UserNotLoggedInAuthException();
+    }
+  }
+
+  @override
+  Future<void> reload() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        await user.reload();
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'network-request-failed') {
+          throw NetworkRequestFailedAuthException();
+        } else {
+          throw GenericAuthException();
+        }
+      }
     }
   }
 }

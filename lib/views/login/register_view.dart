@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:developer' as devtools show log;
-
 import 'package:vecinapp/constants/routes.dart';
+import 'package:vecinapp/services/auth/auth_exceptions.dart';
+import 'package:vecinapp/services/auth/auth_service.dart';
 import 'package:vecinapp/utilities/show_error_dialog.dart';
 
 class RegisterView extends StatefulWidget {
@@ -85,74 +84,42 @@ class _RegisterViewState extends State<RegisterView> {
                       final email = _email.text;
                       final password = _password.text;
                       try {
-                        devtools.log('Registrando usuario...');
-                        await FirebaseAuth.instance
-                            .createUserWithEmailAndPassword(
+                        await AuthService.firebase().createUser(
                           email: email,
                           password: password,
                         );
-                        devtools.log('Usuario registrado');
-                        devtools.log('Enviando email de verificación...');
-                        await FirebaseAuth.instance.currentUser
-                            ?.sendEmailVerification();
-                        devtools.log('Email enviado');
+                        await AuthService.firebase().sendEmailVerification();
                         if (context.mounted) {
                           Navigator.of(context).pushNamedAndRemoveUntil(
                               appRootRouteName, (route) => false);
                         }
-                      } on FirebaseAuthException catch (e) {
-                        switch (e.code) {
-                          case 'email-already-in-use':
-                            if (context.mounted) {
-                              await showErrorDialog(
-                                context,
-                                'Ese email ya tiene una cuenta.',
-                              );
-                            }
-                          case 'network-request-failed':
-                            if (context.mounted) {
-                              showErrorDialog(
-                                context,
-                                'No hay internet.',
-                              );
-                            }
-                          case 'weak-password':
-                            if (context.mounted) {
-                              showErrorDialog(
-                                context,
-                                'La contraseña está muy débil.',
-                              );
-                            }
-                          case 'invalid-email':
-                            if (context.mounted) {
-                              showErrorDialog(
-                                context,
-                                'El correo está mal escrito.',
-                              );
-                            }
-                          case 'channel-error':
-                            if (context.mounted) {
-                              showErrorDialog(
-                                context,
-                                'Dejaste algo vacío.',
-                              );
-                            }
-                          default:
-                            if (context.mounted) {
-                              showErrorDialog(
-                                context,
-                                'Algo salió mal creando tu cuenta.',
-                              );
-                            }
-                        }
-                      } catch (e) {
-                        devtools.log(
-                            'Error Generico tipo: ${e.runtimeType.toString()} Error: ${e.toString()}');
+                      } on EmailAlreadyInUseAuthException {
                         if (context.mounted) {
-                          showErrorDialog(
-                            context,
-                            'Algo salió mal.',
-                          );
+                          await showErrorDialog(
+                              context, 'Ese email ya tiene una cuenta.');
+                        }
+                      } on NetworkRequestFailedAuthException {
+                        if (context.mounted) {
+                          showErrorDialog(context, 'No hay internet.');
+                        }
+                      } on WeakPasswordAuthException {
+                        if (context.mounted) {
+                          await showErrorDialog(
+                              context, 'La contraseña está muy debil.');
+                        }
+                      } on InvalidEmailAuthException {
+                        if (context.mounted) {
+                          await showErrorDialog(
+                              context, 'El correo está mal escrito.');
+                        }
+                      } on ChannelErrorAuthException {
+                        if (context.mounted) {
+                          await showErrorDialog(context, 'Dejaste algo vacío.');
+                        }
+                      } on GenericAuthException {
+                        if (context.mounted) {
+                          await showErrorDialog(
+                              context, 'Algo salió mal creando la cuenta.');
                         }
                       }
                     },
