@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vecinapp/services/auth/auth_service.dart';
 import 'package:vecinapp/services/crud/docs_service.dart';
+import 'package:vecinapp/constants/routes.dart';
 
 class DocsView extends StatefulWidget {
   const DocsView({super.key});
@@ -27,33 +28,41 @@ class _DocsViewState extends State<DocsView> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _docsService.getOrCreateUser(email: userEmail),
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.done:
-            return StreamBuilder(
-                stream: _docsService.allDocs,
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.waiting:
-                      return const Center(
-                        child: Text('waiting...'),
-                      );
-                    case ConnectionState.active:
-                      return const Text('active');
-                    default:
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                  }
-                });
-          default:
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-        }
-      },
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed(newDocRouteName);
+        },
+        child: const Icon(Icons.add),
+      ),
+      body: FutureBuilder(
+        future: _docsService.getOrCreateUser(email: userEmail),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.done:
+              return StreamBuilder(
+                  stream: _docsService.allDocs,
+                  builder: (context, snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return const Center(
+                          child: Text('No hay ningún documento.'),
+                        );
+                      case ConnectionState.active:
+                        return const Text('active');
+                      default:
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                    }
+                  });
+            default:
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+          }
+        },
+      ),
     );
   }
 }

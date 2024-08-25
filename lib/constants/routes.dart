@@ -5,3 +5,4 @@ const loginRouteName = '/login';
 const registerRouteName = '/register';
 const verifyEmailRouteName = '/verifyEmail';
 const settingsRouteName = '/settings';
+const newDocRouteName = '/newDoc';
