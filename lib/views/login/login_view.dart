@@ -47,13 +47,12 @@ class _LoginViewState extends State<LoginView> {
               'Iniciar sesión',
               style: TextStyle(fontSize: 28),
             ),
-
-            //Email and password fields
             SizedBox(
               width: 300,
               child: Column(
                 spacing: 8,
                 children: [
+                  //Email Field
                   TextField(
                     controller: _email,
                     enableSuggestions: false,
@@ -64,6 +63,7 @@ class _LoginViewState extends State<LoginView> {
                       hintText: 'Email',
                     ),
                   ),
+                  //Password Field
                   TextField(
                     controller: _password,
                     obscureText: !_isShowingPassword,
@@ -88,7 +88,6 @@ class _LoginViewState extends State<LoginView> {
                 ],
               ),
             ),
-
             //Buttons
             Column(
               spacing: 8,
@@ -135,7 +134,6 @@ class _LoginViewState extends State<LoginView> {
                   },
                   child: const Text('Entrar a mi cuenta'),
                 ),
-
                 //go to register button
                 TextButton(
                   onPressed: () {
@@ -145,7 +143,6 @@ class _LoginViewState extends State<LoginView> {
                   },
                   child: const Text('Crear una cuenta nueva'),
                 ),
-
                 //Forgot password button
                 const TextButton(
                   onPressed: null,
