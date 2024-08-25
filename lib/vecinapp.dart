@@ -22,48 +22,30 @@ class VecinApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     devtools.log('build VecinApp');
-    return FutureBuilder(
-      future: AuthService.firebase().initialize(),
-      builder: (context, snapshot) {
-        devtools.log('Firebase: ${snapshot.connectionState}');
-        switch (snapshot.connectionState) {
-          case ConnectionState.done:
-            return StreamBuilder(
-              stream: AuthService.firebase().userChanges(),
-              builder: (context, snapshot) {
-                devtools.log('FirebaseAuth: ${snapshot.connectionState}');
-                switch (snapshot.connectionState) {
-                  case ConnectionState.waiting:
-                    return const CircularProgressIndicator();
-                  case ConnectionState.active:
-                    return ListenableBuilder(
-                      listenable: settingsController,
-                      builder: (BuildContext context, Widget? child) {
-                        devtools
-                            .log('ThemeMode: ${settingsController.themeMode}');
-                        return MaterialApp(
-                          debugShowCheckedModeBanner: false,
-                          restorationScopeId: 'vecinapp',
-                          //Theme
-                          theme: ThemeData(useMaterial3: true),
-                          darkTheme: ThemeData.dark(),
-                          themeMode: settingsController.themeMode,
-                          routes: {
-                            appRootRouteName: (context) => const AppRoot(),
-                            welcomeRouteName: (context) => const WelcomeView(),
-                            loginRouteName: (context) => const LoginView(),
-                            registerRouteName: (context) =>
-                                const RegisterView(),
-                            verifyEmailRouteName: (context) =>
-                                const VerifyEmailView(),
-                            homeDrawerRouteName: (context) =>
-                                const HomeDrawer(),
-                            settingsRouteName: (context) =>
-                                SettingsView(controller: settingsController),
-                            newDocRouteName: (context) => const NewDocView(),
-                          },
-                          home: const AppRoot(),
-                          /*
+    return ListenableBuilder(
+      listenable: settingsController,
+      builder: (BuildContext context, Widget? child) {
+        devtools.log('ThemeMode: ${settingsController.themeMode}');
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          restorationScopeId: 'vecinapp',
+          //Theme
+          theme: ThemeData(useMaterial3: true),
+          darkTheme: ThemeData.dark(),
+          themeMode: settingsController.themeMode,
+          routes: {
+            appRootRouteName: (context) => const AppRoot(),
+            welcomeRouteName: (context) => const WelcomeView(),
+            loginRouteName: (context) => const LoginView(),
+            registerRouteName: (context) => const RegisterView(),
+            verifyEmailRouteName: (context) => const VerifyEmailView(),
+            homeDrawerRouteName: (context) => const HomeDrawer(),
+            settingsRouteName: (context) =>
+                SettingsView(controller: settingsController),
+            newDocRouteName: (context) => const NewDocView(),
+          },
+          home: const Initializer(),
+          /*
                 //Localizations
                 localizationsDelegates: const [
                   AppLocalizations.delegate,
@@ -94,19 +76,41 @@ class VecinApp extends StatelessWidget {
                   );
                 },
                 */
-                        );
-                      },
-                    );
-                  default:
-                    return const CircularProgressIndicator();
-                }
-              },
-            );
-          default:
-            return const CircularProgressIndicator();
-        }
+        );
       },
     );
+  }
+}
+
+class Initializer extends StatelessWidget {
+  const Initializer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: AuthService.firebase().initialize(),
+        builder: (context, snapshot) {
+          devtools.log('Firebase: ${snapshot.connectionState}');
+          switch (snapshot.connectionState) {
+            case ConnectionState.done:
+              return StreamBuilder(
+                  stream: AuthService.firebase().userChanges(),
+                  builder: (context, snapshot) {
+                    devtools.log('FirebaseAuth: ${snapshot.connectionState}');
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.active:
+                        return const AppRoot();
+                      default:
+                        return const Scaffold(
+                            body: Center(
+                                child: Text('Listening for user changes...')));
+                    }
+                  });
+            default:
+              return const Scaffold(
+                  body: Center(child: Text('Auth Service initializing...')));
+          }
+        });
   }
 }
 
