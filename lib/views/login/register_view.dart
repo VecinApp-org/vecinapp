@@ -14,6 +14,7 @@ class RegisterView extends StatefulWidget {
 class _RegisterViewState extends State<RegisterView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
+  late bool isShowingPassword = false;
 
   @override
   void initState() {
@@ -32,6 +33,7 @@ class _RegisterViewState extends State<RegisterView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      restorationId: 'registerView',
       appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -59,15 +61,28 @@ class _RegisterViewState extends State<RegisterView> {
                       keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
                         hintText: 'Correo',
+                        icon: Icon(Icons.email),
                       ),
                     ),
                     TextField(
                       controller: _password,
-                      obscureText: true,
+                      obscureText: !isShowingPassword,
                       enableSuggestions: false,
                       autocorrect: false,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Contraseña',
+                        icon: const Icon(Icons.key),
+                        suffixIcon: IconButton(onPressed: () {
+                          setState(() {
+                            isShowingPassword = !isShowingPassword;
+                          });
+                        }, icon: Builder(builder: (context) {
+                          if (isShowingPassword) {
+                            return const Icon(Icons.visibility_off);
+                          } else {
+                            return const Icon(Icons.visibility);
+                          }
+                        })),
                       ),
                     ),
                   ],
