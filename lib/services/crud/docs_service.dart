@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
@@ -8,12 +10,40 @@ import 'package:vecinapp/services/crud/crud_exceptions.dart';
 class DocsService {
   Database? _db;
 
+  List<DatabaseDoc> _docs = [];
+
+  final _docsStreamController = StreamController<List<DatabaseDoc>>.broadcast();
+
+  Future<DatabaseUser> getoOrCreateUser({
+    required String email,
+  }) async {
+    try {
+      final user = await getUser(email: email);
+      return user;
+    } on CouldNotFindUser {
+      final createdUser = await createUser(email: email);
+      return createdUser;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> _cacheDocs() async {
+    final allDocs = await getAllDocs();
+    _docs = allDocs.toList();
+    _docsStreamController.add(_docs);
+  }
+
   Future<DatabaseDoc> updateDoc({
     required DatabaseDoc doc,
     required String text,
   }) async {
     final db = _getDatabaseOrThrow();
+
+    // make sure owner exists in the database with the correct id
     await getDoc(id: doc.id);
+
+    // update the doc in the database
     final updatesCount = await db.update(docTable, {
       textColumn: text,
       isSyncedWithCloudColumn: 0,
@@ -22,7 +52,11 @@ class DocsService {
     if (updatesCount == 0) {
       throw CouldNotUpdateDoc();
     } else {
-      return await getDoc(id: doc.id);
+      final updatedDoc = await getDoc(id: doc.id);
+      _docs.removeWhere((doc) => doc.id == updatedDoc.id);
+      _docs.add(updatedDoc);
+      _docsStreamController.add(_docs);
+      return updatedDoc;
     }
   }
 
@@ -44,13 +78,20 @@ class DocsService {
     if (docs.isEmpty) {
       throw CouldNotFindDoc();
     } else {
-      return DatabaseDoc.fromRow(docs.first);
+      final doc = DatabaseDoc.fromRow(docs.first);
+      _docs.removeWhere((doc) => doc.id == id);
+      _docs.add(doc);
+      _docsStreamController.add(_docs);
+      return doc;
     }
   }
 
   Future<int> deleteAllDocs() async {
     final db = _getDatabaseOrThrow();
-    return await db.delete(docTable);
+    final deletedCount = await db.delete(docTable);
+    _docs = [];
+    _docsStreamController.add(_docs);
+    return deletedCount;
   }
 
   Future<void> deleteDoc({required int id}) async {
@@ -62,6 +103,9 @@ class DocsService {
     );
     if (deletedCount == 0) {
       throw CouldNotDeleteDoc();
+    } else {
+      _docs.removeWhere((doc) => doc.id == id);
+      _docsStreamController.add(_docs);
     }
   }
 
@@ -89,6 +133,9 @@ class DocsService {
       text: text,
       isSyncedWithCloud: true,
     );
+
+    _docs.add(doc);
+    _docsStreamController.add(_docs);
 
     return doc;
   }
@@ -171,6 +218,7 @@ class DocsService {
       await db.execute(createUserTable);
       // create the doc table
       await db.execute(createDocTable);
+      await _cacheDocs();
     } on MissingPlatformDirectoryException {
       throw UnableToGetDocumentsDirectory();
     }
