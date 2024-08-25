@@ -12,9 +12,15 @@ class DocsService {
 
   List<DatabaseDoc> _docs = [];
 
+  static final DocsService _shared = DocsService._sharedInstance();
+  DocsService._sharedInstance();
+  factory DocsService() => _shared;
+
   final _docsStreamController = StreamController<List<DatabaseDoc>>.broadcast();
 
-  Future<DatabaseUser> getoOrCreateUser({
+  Stream<List<DatabaseDoc>> get allDocs => _docsStreamController.stream;
+
+  Future<DatabaseUser> getOrCreateUser({
     required String email,
   }) async {
     try {
@@ -38,6 +44,7 @@ class DocsService {
     required DatabaseDoc doc,
     required String text,
   }) async {
+    await ensureDatatabaseIsOpen();
     final db = _getDatabaseOrThrow();
 
     // make sure owner exists in the database with the correct id
@@ -61,12 +68,14 @@ class DocsService {
   }
 
   Future<Iterable<DatabaseDoc>> getAllDocs() async {
+    await ensureDatatabaseIsOpen();
     final db = _getDatabaseOrThrow();
     final docs = await db.query(docTable);
     return docs.map((docRow) => DatabaseDoc.fromRow(docRow));
   }
 
   Future<DatabaseDoc> getDoc({required int id}) async {
+    await ensureDatatabaseIsOpen();
     final db = _getDatabaseOrThrow();
     final docs = await db.query(
       docTable,
@@ -87,6 +96,7 @@ class DocsService {
   }
 
   Future<int> deleteAllDocs() async {
+    await ensureDatatabaseIsOpen();
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(docTable);
     _docs = [];
@@ -110,6 +120,7 @@ class DocsService {
   }
 
   Future<DatabaseDoc> createDoc({required DatabaseUser owner}) async {
+    await ensureDatatabaseIsOpen();
     final db = _getDatabaseOrThrow();
 
     // make sure owner exists in the database with the correct id
@@ -141,6 +152,7 @@ class DocsService {
   }
 
   Future<DatabaseUser> getUser({required String email}) async {
+    await ensureDatatabaseIsOpen();
     final db = _getDatabaseOrThrow();
     final result = await db.query(
       userTable,
@@ -156,6 +168,7 @@ class DocsService {
   }
 
   Future<DatabaseUser> createUser({required String email}) async {
+    await ensureDatatabaseIsOpen();
     final db = _getDatabaseOrThrow();
     final result = await db.query(
       userTable,
@@ -177,6 +190,7 @@ class DocsService {
   }
 
   Future<void> deleteUser({required String email}) async {
+    await ensureDatatabaseIsOpen();
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(
       userTable,
@@ -203,6 +217,14 @@ class DocsService {
     }
     await _db!.close();
     _db = null;
+  }
+
+  Future<void> ensureDatatabaseIsOpen() async {
+    try {
+      await open();
+    } on DatabaseAlreadyOpenException {
+      // empty
+    }
   }
 
   Future<void> open() async {
