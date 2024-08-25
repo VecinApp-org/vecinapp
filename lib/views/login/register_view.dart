@@ -14,12 +14,15 @@ class RegisterView extends StatefulWidget {
 class _RegisterViewState extends State<RegisterView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
+  late final TextEditingController _password2;
   late bool isShowingPassword = false;
+  late bool isShowingPassword2 = false;
 
   @override
   void initState() {
     _email = TextEditingController();
     _password = TextEditingController();
+    _password2 = TextEditingController();
     super.initState();
   }
 
@@ -27,6 +30,7 @@ class _RegisterViewState extends State<RegisterView> {
   void dispose() {
     _email.dispose();
     _password.dispose();
+    _password2.dispose();
     super.dispose();
   }
 
@@ -85,6 +89,27 @@ class _RegisterViewState extends State<RegisterView> {
                         })),
                       ),
                     ),
+                    TextField(
+                      controller: _password2,
+                      obscureText: !isShowingPassword2,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      decoration: InputDecoration(
+                        hintText: 'Contraseña',
+                        icon: const Icon(Icons.key),
+                        suffixIcon: IconButton(onPressed: () {
+                          setState(() {
+                            isShowingPassword2 = !isShowingPassword2;
+                          });
+                        }, icon: Builder(builder: (context) {
+                          if (isShowingPassword2) {
+                            return const Icon(Icons.visibility_off);
+                          } else {
+                            return const Icon(Icons.visibility);
+                          }
+                        })),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -102,6 +127,7 @@ class _RegisterViewState extends State<RegisterView> {
                         await AuthService.firebase().createUser(
                           email: email,
                           password: password,
+                          passwordConfirmation: _password2.text,
                         );
                         await AuthService.firebase().sendEmailVerification();
                         if (context.mounted) {
@@ -130,6 +156,11 @@ class _RegisterViewState extends State<RegisterView> {
                       } on ChannelErrorAuthException {
                         if (context.mounted) {
                           await showErrorDialog(context, 'Dejaste algo vacío.');
+                        }
+                      } on PasswordConfirmationDoesNotMatchAuthException {
+                        if (context.mounted) {
+                          await showErrorDialog(
+                              context, 'Las contraseñas no coinciden.');
                         }
                       } on GenericAuthException {
                         if (context.mounted) {

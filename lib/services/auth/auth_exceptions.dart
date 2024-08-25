@@ -8,6 +8,8 @@ class EmailAlreadyInUseAuthException implements Exception {}
 
 class WeakPasswordAuthException implements Exception {}
 
+class PasswordConfirmationDoesNotMatchAuthException implements Exception {}
+
 // delete user exceptions
 class RequiresRecentLoginAuthException implements Exception {}
 

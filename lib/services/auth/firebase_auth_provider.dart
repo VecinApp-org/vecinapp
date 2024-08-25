@@ -20,17 +20,22 @@ class FirebaseAuthProvider implements AuthProvider {
   Future<AuthUser> createUser({
     required String email,
     required String password,
+    required String passwordConfirmation,
   }) async {
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      final user = currentUser;
-      if (user != null) {
-        return user;
+      if (password != passwordConfirmation) {
+        throw PasswordConfirmationDoesNotMatchAuthException();
       } else {
-        throw UserNotLoggedInAuthException();
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+        final user = currentUser;
+        if (user != null) {
+          return user;
+        } else {
+          throw UserNotLoggedInAuthException();
+        }
       }
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
