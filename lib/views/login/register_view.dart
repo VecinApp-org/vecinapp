@@ -15,8 +15,8 @@ class _RegisterViewState extends State<RegisterView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
   late final TextEditingController _password2;
-  late bool isShowingPassword = false;
-  late bool isShowingPassword2 = false;
+  late bool _isShowingPassword = false;
+  late bool _isShowingPassword2 = false;
 
   @override
   void initState() {
@@ -70,28 +70,33 @@ class _RegisterViewState extends State<RegisterView> {
                     ),
                     TextField(
                       controller: _password,
-                      obscureText: !isShowingPassword,
+                      obscureText: !_isShowingPassword,
                       enableSuggestions: false,
                       autocorrect: false,
                       decoration: InputDecoration(
                         hintText: 'Contraseña',
                         icon: const Icon(Icons.key),
-                        suffixIcon: IconButton(onPressed: () {
-                          setState(() {
-                            isShowingPassword = !isShowingPassword;
-                          });
-                        }, icon: Builder(builder: (context) {
-                          if (isShowingPassword) {
-                            return const Icon(Icons.visibility_off);
-                          } else {
-                            return const Icon(Icons.visibility);
-                          }
-                        })),
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _isShowingPassword = !_isShowingPassword;
+                            });
+                          },
+                          icon: Builder(
+                            builder: (context) {
+                              if (_isShowingPassword) {
+                                return const Icon(Icons.visibility_off);
+                              } else {
+                                return const Icon(Icons.visibility);
+                              }
+                            },
+                          ),
+                        ),
                       ),
                     ),
                     TextField(
                       controller: _password2,
-                      obscureText: !isShowingPassword2,
+                      obscureText: !_isShowingPassword2,
                       enableSuggestions: false,
                       autocorrect: false,
                       decoration: InputDecoration(
@@ -99,10 +104,10 @@ class _RegisterViewState extends State<RegisterView> {
                         icon: const Icon(Icons.key),
                         suffixIcon: IconButton(onPressed: () {
                           setState(() {
-                            isShowingPassword2 = !isShowingPassword2;
+                            _isShowingPassword2 = !_isShowingPassword2;
                           });
                         }, icon: Builder(builder: (context) {
-                          if (isShowingPassword2) {
+                          if (_isShowingPassword2) {
                             return const Icon(Icons.visibility_off);
                           } else {
                             return const Icon(Icons.visibility);

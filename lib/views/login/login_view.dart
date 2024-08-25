@@ -16,6 +16,7 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
+  late bool _isShowingPassword = false;
 
   @override
   void initState() {
@@ -59,16 +60,29 @@ class _LoginViewState extends State<LoginView> {
                     autocorrect: false,
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
+                      icon: Icon(Icons.email),
                       hintText: 'Email',
                     ),
                   ),
                   TextField(
                     controller: _password,
-                    obscureText: true,
+                    obscureText: !_isShowingPassword,
                     enableSuggestions: false,
                     autocorrect: false,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
+                      icon: const Icon(Icons.key),
                       hintText: 'Contraseña',
+                      suffixIcon: IconButton(onPressed: () {
+                        setState(() {
+                          _isShowingPassword = !_isShowingPassword;
+                        });
+                      }, icon: Builder(builder: (context) {
+                        if (_isShowingPassword) {
+                          return const Icon(Icons.visibility_off);
+                        } else {
+                          return const Icon(Icons.visibility);
+                        }
+                      })),
                     ),
                   ),
                 ],
