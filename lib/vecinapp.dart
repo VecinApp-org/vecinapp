@@ -21,7 +21,7 @@ class VecinApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    devtools.log('Build VecinApp');
+    devtools.log('MaterialApp');
     return ListenableBuilder(
       listenable: settingsController,
       builder: (BuildContext context, Widget? child) {
@@ -43,7 +43,7 @@ class VecinApp extends StatelessWidget {
                 SettingsView(controller: settingsController),
             newDocRouteName: (context) => const NewDocView(),
           },
-          home: const Initializer(),
+          home: const HomeBuilder(),
           /*
                 //Localizations
                 localizationsDelegates: const [
@@ -81,34 +81,32 @@ class VecinApp extends StatelessWidget {
   }
 }
 
-class Initializer extends StatelessWidget {
-  const Initializer({super.key});
+class HomeBuilder extends StatelessWidget {
+  const HomeBuilder({super.key});
 
   @override
   Widget build(BuildContext context) {
+    devtools.log('HomeBuilder');
     return FutureBuilder(
         future: AuthService.firebase().initialize(),
         builder: (context, snapshot) {
-          devtools.log('Firebase: ${snapshot.connectionState}');
           switch (snapshot.connectionState) {
             case ConnectionState.done:
               return StreamBuilder(
                   stream: AuthService.firebase().userChanges(),
                   builder: (context, snapshot) {
                     AuthService.firebase().currentUser;
-                    devtools.log('FirebaseAuth: ${snapshot.connectionState}');
                     switch (snapshot.connectionState) {
                       case ConnectionState.active:
                         return const AppRoot();
                       default:
                         return const Scaffold(
-                            body: Center(
-                                child: Text('Listening for user changes...')));
+                            body: Center(child: CircularProgressIndicator()));
                     }
                   });
             default:
               return const Scaffold(
-                  body: Center(child: Text('AuthService initializing...')));
+                  body: Center(child: CircularProgressIndicator()));
           }
         });
   }
@@ -119,15 +117,13 @@ class AppRoot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    devtools.log('AppRoot');
     final user = AuthService.firebase().currentUser;
     if (user == null) {
-      devtools.log('User null');
       return const WelcomeView();
     } else if (user.isEmailVerified) {
-      devtools.log('User verified');
       return const HomeDrawer();
     } else {
-      devtools.log('User not verified');
       return const VerifyEmailView();
     }
   }

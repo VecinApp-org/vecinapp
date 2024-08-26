@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' show join;
 
 import 'package:vecinapp/services/crud/crud_exceptions.dart';
-import 'dart:developer' as devtools show log;
+//import 'dart:developer' as devtools show log;
 
 class DocsService {
   Database? _db;
@@ -14,24 +14,22 @@ class DocsService {
   List<DatabaseDoc> _docs = [];
 
   static final DocsService _shared = DocsService._sharedInstance();
+
   DocsService._sharedInstance() {
     _docsStreamController = StreamController<List<DatabaseDoc>>.broadcast(
       onListen: () {
-        devtools.log('_docsStreamController onListen');
         _docsStreamController.sink.add(_docs);
       },
     );
   }
 
   factory DocsService() {
-    devtools.log('(Factory DocsService)');
     return _shared;
   }
 
   late final StreamController<List<DatabaseDoc>> _docsStreamController;
 
   Stream<List<DatabaseDoc>> get allDocs {
-    devtools.log('(Get allDocs Stream)');
     return _docsStreamController.stream;
   }
 
@@ -40,20 +38,16 @@ class DocsService {
   }) async {
     try {
       final user = await getUser(authId: authId);
-      devtools.log('(getOrCreateUser) Found user: $user');
       return user;
     } on CouldNotFindUser {
       final createdUser = await createUser(authId: authId);
-      devtools.log('(getOrCreateUser) Created user: $createdUser');
       return createdUser;
     } catch (e) {
-      devtools.log('(getOrCreateUser) Error: $e');
       rethrow;
     }
   }
 
   Future<void> _cacheDocs() async {
-    devtools.log('(_cacheDocs)');
     final allDocs = await getAllDocs();
     _docs = allDocs.toList();
     _docsStreamController.add(_docs);
@@ -90,7 +84,6 @@ class DocsService {
     await ensureDatatabaseIsOpen();
     final db = _getDatabaseOrThrow();
     final docs = await db.query(docTable);
-    devtools.log('(getAllDocs) docs: $docs');
     return docs.map((docRow) => DatabaseDoc.fromRow(docRow));
   }
 
@@ -121,7 +114,6 @@ class DocsService {
     final deletedCount = await db.delete(docTable);
     _docs = [];
     _docsStreamController.add(_docs);
-    devtools.log('deleteAllDocs: $deletedCount');
     return deletedCount;
   }
 
@@ -137,12 +129,10 @@ class DocsService {
     } else {
       _docs.removeWhere((doc) => doc.id == id);
       _docsStreamController.add(_docs);
-      devtools.log('(deleteDoc) deleted Doc');
     }
   }
 
   Future<DatabaseDoc> createDoc({required DatabaseUser owner}) async {
-    devtools.log('(createDoc) owner: $owner.authId');
     await ensureDatatabaseIsOpen();
     final db = _getDatabaseOrThrow();
 
@@ -150,10 +140,7 @@ class DocsService {
     final dbUser = await getUser(authId: owner.authId);
 
     if (dbUser != owner) {
-      devtools.log('(createDoc) user is not the owner');
       throw CouldNotFindUser();
-    } else {
-      devtools.log('(createDoc) user is the owner');
     }
 
     const text = '';
@@ -177,7 +164,6 @@ class DocsService {
 
     _docs.add(doc);
     _docsStreamController.add(_docs);
-    devtools.log('(createDoc) added doc: $doc');
 
     return doc;
   }
@@ -201,72 +187,46 @@ class DocsService {
   }
 
   Future<DatabaseUser> createUser({required String authId}) async {
-    try {
-      devtools.log('(createUser) Creating User: $authId');
-      await ensureDatatabaseIsOpen();
-      final db = _getDatabaseOrThrow();
-
-      final usersInTable = await db.query(userTable);
-      devtools.log('(createUser) usersInTable: $usersInTable');
-
-      final result = await db.query(
-        userTable,
-        limit: 1,
-        where: "auth_id = ?",
-        whereArgs: [authId],
-      );
-      devtools.log('(createUser) result: $result');
-
-      if (result.isNotEmpty) {
-        devtools.log('(createUser) User already exists');
-        throw UserAlreadyExists();
-      }
-      devtools.log('(createUser) User does not exist, creating user');
-      final userId = await db.insert(userTable, {
-        authIdColumn: authId,
-      });
-
-      devtools.log('(createUser) Created user with id $userId');
-
-      final confirmUsersInTable = await db.query(userTable);
-      devtools.log('(createUser) confirmUsersInTable: $confirmUsersInTable');
-
-      return DatabaseUser(
-        id: userId,
-        authId: authId,
-      );
-    } catch (e) {
-      devtools.log('(createUser) Error: $e');
-      rethrow;
+    await ensureDatatabaseIsOpen();
+    final db = _getDatabaseOrThrow();
+    // make sure authId is unique in the database
+    final result = await db.query(
+      userTable,
+      limit: 1,
+      where: "auth_id = ?",
+      whereArgs: [authId],
+    );
+    if (result.isNotEmpty) {
+      throw UserAlreadyExists();
     }
+    // create the user
+    final userId = await db.insert(userTable, {
+      authIdColumn: authId,
+    });
+    return DatabaseUser(
+      id: userId,
+      authId: authId,
+    );
   }
 
   Future<void> deleteUser({required String authId}) async {
     await ensureDatatabaseIsOpen();
     final db = _getDatabaseOrThrow();
-    devtools.log(db.path);
-    devtools.log(db.database.toString());
-    devtools.log(db.toString());
     final deletedCount = await db.delete(
       userTable,
       where: 'auth_id = ?',
       whereArgs: [authId],
     );
     if (deletedCount != 1) {
-      devtools.log('(deleteUser) Could not delete user');
       throw CouldNotDeleteUser();
-    } else {
-      devtools.log('(deleteUser) Deleted $deletedCount users');
-    }
+    } else {}
   }
 
   Database _getDatabaseOrThrow() {
     final db = _db;
     if (db == null) {
-      devtools.log('(_getDatabaseOrThrow) Database is not open');
       throw DatabaseIsNotOpen();
     } else {
-      devtools.log('(_getDatabaseOrThrow) Database is open');
       return db;
     }
   }
@@ -277,15 +237,13 @@ class DocsService {
     }
     await _db!.close();
     _db = null;
-    devtools.log('Close Database');
   }
 
   Future<void> ensureDatatabaseIsOpen() async {
     try {
       await open();
-      devtools.log('(ensureDatatabaseIsOpen) opened database');
     } on DatabaseAlreadyOpenException {
-      devtools.log('(ensureDatatabaseIsOpen) database is already open');
+      null;
     }
   }
 

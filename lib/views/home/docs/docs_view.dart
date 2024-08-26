@@ -25,6 +25,7 @@ class _DocsViewState extends State<DocsView> {
 
   @override
   Widget build(BuildContext context) {
+    devtools.log('DocsView');
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -35,17 +36,14 @@ class _DocsViewState extends State<DocsView> {
       body: FutureBuilder(
         future: _docsService.getOrCreateUser(authId: userId),
         builder: (context, snapshot) {
-          devtools.log('DocsUser: ${snapshot.connectionState}');
           switch (snapshot.connectionState) {
             case ConnectionState.done:
               return StreamBuilder(
                 stream: _docsService.allDocs,
                 builder: (context, snapshot) {
-                  devtools.log('Get allDocs: ${snapshot.connectionState}');
                   switch (snapshot.connectionState) {
                     case ConnectionState.active:
                       if (snapshot.hasData) {
-                        devtools.log('snapshot.data: ${snapshot.data}');
                         final allNotes = snapshot.data as List<DatabaseDoc>;
                         return DocsListView(
                           docs: allNotes,
@@ -54,23 +52,15 @@ class _DocsViewState extends State<DocsView> {
                           },
                         );
                       } else {
-                        return const Center(
-                          child: Center(
-                            child: Text('No hay documentos'),
-                          ),
-                        );
+                        return const Center(child: CircularProgressIndicator());
                       }
                     default:
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
+                      return const Center(child: CircularProgressIndicator());
                   }
                 },
               );
             default:
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return const Center(child: CircularProgressIndicator());
           }
         },
       ),

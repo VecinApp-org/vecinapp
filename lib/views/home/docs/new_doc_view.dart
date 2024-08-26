@@ -23,13 +23,10 @@ class _NewDocViewState extends State<NewDocView> {
     final currentUser = AuthService.firebase().currentUser!;
 
     final uid = currentUser.uid;
-    devtools.log('uid: $uid');
     try {
       final owner = await _docsService.getUser(authId: uid);
-      devtools.log('owner: $owner');
       return await _docsService.createDoc(owner: owner);
     } catch (e) {
-      devtools.log('Error: $e');
       rethrow;
     }
   }
@@ -45,7 +42,6 @@ class _NewDocViewState extends State<NewDocView> {
   void _deleteDocIfTextIsEmpty() {
     final doc = _doc;
     if (_textController.text.isEmpty && doc != null) {
-      devtools.log('deleteDocIfTextIsEmpty');
       _docsService.deleteDoc(id: doc.id);
     }
   }
@@ -54,8 +50,10 @@ class _NewDocViewState extends State<NewDocView> {
     final doc = _doc;
     final text = _textController.text;
     if (text.isNotEmpty && doc != null) {
-      devtools.log('saveDocIfTextNotEmpty');
-      await _docsService.updateDoc(doc: doc, text: text);
+      await _docsService.updateDoc(
+        doc: doc,
+        text: text,
+      );
     }
   }
 
@@ -79,13 +77,13 @@ class _NewDocViewState extends State<NewDocView> {
   }
 
   void _setupTextControllerListener() {
-    devtools.log('_setupTextControllerListener');
     _textController.removeListener(_textControllerListener);
     _textController.addListener(_textControllerListener);
   }
 
   @override
   Widget build(BuildContext context) {
+    devtools.log('NewDocView');
     return Scaffold(
         appBar: AppBar(
           title: const Text('New Doc'),
@@ -95,10 +93,8 @@ class _NewDocViewState extends State<NewDocView> {
           child: FutureBuilder(
               future: _createDoc(),
               builder: (context, snapshot) {
-                devtools.log('Creating doc: ${snapshot.connectionState}');
                 switch (snapshot.connectionState) {
                   case ConnectionState.done:
-                    devtools.log('Doc created: ${snapshot.data}');
                     _doc = snapshot.data;
                     _setupTextControllerListener();
                     return TextField(
@@ -110,7 +106,7 @@ class _NewDocViewState extends State<NewDocView> {
                       controller: _textController,
                     );
                   default:
-                    return const CircularProgressIndicator();
+                    return const Center(child: CircularProgressIndicator());
                 }
               }),
         ));
