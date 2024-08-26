@@ -18,7 +18,6 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
     return Scaffold(
       body: Center(
         child: Column(
-          spacing: 64,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
@@ -26,7 +25,6 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
               style: TextStyle(fontSize: 28),
             ),
             Column(
-              spacing: 16,
               children: [
                 const SizedBox(
                   width: 300,
@@ -66,7 +64,6 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
               ],
             ),
             Column(
-              spacing: 16,
               children: [
                 const SizedBox(
                   width: 300,
@@ -98,7 +95,6 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
               ],
             ),
             Column(
-              spacing: 16,
               children: [
                 const SizedBox(
                   width: 300,

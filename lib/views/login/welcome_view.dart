@@ -9,12 +9,10 @@ class WelcomeView extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: Column(
-          spacing: 64,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             //Title
             const Column(
-              spacing: 8,
               children: [
                 Text(
                   'VecinApp',
@@ -29,7 +27,6 @@ class WelcomeView extends StatelessWidget {
 
             //Buttons
             Row(
-              spacing: 16,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 FilledButton(

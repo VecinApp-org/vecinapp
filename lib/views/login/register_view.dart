@@ -44,7 +44,6 @@ class _RegisterViewState extends State<RegisterView> {
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 64,
             children: [
               //Title
               const Text(
@@ -56,7 +55,6 @@ class _RegisterViewState extends State<RegisterView> {
               SizedBox(
                 width: 300,
                 child: Column(
-                  spacing: 8,
                   children: [
                     TextField(
                       controller: _email,
@@ -121,7 +119,6 @@ class _RegisterViewState extends State<RegisterView> {
 
               //Buttons
               Column(
-                spacing: 8,
                 children: [
                   //Register button
                   FilledButton(

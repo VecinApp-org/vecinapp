@@ -40,7 +40,6 @@ class _LoginViewState extends State<LoginView> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 64,
           children: [
             //Title
             const Text(
@@ -50,7 +49,6 @@ class _LoginViewState extends State<LoginView> {
             SizedBox(
               width: 300,
               child: Column(
-                spacing: 8,
                 children: [
                   //Email Field
                   TextField(
@@ -90,7 +88,6 @@ class _LoginViewState extends State<LoginView> {
             ),
             //Buttons
             Column(
-              spacing: 8,
               children: [
                 //Login button
                 FilledButton(

@@ -21,11 +21,10 @@ class VecinApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    devtools.log('build VecinApp');
+    devtools.log('Build VecinApp');
     return ListenableBuilder(
       listenable: settingsController,
       builder: (BuildContext context, Widget? child) {
-        devtools.log('ThemeMode: ${settingsController.themeMode}');
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           restorationScopeId: 'vecinapp',

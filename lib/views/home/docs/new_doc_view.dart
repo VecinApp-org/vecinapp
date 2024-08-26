@@ -15,30 +15,38 @@ class _NewDocViewState extends State<NewDocView> {
   late final DocsService _docsService;
   late final TextEditingController _textController;
 
-  Future<DatabaseDoc> createDoc() async {
+  Future<DatabaseDoc> _createDoc() async {
     final existingNote = _doc;
     if (existingNote != null) {
       return existingNote;
     }
     final currentUser = AuthService.firebase().currentUser!;
+
     final uid = currentUser.uid;
-    final owner = await _docsService.getUser(authId: uid);
-    return await _docsService.createDoc(owner: owner);
+    devtools.log('uid: $uid');
+    try {
+      final owner = await _docsService.getUser(authId: uid);
+      devtools.log('owner: $owner');
+      return await _docsService.createDoc(owner: owner);
+    } catch (e) {
+      devtools.log('Error: $e');
+      rethrow;
+    }
   }
 
   void _deleteDocIfTextIsEmpty() {
-    devtools.log('deleteDocIfTextIsEmpty');
     final doc = _doc;
     if (_textController.text.isEmpty && doc != null) {
+      devtools.log('deleteDocIfTextIsEmpty');
       _docsService.deleteDoc(id: doc.id);
     }
   }
 
   void _saveDocIfTextNotEmpty() async {
-    devtools.log('saveDocIfTextNotEmpty');
     final doc = _doc;
     final text = _textController.text;
     if (text.isNotEmpty && doc != null) {
+      devtools.log('saveDocIfTextNotEmpty');
       await _docsService.updateDoc(doc: doc, text: text);
     }
   }
@@ -63,14 +71,15 @@ class _NewDocViewState extends State<NewDocView> {
   }
 
   void _setupTextControllerListener() {
+    devtools.log('_setupTextControllerListener');
     _textController.removeListener(_textControllerListener);
     _textController.addListener(_textControllerListener);
   }
 
   @override
   void dispose() {
-    _deleteDocIfTextIsEmpty();
     _saveDocIfTextNotEmpty();
+    _deleteDocIfTextIsEmpty();
     _textController.dispose();
     super.dispose();
   }
@@ -84,10 +93,12 @@ class _NewDocViewState extends State<NewDocView> {
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: FutureBuilder(
-              future: createDoc(),
+              future: _createDoc(),
               builder: (context, snapshot) {
+                devtools.log('Creating doc: ${snapshot.connectionState}');
                 switch (snapshot.connectionState) {
                   case ConnectionState.done:
+                    devtools.log('Doc created: ${snapshot.data}');
                     _doc = snapshot.data;
                     _setupTextControllerListener();
                     return TextField(
