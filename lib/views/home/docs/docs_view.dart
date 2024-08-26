@@ -4,6 +4,8 @@ import 'package:vecinapp/services/crud/docs_service.dart';
 import 'package:vecinapp/constants/routes.dart';
 import 'dart:developer' as devtools show log;
 
+import 'package:vecinapp/views/home/docs/docs_list_view.dart';
+
 class DocsView extends StatefulWidget {
   const DocsView({super.key});
 
@@ -45,19 +47,12 @@ class _DocsViewState extends State<DocsView> {
                       if (snapshot.hasData) {
                         devtools.log('snapshot.data: ${snapshot.data}');
                         final allNotes = snapshot.data as List<DatabaseDoc>;
-                        return ListView.builder(
-                            itemCount: allNotes.length,
-                            itemBuilder: (context, index) {
-                              final doc = allNotes[index];
-                              return ListTile(
-                                title: Text(
-                                  doc.text,
-                                  maxLines: 1,
-                                  softWrap: true,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              );
-                            });
+                        return DocsListView(
+                          docs: allNotes,
+                          onDeleteDoc: (doc) async {
+                            await _docsService.deleteDoc(id: doc.id);
+                          },
+                        );
                       } else {
                         return const Center(
                           child: Center(

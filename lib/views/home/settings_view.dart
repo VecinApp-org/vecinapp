@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vecinapp/constants/routes.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
 import 'package:vecinapp/services/auth/auth_service.dart';
-import 'package:vecinapp/utilities/confirmation_action_dialog.dart';
+import 'package:vecinapp/utilities/show_confirmation_dialog.dart';
 import 'package:vecinapp/utilities/show_error_dialog.dart';
 
 import '../../services/settings/settings_controller.dart';
@@ -52,7 +52,7 @@ class SettingsView extends StatelessWidget {
             onPressed: () async {
               devtools.log('Logging out...');
 
-              final confirmation = await confirmationActionDialog(
+              final confirmation = await showConfirmationDialog(
                 context,
                 '¿Seguro que quieres cerrar sesión?',
               );
@@ -73,7 +73,7 @@ class SettingsView extends StatelessWidget {
             onPressed: () async {
               devtools.log('Deleting user...');
               try {
-                final confirmation = await confirmationActionDialog(
+                final confirmation = await showConfirmationDialog(
                   context,
                   '¿Seguro que quieres borrar tu cuenta?',
                 );
