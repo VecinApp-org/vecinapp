@@ -41,21 +41,22 @@ class _DocsViewState extends State<DocsView> {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
               return StreamBuilder(
-                  stream: _docsService.allDocs,
-                  builder: (context, snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.waiting:
-                        return const Center(
-                          child: Text('No hay ningún documento.'),
-                        );
-                      case ConnectionState.active:
-                        return const Text('active');
-                      default:
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                    }
-                  });
+                stream: _docsService.allDocs,
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return const Center(
+                        child: Text('No hay ningún documento.'),
+                      );
+                    case ConnectionState.active:
+                      return const Text('active');
+                    default:
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                  }
+                },
+              );
             default:
               return const Center(
                 child: CircularProgressIndicator(),
