@@ -190,7 +190,7 @@ class DocsService {
       userTable,
       limit: 1,
       where: 'auth_id = ?',
-      //whereArgs: [authId],
+      whereArgs: [authId],
     );
 
     devtools.log('(getUser) result: $result');
@@ -287,8 +287,9 @@ class DocsService {
   Future<void> ensureDatatabaseIsOpen() async {
     try {
       await open();
+      devtools.log('(ensureDatatabaseIsOpen) opened database');
     } on DatabaseAlreadyOpenException {
-      // empty
+      devtools.log('(ensureDatatabaseIsOpen) database is already open');
     }
   }
 

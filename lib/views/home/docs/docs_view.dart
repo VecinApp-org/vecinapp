@@ -17,8 +17,8 @@ class _DocsViewState extends State<DocsView> {
 
   @override
   void initState() {
-    super.initState();
     _docsService = DocsService();
+    super.initState();
   }
 
   @override
