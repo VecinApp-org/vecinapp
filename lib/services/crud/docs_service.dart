@@ -185,21 +185,17 @@ class DocsService {
   Future<DatabaseUser> getUser({required String authId}) async {
     await ensureDatatabaseIsOpen();
     final db = _getDatabaseOrThrow();
-    devtools.log('(getUser) Awaiting getUser');
     final result = await db.query(
       userTable,
       limit: 1,
-      where: 'auth_id = ?',
+      where: '$authIdColumn = ?',
       whereArgs: [authId],
     );
 
-    devtools.log('(getUser) result: $result');
     if (result.isEmpty) {
-      devtools.log('(getUser) Empty result');
       throw CouldNotFindUser();
     } else {
       final user = DatabaseUser.fromRow(result.first);
-      devtools.log('(getUser) Got user $user');
       return user;
     }
   }

@@ -24,15 +24,6 @@ class _DocsViewState extends State<DocsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-              onPressed: () async {
-                await _docsService.deleteUser(authId: userId);
-              },
-              icon: const Icon(Icons.delete_forever))
-        ],
-      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).pushNamed(newDocRouteName);
@@ -53,10 +44,20 @@ class _DocsViewState extends State<DocsView> {
                     case ConnectionState.active:
                       if (snapshot.hasData) {
                         devtools.log('snapshot.data: ${snapshot.data}');
-                        final allNotes = snapshot.data;
-                        return ListView(children: [
-                          Text('All Notes: $allNotes'),
-                        ]);
+                        final allNotes = snapshot.data as List<DatabaseDoc>;
+                        return ListView.builder(
+                            itemCount: allNotes.length,
+                            itemBuilder: (context, index) {
+                              final doc = allNotes[index];
+                              return ListTile(
+                                title: Text(
+                                  doc.text,
+                                  maxLines: 1,
+                                  softWrap: true,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              );
+                            });
                       } else {
                         return const Center(
                           child: Center(

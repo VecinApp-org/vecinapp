@@ -34,6 +34,14 @@ class _NewDocViewState extends State<NewDocView> {
     }
   }
 
+  @override
+  void dispose() {
+    _textController.dispose();
+    _saveDocIfTextNotEmpty();
+    _deleteDocIfTextIsEmpty();
+    super.dispose();
+  }
+
   void _deleteDocIfTextIsEmpty() {
     final doc = _doc;
     if (_textController.text.isEmpty && doc != null) {
@@ -74,14 +82,6 @@ class _NewDocViewState extends State<NewDocView> {
     devtools.log('_setupTextControllerListener');
     _textController.removeListener(_textControllerListener);
     _textController.addListener(_textControllerListener);
-  }
-
-  @override
-  void dispose() {
-    _saveDocIfTextNotEmpty();
-    _deleteDocIfTextIsEmpty();
-    _textController.dispose();
-    super.dispose();
   }
 
   @override

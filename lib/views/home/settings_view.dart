@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vecinapp/constants/routes.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
 import 'package:vecinapp/services/auth/auth_service.dart';
+import 'package:vecinapp/utilities/confirmation_action_dialog.dart';
 import 'package:vecinapp/utilities/show_error_dialog.dart';
 
 import '../../services/settings/settings_controller.dart';
@@ -50,11 +51,19 @@ class SettingsView extends StatelessWidget {
           TextButton(
             onPressed: () async {
               devtools.log('Logging out...');
-              await AuthService.firebase().logOut();
-              if (context.mounted) {
-                Navigator.of(context).popAndPushNamed(
-                  appRootRouteName,
-                );
+
+              final confirmation = await confirmationActionDialog(
+                context,
+                '¿Seguro que quieres cerrar sesión?',
+              );
+              if (confirmation != null && confirmation) {
+                await AuthService.firebase().logOut();
+                if (context.mounted) {
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    appRootRouteName,
+                    (route) => false,
+                  );
+                }
               }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -64,12 +73,18 @@ class SettingsView extends StatelessWidget {
             onPressed: () async {
               devtools.log('Deleting user...');
               try {
-                await AuthService.firebase().deleteAccount();
-                if (context.mounted) {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    appRootRouteName,
-                    (route) => false,
-                  );
+                final confirmation = await confirmationActionDialog(
+                  context,
+                  '¿Seguro que quieres borrar tu cuenta?',
+                );
+                if (confirmation != null && confirmation) {
+                  await AuthService.firebase().deleteAccount();
+                  if (context.mounted) {
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      appRootRouteName,
+                      (route) => false,
+                    );
+                  }
                 }
               } on RequiresRecentLoginAuthException {
                 if (context.mounted) {
