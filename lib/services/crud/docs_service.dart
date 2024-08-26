@@ -21,13 +21,13 @@ class DocsService {
   Stream<List<DatabaseDoc>> get allDocs => _docsStreamController.stream;
 
   Future<DatabaseUser> getOrCreateUser({
-    required String email,
+    required String authId,
   }) async {
     try {
-      final user = await getUser(email: email);
+      final user = await getUser(authId: authId);
       return user;
     } on CouldNotFindUser {
-      final createdUser = await createUser(email: email);
+      final createdUser = await createUser(authId: authId);
       return createdUser;
     } catch (e) {
       rethrow;
@@ -124,7 +124,7 @@ class DocsService {
     final db = _getDatabaseOrThrow();
 
     // make sure owner exists in the database with the correct id
-    final dbUser = await getUser(email: owner.email);
+    final dbUser = await getUser(authId: owner.authId);
     if (dbUser != owner) {
       throw CouldNotFindUser();
     }
@@ -151,14 +151,14 @@ class DocsService {
     return doc;
   }
 
-  Future<DatabaseUser> getUser({required String email}) async {
+  Future<DatabaseUser> getUser({required String authId}) async {
     await ensureDatatabaseIsOpen();
     final db = _getDatabaseOrThrow();
     final result = await db.query(
       userTable,
       limit: 1,
-      where: 'email = ?',
-      whereArgs: [email.toLowerCase()],
+      where: 'auth_id = ?',
+      whereArgs: [authId.toLowerCase()],
     );
     if (result.isEmpty) {
       throw CouldNotFindUser();
@@ -167,35 +167,35 @@ class DocsService {
     }
   }
 
-  Future<DatabaseUser> createUser({required String email}) async {
+  Future<DatabaseUser> createUser({required String authId}) async {
     await ensureDatatabaseIsOpen();
     final db = _getDatabaseOrThrow();
     final result = await db.query(
       userTable,
       limit: 1,
-      where: 'email = ?',
-      whereArgs: [email.toLowerCase()],
+      where: 'auth_id = ?',
+      whereArgs: [authId.toLowerCase()],
     );
     if (result.isNotEmpty) {
       throw UserAlreadyExists();
     }
 
     final userId = await db.insert(userTable, {
-      emailColumn: email.toLowerCase(),
+      authIdColumn: authId.toLowerCase(),
     });
     return DatabaseUser(
       id: userId,
-      email: email,
+      authId: authId,
     );
   }
 
-  Future<void> deleteUser({required String email}) async {
+  Future<void> deleteUser({required String authId}) async {
     await ensureDatatabaseIsOpen();
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(
       userTable,
-      where: 'email = ?',
-      whereArgs: [email.toLowerCase()],
+      where: 'auth_id = ?',
+      whereArgs: [authId.toLowerCase()],
     );
     if (deletedCount != 1) {
       throw CouldNotDeleteUser();
@@ -250,18 +250,18 @@ class DocsService {
 @immutable
 class DatabaseUser {
   final int id;
-  final String email;
+  final String authId;
   const DatabaseUser({
     required this.id,
-    required this.email,
+    required this.authId,
   });
 
   DatabaseUser.fromRow(Map<String, Object?> map)
       : id = map[idColumn] as int,
-        email = map[emailColumn] as String;
+        authId = map[authIdColumn] as String;
 
   @override
-  String toString() => 'Person, ID = $id, email = $email';
+  String toString() => 'Person, ID = $id, AuthId = $authId';
 
   @override
   bool operator ==(covariant DatabaseUser other) => id == other.id;
@@ -305,7 +305,7 @@ const docTable = 'docs';
 const userTable = 'users';
 
 const idColumn = 'id';
-const emailColumn = 'email';
+const authIdColumn = 'auth_id';
 
 const userIdColumn = 'user_id';
 const textColumn = 'text';
@@ -314,7 +314,7 @@ const isSyncedWithCloudColumn = 'is_synced_with_cloud';
 const createUserTable = '''
 CREATE TABLE IF NOT EXISTS "user" (
   "id"	INTEGER NOT NULL UNIQUE,
-  "email"	TEXT NOT NULL UNIQUE,
+  "auth_id"	TEXT NOT NULL UNIQUE,
   PRIMARY KEY("id" AUTOINCREMENT)
 );''';
 const createDocTable = '''

@@ -12,7 +12,7 @@ class DocsView extends StatefulWidget {
 
 class _DocsViewState extends State<DocsView> {
   late final DocsService _docsService;
-  String get userEmail => AuthService.firebase().currentUser!.email!;
+  String get userId => AuthService.firebase().currentUser!.uid;
 
   @override
   void initState() {
@@ -36,7 +36,7 @@ class _DocsViewState extends State<DocsView> {
         child: const Icon(Icons.add),
       ),
       body: FutureBuilder(
-        future: _docsService.getOrCreateUser(email: userEmail),
+        future: _docsService.getOrCreateUser(authId: userId),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:

@@ -96,6 +96,7 @@ class Initializer extends StatelessWidget {
               return StreamBuilder(
                   stream: AuthService.firebase().userChanges(),
                   builder: (context, snapshot) {
+                    AuthService.firebase().currentUser;
                     devtools.log('FirebaseAuth: ${snapshot.connectionState}');
                     switch (snapshot.connectionState) {
                       case ConnectionState.active:
@@ -108,7 +109,7 @@ class Initializer extends StatelessWidget {
                   });
             default:
               return const Scaffold(
-                  body: Center(child: Text('Auth Service initializing...')));
+                  body: Center(child: Text('AuthService initializing...')));
           }
         });
   }

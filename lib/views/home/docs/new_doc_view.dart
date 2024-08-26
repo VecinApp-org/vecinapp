@@ -21,8 +21,8 @@ class _NewDocViewState extends State<NewDocView> {
       return existingNote;
     }
     final currentUser = AuthService.firebase().currentUser!;
-    final email = currentUser.email;
-    final owner = await _docsService.getUser(email: email!);
+    final uid = currentUser.uid;
+    final owner = await _docsService.getUser(authId: uid);
     return await _docsService.createDoc(owner: owner);
   }
 
