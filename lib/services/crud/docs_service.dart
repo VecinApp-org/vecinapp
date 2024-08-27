@@ -5,7 +5,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' show join;
 
-import 'package:vecinapp/services/crud/crud_exceptions.dart';
+import 'package:vecinapp/services/crud/docs_exceptions.dart';
 import 'dart:developer' as devtools show log;
 
 class DocsService {

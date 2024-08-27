@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vecinapp/services/auth/auth_service.dart';
-import 'package:vecinapp/services/crud/crud_exceptions.dart';
+import 'package:vecinapp/services/crud/docs_exceptions.dart';
 import 'package:vecinapp/services/crud/docs_service.dart';
 import 'dart:developer' as devtools show log;
 
@@ -57,58 +57,57 @@ class _NewDocViewState extends State<NewDocView> {
     devtools.log('NewDocView');
     return Scaffold(
         appBar: AppBar(
-          title: const Text('New Doc'),
+          title: const Text('Editar Reglamento'),
         ),
-        body: Padding(
+        body: ListView(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              TextField(
-                autofocus: true,
-                keyboardType: TextInputType.multiline,
-                maxLines: 1,
-                decoration: const InputDecoration(
-                  labelText: 'Título',
-                  //hintText: 'Título...',
-                ),
-                controller: _titleController,
+          children: [
+            TextField(
+              autofocus: true,
+              keyboardType: TextInputType.multiline,
+              maxLines: 1,
+              decoration: const InputDecoration(
+                labelText: 'Título',
+                //hintText: 'Título...',
               ),
-              TextField(
-                keyboardType: TextInputType.multiline,
-                maxLines: null,
-                decoration: const InputDecoration(
-                  labelText: 'Contenido',
-                ),
-                controller: _textController,
+              controller: _titleController,
+            ),
+            const SizedBox(height: 8.0),
+            TextField(
+              keyboardType: TextInputType.multiline,
+              maxLines: null,
+              decoration: const InputDecoration(
+                labelText: 'Contenido',
               ),
-              const SizedBox(height: 8),
-              FilledButton(
-                onPressed: () async {
-                  try {
-                    await _createDoc();
-                    if (context.mounted) {
-                      Navigator.of(context).pop();
-                    }
-                  } on EmptyText {
-                    if (context.mounted) {
-                      showErrorDialog(
-                        context,
-                        'El contenido no puede estar vacío.',
-                      );
-                    }
-                  } on EmptyTitle {
-                    if (context.mounted) {
-                      showErrorDialog(
-                        context,
-                        'El título no puede estar vacío.',
-                      );
-                    }
+              controller: _textController,
+            ),
+            const SizedBox(height: 32.0),
+            FilledButton(
+              onPressed: () async {
+                try {
+                  await _createDoc();
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
                   }
-                },
-                child: const Text('Crear'),
-              )
-            ],
-          ),
+                } on EmptyText {
+                  if (context.mounted) {
+                    showErrorDialog(
+                      context,
+                      'El contenido no puede estar vacío.',
+                    );
+                  }
+                } on EmptyTitle {
+                  if (context.mounted) {
+                    showErrorDialog(
+                      context,
+                      'El título no puede estar vacío.',
+                    );
+                  }
+                }
+              },
+              child: const Text('Guardar'),
+            )
+          ],
         ));
   }
 }

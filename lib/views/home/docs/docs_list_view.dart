@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vecinapp/services/crud/docs_service.dart';
-import 'package:vecinapp/utilities/show_confirmation_dialog.dart';
+import 'package:vecinapp/views/home/docs/docs_details_view.dart';
 import 'dart:developer' as devtools show log;
 
 typedef DeleteDocCallback = void Function(DatabaseDoc doc);
@@ -25,22 +25,17 @@ class DocsListView extends StatelessWidget {
           return Column(
             children: [
               ListTile(
-                subtitle: Text(doc.text),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DocDetailsView(doc: doc),
+                  ),
+                ),
                 title: Text(
                   doc.title,
                   maxLines: 1,
                   softWrap: true,
                   overflow: TextOverflow.ellipsis,
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () async {
-                    final shouldDelete = await showConfirmationDialog(
-                        context, '¿Quieres eliminar el documento?');
-                    if (shouldDelete == true) {
-                      onDeleteDoc(doc);
-                    }
-                  },
                 ),
               ),
               const Divider(),
