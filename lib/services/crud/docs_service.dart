@@ -51,7 +51,6 @@ class DocsService {
     final allDocs = await getAllDocs();
     _docs = allDocs.toList();
     _docsStreamController.add(_docs);
-    devtools.log('(_cacheDocs) Cached docs: ${_docs.toString()}');
   }
 
   Future<DatabaseDoc> updateDoc({
@@ -62,13 +61,22 @@ class DocsService {
     final db = _getDatabaseOrThrow();
 
     // make sure owner exists in the database with the correct id
-    await getDoc(id: doc.id);
+    final owner = await getDoc(id: doc.id);
+    if (owner.userId != doc.userId) {
+      throw CouldNotUpdateDoc();
+    }
 
     // update the doc in the database
-    final updatesCount = await db.update(docTable, {
-      textColumn: text,
-      isSyncedWithCloudColumn: 0,
-    });
+    final updatesCount = await db.update(
+      docTable,
+      {
+        docsTitleColumn: doc.title,
+        docsTextColumn: text,
+        docsIsSyncedWithCloudColumn: 0,
+      },
+      where: '$docsIdColumn = ?',
+      whereArgs: [doc.id],
+    );
 
     if (updatesCount == 0) {
       throw CouldNotUpdateDoc();
@@ -94,7 +102,7 @@ class DocsService {
     final docs = await db.query(
       docTable,
       limit: 1,
-      where: '$idColumn = ?',
+      where: '$docsIdColumn = ?',
       whereArgs: [id],
     );
 
@@ -122,7 +130,7 @@ class DocsService {
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(
       docTable,
-      where: 'id = ?',
+      where: '$docsIdColumn = ?',
       whereArgs: [id],
     );
     if (deletedCount == 0) {
@@ -133,7 +141,7 @@ class DocsService {
     }
   }
 
-  Future<DatabaseDoc> createDoc({required DatabaseUser owner}) async {
+  Future<DatabaseDoc> createEmptyDoc({required DatabaseUser owner}) async {
     await ensureDatabaseIsOpen();
     final db = _getDatabaseOrThrow();
 
@@ -149,10 +157,10 @@ class DocsService {
 
     // create the document
     final docId = await db.insert(docTable, {
-      userIdColumn: owner.id,
-      textColumn: text,
-      titleColumn: title,
-      isSyncedWithCloudColumn: 1,
+      docsUserIdSyncedColumn: owner.id,
+      docsTextColumn: text,
+      docsTitleColumn: title,
+      docsIsSyncedWithCloudColumn: 1,
     });
 
     final doc = DatabaseDoc(
@@ -175,7 +183,7 @@ class DocsService {
     final result = await db.query(
       userTable,
       limit: 1,
-      where: '$authIdColumn = ?',
+      where: '$usersAuthIdColumn = ?',
       whereArgs: [authId],
     );
 
@@ -194,7 +202,7 @@ class DocsService {
     final result = await db.query(
       userTable,
       limit: 1,
-      where: "auth_id = ?",
+      where: "$usersAuthIdColumn = ?",
       whereArgs: [authId],
     );
     if (result.isNotEmpty) {
@@ -202,7 +210,7 @@ class DocsService {
     }
     // create the user
     final userId = await db.insert(userTable, {
-      authIdColumn: authId,
+      usersAuthIdColumn: authId,
     });
     return DatabaseUser(
       id: userId,
@@ -215,7 +223,7 @@ class DocsService {
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(
       userTable,
-      where: 'auth_id = ?',
+      where: '$usersAuthIdColumn = ?',
       whereArgs: [authId],
     );
     if (deletedCount != 1) {
@@ -239,31 +247,25 @@ class DocsService {
       throw DatabaseIsNotOpen();
     }
 
-    final docsTableLog = await db.query('docs');
-    devtools.log('(close) docsTableLog: ${docsTableLog.toString()}');
-
     await db.close();
     _db = null;
-
-    final docsTableLog2 = await db.query('docs');
-    devtools.log('(close) docsTableLog: ${docsTableLog2.toString()}');
   }
 
   Future<void> ensureDatabaseIsOpen() async {
     try {
       await open();
-    } on DatabaseAlreadyOpenException {
-      null;
+    } on DatabaseAlreadyOpen {
+      // empty
     }
   }
 
   Future<void> open() async {
-    devtools.log('Opening database');
     if (_db != null) {
-      devtools.log('Database already open');
-      throw DatabaseAlreadyOpenException();
+      devtools.log('(open) Database already open');
+      throw DatabaseAlreadyOpen();
     }
     try {
+      devtools.log('(open) Opening database');
       final docsPath = await getApplicationDocumentsDirectory();
       final docsDbPath = join(docsPath.path, dbName);
       final db = await openDatabase(docsDbPath);
@@ -272,9 +274,6 @@ class DocsService {
       await db.execute(createUserTable);
       // create the doc table
       await db.execute(createDocTable);
-
-      final docsTableLog = await db.query('docs');
-      devtools.log(docsTableLog.toString());
 
       await _cacheDocs();
     } on MissingPlatformDirectoryException {
@@ -295,8 +294,8 @@ class DatabaseUser {
   });
 
   DatabaseUser.fromRow(Map<String, Object?> map)
-      : id = map[idColumn] as int,
-        authId = map[authIdColumn] as String;
+      : id = map[usersIdColumn] as int,
+        authId = map[usersAuthIdColumn] as String;
 
   @override
   String toString() => 'Person, ID = $id, AuthId = $authId';
@@ -324,12 +323,12 @@ class DatabaseDoc {
   });
 
   DatabaseDoc.fromRow(Map<String, Object?> map)
-      : id = map[idColumn] as int,
-        userId = map[userIdColumn] as int,
-        text = map[textColumn] as String,
-        title = map[titleColumn] as String,
+      : id = map[usersIdColumn] as int,
+        userId = map[docsUserIdSyncedColumn] as int,
+        text = map[docsTextColumn] as String,
+        title = map[docsTitleColumn] as String,
         isSyncedWithCloud =
-            (map[isSyncedWithCloudColumn] as int) == 1 ? true : false;
+            (map[docsIsSyncedWithCloudColumn] as int) == 1 ? true : false;
 
   @override
   String toString() =>
@@ -345,13 +344,14 @@ const dbName = 'docs.db';
 const docTable = 'docs';
 const userTable = 'users';
 
-const idColumn = 'id';
-const authIdColumn = 'auth_id';
+const usersIdColumn = 'id';
+const usersAuthIdColumn = 'auth_id';
 
-const userIdColumn = 'user_id';
-const textColumn = 'text';
-const isSyncedWithCloudColumn = 'is_synced_with_cloud';
-const titleColumn = 'title';
+const docsIdColumn = 'id';
+const docsUserIdSyncedColumn = 'user_id';
+const docsTextColumn = 'text';
+const docsIsSyncedWithCloudColumn = 'is_synced_with_cloud';
+const docsTitleColumn = 'title';
 
 const createUserTable = '''CREATE TABLE IF NOT EXISTS "users" (
 	"id"	INTEGER NOT NULL,

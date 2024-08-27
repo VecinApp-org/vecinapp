@@ -25,7 +25,7 @@ class _NewDocViewState extends State<NewDocView> {
     final uid = currentUser.uid;
     try {
       final owner = await _docsService.getUser(authId: uid);
-      return await _docsService.createDoc(owner: owner);
+      return await _docsService.createEmptyDoc(owner: owner);
     } catch (e) {
       rethrow;
     }
@@ -33,9 +33,9 @@ class _NewDocViewState extends State<NewDocView> {
 
   @override
   void dispose() {
-    _textController.dispose();
     _saveDocIfTextNotEmpty();
     _deleteDocIfTextIsEmpty();
+    _textController.dispose();
     super.dispose();
   }
 
@@ -64,23 +64,6 @@ class _NewDocViewState extends State<NewDocView> {
     super.initState();
   }
 
-  void _textControllerListener() async {
-    final doc = _doc;
-    if (doc == null) {
-      return;
-    }
-    final text = _textController.text;
-    await _docsService.updateDoc(
-      doc: doc,
-      text: text,
-    );
-  }
-
-  void _setupTextControllerListener() {
-    _textController.removeListener(_textControllerListener);
-    _textController.addListener(_textControllerListener);
-  }
-
   @override
   Widget build(BuildContext context) {
     devtools.log('NewDocView');
@@ -96,7 +79,6 @@ class _NewDocViewState extends State<NewDocView> {
                 switch (snapshot.connectionState) {
                   case ConnectionState.done:
                     _doc = snapshot.data;
-                    _setupTextControllerListener();
                     return TextField(
                       keyboardType: TextInputType.multiline,
                       maxLines: null,
