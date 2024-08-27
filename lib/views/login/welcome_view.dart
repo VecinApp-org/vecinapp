@@ -21,9 +21,10 @@ class WelcomeView extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text('Encuentra a tus vecinos'),
               ],
             ),
+
+            const SizedBox(height: 89),
 
             //Buttons
             Row(
@@ -37,6 +38,7 @@ class WelcomeView extends StatelessWidget {
                   },
                   child: const Text('Crear cuenta'),
                 ),
+                const SizedBox(width: 13),
                 OutlinedButton(
                   onPressed: () {
                     Navigator.of(context).pushNamed(
