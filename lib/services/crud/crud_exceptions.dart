@@ -18,4 +18,6 @@ class CouldNotUpdateDoc implements Exception {}
 
 class CouldNotOpenDatabase implements Exception {}
 
-class TitleIsRequired implements Exception {}
+class EmptyTitle implements Exception {}
+
+class EmptyText implements Exception {}

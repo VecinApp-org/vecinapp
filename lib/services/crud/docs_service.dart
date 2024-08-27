@@ -146,6 +146,14 @@ class DocsService {
     required String title,
     required String text,
   }) async {
+    if (title.isEmpty) {
+      throw EmptyTitle();
+    }
+
+    if (text.isEmpty) {
+      throw EmptyText();
+    }
+
     await ensureDatabaseIsOpen();
     final db = _getDatabaseOrThrow();
 

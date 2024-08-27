@@ -25,6 +25,7 @@ class DocsListView extends StatelessWidget {
           return Column(
             children: [
               ListTile(
+                subtitle: Text(doc.text),
                 title: Text(
                   doc.title,
                   maxLines: 1,
