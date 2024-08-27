@@ -56,21 +56,32 @@ class DocsService {
   Future<DatabaseDoc> updateDoc({
     required DatabaseDoc doc,
     required String text,
+    required String title,
   }) async {
+    if (title.isEmpty) {
+      throw EmptyTitle();
+    }
+
+    if (text.isEmpty) {
+      throw EmptyText();
+    }
+
     await ensureDatabaseIsOpen();
     final db = _getDatabaseOrThrow();
 
-    // make sure owner exists in the database with the correct id
-    final owner = await getDoc(id: doc.id);
-    if (owner.userId != doc.userId) {
-      throw CouldNotUpdateDoc();
+    // make sure doc exists in the database with the correct id
+    final dbDoc = await getDoc(id: doc.id);
+    if (dbDoc.userId != doc.userId) {
+      throw CouldNotFindDoc();
     }
+
+    // make sure user is the owner
 
     // update the doc in the database
     final updatesCount = await db.update(
       docTable,
       {
-        docsTitleColumn: doc.title,
+        docsTitleColumn: title,
         docsTextColumn: text,
         docsIsSyncedWithCloudColumn: 0,
       },

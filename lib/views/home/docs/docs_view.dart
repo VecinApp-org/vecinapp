@@ -54,9 +54,6 @@ class _DocsViewState extends State<DocsView> {
                         devtools.log('Building DocsListView: $allNotes');
                         return DocsListView(
                           docs: allNotes,
-                          onDeleteDoc: (doc) async {
-                            await _docsService.deleteDoc(id: doc.id);
-                          },
                         );
                       } else {
                         return const Center(child: CircularProgressIndicator());

@@ -3,16 +3,12 @@ import 'package:vecinapp/services/crud/docs_service.dart';
 import 'package:vecinapp/views/home/docs/docs_details_view.dart';
 import 'dart:developer' as devtools show log;
 
-typedef DeleteDocCallback = void Function(DatabaseDoc doc);
-
 class DocsListView extends StatelessWidget {
   final List<DatabaseDoc> docs;
-  final DeleteDocCallback onDeleteDoc;
 
   const DocsListView({
     super.key,
     required this.docs,
-    required this.onDeleteDoc,
   });
 
   @override

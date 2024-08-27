@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vecinapp/services/crud/docs_service.dart';
 import 'package:vecinapp/utilities/show_confirmation_dialog.dart';
+import 'package:vecinapp/views/home/docs/edit_doc_view.dart';
 
 class DocDetailsView extends StatefulWidget {
   const DocDetailsView({super.key, required this.doc});
@@ -18,27 +19,35 @@ class _DocDetailsViewState extends State<DocDetailsView> {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.edit),
-          ),
-          PopupMenuButton<DocDetailsViewAction>(
+          PopupMenuButton<EditOrDelete>(
             onSelected: (value) async {
-              if (value == DocDetailsViewAction.delete) {
-                final shouldDelete = await showConfirmationDialog(
-                    context, '¿Quieres eliminar el documento?');
-                if (shouldDelete == true) {
-                  await _docsService.deleteDoc(id: widget.doc.id);
-                  if (context.mounted) {
-                    Navigator.of(context).pop();
+              switch (value) {
+                case EditOrDelete.edit:
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NewDocView(doc: widget.doc),
+                    ),
+                  );
+                case EditOrDelete.delete:
+                  final shouldDelete = await showConfirmationDialog(
+                      context, '¿Eliminar el documento?');
+                  if (shouldDelete == true) {
+                    await _docsService.deleteDoc(id: widget.doc.id);
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
                   }
-                }
               }
             },
             itemBuilder: (context) {
               return [
-                const PopupMenuItem<DocDetailsViewAction>(
-                  value: DocDetailsViewAction.delete,
+                const PopupMenuItem<EditOrDelete>(
+                  value: EditOrDelete.edit,
+                  child: Text('Editar'),
+                ),
+                const PopupMenuItem<EditOrDelete>(
+                  value: EditOrDelete.delete,
                   child: Text('Eliminar'),
                 ),
               ];
@@ -61,4 +70,7 @@ class _DocDetailsViewState extends State<DocDetailsView> {
   }
 }
 
-enum DocDetailsViewAction { delete }
+enum EditOrDelete {
+  edit,
+  delete,
+}

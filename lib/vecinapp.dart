@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 //import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 //import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:vecinapp/constants/routes.dart';
-import 'package:vecinapp/views/home/docs/new_doc_view.dart';
+import 'package:vecinapp/views/home/docs/edit_doc_view.dart';
 import 'package:vecinapp/views/home/home_drawer.dart';
 import 'package:vecinapp/views/login/login_view.dart';
 import 'package:vecinapp/views/login/verify_email_view.dart';
@@ -13,7 +13,6 @@ import 'views/home/settings_view.dart';
 import 'views/login/register_view.dart';
 import 'dart:developer' as devtools show log;
 
-/// The Widget that configures your application.
 class VecinApp extends StatelessWidget {
   const VecinApp({super.key, required this.settingsController});
 
