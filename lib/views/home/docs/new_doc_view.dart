@@ -11,56 +11,44 @@ class NewDocView extends StatefulWidget {
 }
 
 class _NewDocViewState extends State<NewDocView> {
-  DatabaseDoc? _doc;
+  //DatabaseDoc? _doc;
   late final DocsService _docsService;
   late final TextEditingController _textController;
+  late final TextEditingController _titleController;
 
-  Future<DatabaseDoc> _createDoc() async {
-    final existingNote = _doc;
-    if (existingNote != null) {
-      return existingNote;
-    }
+  Future<void> _createDocIfNotEmpty() async {
+    final text = _textController.text;
+    final title = _titleController.text;
     final currentUser = AuthService.firebase().currentUser!;
-
     final uid = currentUser.uid;
-    try {
-      final owner = await _docsService.getUser(authId: uid);
-      return await _docsService.createEmptyDoc(owner: owner);
-    } catch (e) {
-      rethrow;
+
+    if (title.isNotEmpty && text.isNotEmpty) {
+      try {
+        final owner = await _docsService.getUser(authId: uid);
+        await _docsService.createDoc(
+          owner: owner,
+          title: title,
+          text: text,
+        );
+      } catch (e) {
+        rethrow;
+      }
     }
   }
 
   @override
   void dispose() {
-    _saveDocIfTextNotEmpty();
-    _deleteDocIfTextIsEmpty();
+    _createDocIfNotEmpty();
     _textController.dispose();
+    _titleController.dispose();
     super.dispose();
-  }
-
-  void _deleteDocIfTextIsEmpty() {
-    final doc = _doc;
-    if (_textController.text.isEmpty && doc != null) {
-      _docsService.deleteDoc(id: doc.id);
-    }
-  }
-
-  void _saveDocIfTextNotEmpty() async {
-    final doc = _doc;
-    final text = _textController.text;
-    if (text.isNotEmpty && doc != null) {
-      await _docsService.updateDoc(
-        doc: doc,
-        text: text,
-      );
-    }
   }
 
   @override
   void initState() {
     _docsService = DocsService();
     _textController = TextEditingController();
+    _titleController = TextEditingController();
     super.initState();
   }
 
@@ -73,24 +61,28 @@ class _NewDocViewState extends State<NewDocView> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: FutureBuilder(
-              future: _createDoc(),
-              builder: (context, snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.done:
-                    _doc = snapshot.data;
-                    return TextField(
-                      keyboardType: TextInputType.multiline,
-                      maxLines: null,
-                      decoration: const InputDecoration(
-                        hintText: 'Start typing here...',
-                      ),
-                      controller: _textController,
-                    );
-                  default:
-                    return const Center(child: CircularProgressIndicator());
-                }
-              }),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              TextField(
+                autofocus: true,
+                keyboardType: TextInputType.multiline,
+                maxLines: 1,
+                decoration: const InputDecoration(
+                  hintText: 'Título...',
+                ),
+                controller: _titleController,
+              ),
+              TextField(
+                keyboardType: TextInputType.multiline,
+                maxLines: null,
+                decoration: const InputDecoration(
+                  hintText: 'Texto...',
+                ),
+                controller: _textController,
+              ),
+            ],
+          ),
         ));
   }
 }

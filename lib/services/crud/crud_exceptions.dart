@@ -17,3 +17,5 @@ class CouldNotFindDoc implements Exception {}
 class CouldNotUpdateDoc implements Exception {}
 
 class CouldNotOpenDatabase implements Exception {}
+
+class TitleIsRequired implements Exception {}

@@ -141,6 +141,43 @@ class DocsService {
     }
   }
 
+  Future<DatabaseDoc> createDoc({
+    required DatabaseUser owner,
+    required String title,
+    required String text,
+  }) async {
+    await ensureDatabaseIsOpen();
+    final db = _getDatabaseOrThrow();
+
+    // make sure owner exists in the database with the correct id
+    final dbUser = await getUser(authId: owner.authId);
+
+    if (dbUser != owner) {
+      throw CouldNotFindUser();
+    }
+
+    // create the document
+    final docId = await db.insert(docTable, {
+      docsUserIdSyncedColumn: owner.id,
+      docsTextColumn: text,
+      docsTitleColumn: title,
+      docsIsSyncedWithCloudColumn: 1,
+    });
+
+    final doc = DatabaseDoc(
+      id: docId,
+      userId: owner.id,
+      text: text,
+      title: title,
+      isSyncedWithCloud: true,
+    );
+
+    _docs.add(doc);
+    _docsStreamController.add(_docs);
+
+    return doc;
+  }
+
   Future<DatabaseDoc> createEmptyDoc({required DatabaseUser owner}) async {
     await ensureDatabaseIsOpen();
     final db = _getDatabaseOrThrow();

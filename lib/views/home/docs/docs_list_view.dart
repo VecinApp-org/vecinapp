@@ -26,7 +26,7 @@ class DocsListView extends StatelessWidget {
             children: [
               ListTile(
                 title: Text(
-                  doc.text,
+                  doc.title,
                   maxLines: 1,
                   softWrap: true,
                   overflow: TextOverflow.ellipsis,
