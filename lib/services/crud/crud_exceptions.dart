@@ -15,3 +15,5 @@ class CouldNotDeleteDoc implements Exception {}
 class CouldNotFindDoc implements Exception {}
 
 class CouldNotUpdateDoc implements Exception {}
+
+class CouldNotOpenDatabase implements Exception {}

@@ -24,6 +24,12 @@ class _DocsViewState extends State<DocsView> {
   }
 
   @override
+  void dispose() {
+    _docsService.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     devtools.log('DocsView');
     return Scaffold(
@@ -45,6 +51,7 @@ class _DocsViewState extends State<DocsView> {
                     case ConnectionState.active:
                       if (snapshot.hasData) {
                         final allNotes = snapshot.data as List<DatabaseDoc>;
+                        devtools.log('Building DocsListView: $allNotes');
                         return DocsListView(
                           docs: allNotes,
                           onDeleteDoc: (doc) async {

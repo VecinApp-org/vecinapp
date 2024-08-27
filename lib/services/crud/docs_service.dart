@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' show join;
 
 import 'package:vecinapp/services/crud/crud_exceptions.dart';
-//import 'dart:developer' as devtools show log;
+import 'dart:developer' as devtools show log;
 
 class DocsService {
   Database? _db;
@@ -51,13 +51,14 @@ class DocsService {
     final allDocs = await getAllDocs();
     _docs = allDocs.toList();
     _docsStreamController.add(_docs);
+    devtools.log('(_cacheDocs) Cached docs: ${_docs.toString()}');
   }
 
   Future<DatabaseDoc> updateDoc({
     required DatabaseDoc doc,
     required String text,
   }) async {
-    await ensureDatatabaseIsOpen();
+    await ensureDatabaseIsOpen();
     final db = _getDatabaseOrThrow();
 
     // make sure owner exists in the database with the correct id
@@ -81,19 +82,19 @@ class DocsService {
   }
 
   Future<Iterable<DatabaseDoc>> getAllDocs() async {
-    await ensureDatatabaseIsOpen();
+    await ensureDatabaseIsOpen();
     final db = _getDatabaseOrThrow();
     final docs = await db.query(docTable);
     return docs.map((docRow) => DatabaseDoc.fromRow(docRow));
   }
 
   Future<DatabaseDoc> getDoc({required int id}) async {
-    await ensureDatatabaseIsOpen();
+    await ensureDatabaseIsOpen();
     final db = _getDatabaseOrThrow();
     final docs = await db.query(
       docTable,
       limit: 1,
-      where: 'id = ?',
+      where: '$idColumn = ?',
       whereArgs: [id],
     );
 
@@ -109,7 +110,7 @@ class DocsService {
   }
 
   Future<int> deleteAllDocs() async {
-    await ensureDatatabaseIsOpen();
+    await ensureDatabaseIsOpen();
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(docTable);
     _docs = [];
@@ -133,7 +134,7 @@ class DocsService {
   }
 
   Future<DatabaseDoc> createDoc({required DatabaseUser owner}) async {
-    await ensureDatatabaseIsOpen();
+    await ensureDatabaseIsOpen();
     final db = _getDatabaseOrThrow();
 
     // make sure owner exists in the database with the correct id
@@ -169,7 +170,7 @@ class DocsService {
   }
 
   Future<DatabaseUser> getUser({required String authId}) async {
-    await ensureDatatabaseIsOpen();
+    await ensureDatabaseIsOpen();
     final db = _getDatabaseOrThrow();
     final result = await db.query(
       userTable,
@@ -187,7 +188,7 @@ class DocsService {
   }
 
   Future<DatabaseUser> createUser({required String authId}) async {
-    await ensureDatatabaseIsOpen();
+    await ensureDatabaseIsOpen();
     final db = _getDatabaseOrThrow();
     // make sure authId is unique in the database
     final result = await db.query(
@@ -210,7 +211,7 @@ class DocsService {
   }
 
   Future<void> deleteUser({required String authId}) async {
-    await ensureDatatabaseIsOpen();
+    await ensureDatabaseIsOpen();
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(
       userTable,
@@ -232,14 +233,23 @@ class DocsService {
   }
 
   Future<void> close() async {
-    if (_db == null) {
+    final db = _db;
+    if (db == null) {
+      devtools.log('(close) Database is not open');
       throw DatabaseIsNotOpen();
     }
-    await _db!.close();
+
+    final docsTableLog = await db.query('docs');
+    devtools.log('(close) docsTableLog: ${docsTableLog.toString()}');
+
+    await db.close();
     _db = null;
+
+    final docsTableLog2 = await db.query('docs');
+    devtools.log('(close) docsTableLog: ${docsTableLog2.toString()}');
   }
 
-  Future<void> ensureDatatabaseIsOpen() async {
+  Future<void> ensureDatabaseIsOpen() async {
     try {
       await open();
     } on DatabaseAlreadyOpenException {
@@ -248,7 +258,9 @@ class DocsService {
   }
 
   Future<void> open() async {
+    devtools.log('Opening database');
     if (_db != null) {
+      devtools.log('Database already open');
       throw DatabaseAlreadyOpenException();
     }
     try {
@@ -260,9 +272,15 @@ class DocsService {
       await db.execute(createUserTable);
       // create the doc table
       await db.execute(createDocTable);
+
+      final docsTableLog = await db.query('docs');
+      devtools.log(docsTableLog.toString());
+
       await _cacheDocs();
     } on MissingPlatformDirectoryException {
       throw UnableToGetDocumentsDirectory();
+    } catch (e) {
+      throw CouldNotOpenDatabase();
     }
   }
 }
