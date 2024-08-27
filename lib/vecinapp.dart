@@ -98,34 +98,34 @@ class AppRoot extends StatelessWidget {
 }
 
 
-          /* REMOVED FROM MATERIAL APP FOR LATER USE WHEN I LEARN ABOUT LOCALIZATIONS AND DEEPLINKS
-                //Localizations
-                localizationsDelegates: const [
-                  AppLocalizations.delegate,
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
-                supportedLocales: const [
-                  Locale('en', ''), // English, no country code
-                ],
-                onGenerateTitle: (BuildContext context) =>
-                    AppLocalizations.of(context)!.appTitle,
-          
-                //Deep links
-                onGenerateRoute: (RouteSettings routeSettings) {
-                  devtools.log('onGenerateRoute ${routeSettings.name}');
-                  return MaterialPageRoute<void>(
-                    settings: routeSettings,
-                    builder: (BuildContext context) {
-                      devtools.log('builder ${routeSettings.name}');
-                      switch (routeSettings.name) {
-                        case settingsRouteName:
-                          return SettingsView(controller: settingsController);
-                        default:
-                          return const AppRoot();
-                      }
-                    },
-                  );
-                },
-                */
+/* REMOVED FROM MATERIAL APP FOR LATER USE WHEN I LEARN ABOUT LOCALIZATIONS AND DEEPLINKS
+//Localizations
+localizationsDelegates: const [
+  AppLocalizations.delegate,
+  GlobalMaterialLocalizations.delegate,
+  GlobalWidgetsLocalizations.delegate,
+  GlobalCupertinoLocalizations.delegate,
+],
+supportedLocales: const [
+  Locale('en', ''), // English, no country code
+],
+onGenerateTitle: (BuildContext context) =>
+    AppLocalizations.of(context)!.appTitle,
+
+//Deep links
+onGenerateRoute: (RouteSettings routeSettings) {
+  devtools.log('onGenerateRoute ${routeSettings.name}');
+  return MaterialPageRoute<void>(
+    settings: routeSettings,
+    builder: (BuildContext context) {
+      devtools.log('builder ${routeSettings.name}');
+      switch (routeSettings.name) {
+        case settingsRouteName:
+          return SettingsView(controller: settingsController);
+        default:
+          return const AppRoot();
+      }
+    },
+  );
+},
+*/
