@@ -32,7 +32,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
       key: _scaffoldKey,
       appBar: AppBar(
         title: const [
-          Text('VecinApp'),
+          Text(''),
           Text('Contactos'),
           Text('Reglamentos'),
           Text('Documentos'),
@@ -56,7 +56,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'VecinApp',
+                  'Tu Vecindad',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 IconButton(

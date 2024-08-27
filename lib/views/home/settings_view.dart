@@ -20,38 +20,38 @@ class SettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
+      appBar: AppBar(),
       body: Column(
         children: [
+          const SizedBox(height: 32),
+          const Text('Configuración', style: TextStyle(fontSize: 24)),
+          const SizedBox(height: 32),
           ListTile(
-            title: const Text('Tema', style: TextStyle(fontSize: 20)),
-            trailing: Padding(
-                padding: const EdgeInsets.all(8),
-                child: DropdownButton<ThemeMode>(
-                    value: controller.themeMode,
-                    onChanged: controller.updateThemeMode,
-                    items: const [
-                      DropdownMenuItem(
-                        value: ThemeMode.system,
-                        child: Text('Igual que el sistema'),
-                      ),
-                      DropdownMenuItem(
-                        value: ThemeMode.light,
-                        child: Text('Claro'),
-                      ),
-                      DropdownMenuItem(
-                        value: ThemeMode.dark,
-                        child: Text('Oscuro'),
-                      )
-                    ])),
+            title: const Text('Modo Oscuro', style: TextStyle(fontSize: 20)),
+            trailing: DropdownButton<ThemeMode>(
+                value: controller.themeMode,
+                onChanged: controller.updateThemeMode,
+                items: const [
+                  DropdownMenuItem(
+                    value: ThemeMode.dark,
+                    child: Text('Prendido'),
+                  ),
+                  DropdownMenuItem(
+                    value: ThemeMode.light,
+                    child: Text('Apagado'),
+                  ),
+                  DropdownMenuItem(
+                    value: ThemeMode.system,
+                    child: Text('Sistema'),
+                  )
+                ]),
           ),
-          const Divider(),
+          //const Divider(),
+          const Spacer(),
+          const SizedBox(height: 32),
           TextButton(
             onPressed: () async {
               devtools.log('Logging out...');
-
               final confirmation = await showConfirmationDialog(
                 context,
                 '¿Seguro que quieres cerrar sesión?',
@@ -69,6 +69,7 @@ class SettingsView extends StatelessWidget {
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Cerrar sesión'),
           ),
+          const SizedBox(height: 32),
           TextButton(
             onPressed: () async {
               devtools.log('Deleting user...');
@@ -106,6 +107,7 @@ class SettingsView extends StatelessWidget {
             ),
             child: const Text('Eliminar cuenta'),
           ),
+          const SizedBox(height: 64),
         ],
       ),
     );
