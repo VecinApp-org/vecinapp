@@ -95,7 +95,6 @@ class HomeBuilder extends StatelessWidget {
               return StreamBuilder(
                   stream: AuthService.firebase().userChanges(),
                   builder: (context, snapshot) {
-                    AuthService.firebase().currentUser;
                     switch (snapshot.connectionState) {
                       case ConnectionState.active:
                         return const AppRoot();
