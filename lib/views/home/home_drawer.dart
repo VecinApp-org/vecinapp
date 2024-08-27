@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vecinapp/constants/routes.dart';
 import 'package:vecinapp/views/home/docs/docs_view.dart';
-import 'rulebooks/rulebook_list.dart';
 import 'contacts/contact_list.dart';
 import 'dart:developer' as devtools show log;
 
@@ -14,7 +13,7 @@ class HomeDrawer extends StatefulWidget {
 
 class _HomeDrawerState extends State<HomeDrawer> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  int _navigationDrawerIndex = 3;
+  int _navigationDrawerIndex = 2;
   late bool showNavigationDrawer;
 
   void handleScreenChanged(int selectedScreen) {
@@ -34,14 +33,12 @@ class _HomeDrawerState extends State<HomeDrawer> {
         title: const [
           Text(''),
           Text('Contactos'),
-          Text('Reglamentos'),
           Text('Documentos'),
         ][_navigationDrawerIndex],
       ),
       body: const [
         DashboardView(),
         ContactList(),
-        RulebookList(),
         DocsView(),
       ][_navigationDrawerIndex],
       drawer: NavigationDrawer(
@@ -80,11 +77,6 @@ class _HomeDrawerState extends State<HomeDrawer> {
             icon: Icon(Icons.contacts_outlined),
             selectedIcon: Icon(Icons.contacts),
             label: Text('Contactos'),
-          ),
-          const NavigationDrawerDestination(
-            icon: Icon(Icons.book_outlined),
-            selectedIcon: Icon(Icons.book),
-            label: Text('Reglamentos'),
           ),
           const NavigationDrawerDestination(
             icon: Icon(Icons.book_outlined),

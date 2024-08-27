@@ -57,7 +57,7 @@ class _NewDocViewState extends State<NewDocView> {
     devtools.log('NewDocView');
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Editar Reglamento'),
+          title: const Text('Nuevo Documento'),
         ),
         body: ListView(
           padding: const EdgeInsets.all(16.0),
