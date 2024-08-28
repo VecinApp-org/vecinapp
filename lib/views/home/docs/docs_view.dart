@@ -51,7 +51,6 @@ class _DocsViewState extends State<DocsView> {
                     case ConnectionState.active:
                       if (snapshot.hasData) {
                         final allNotes = snapshot.data as List<DatabaseDoc>;
-                        devtools.log('Building DocsListView: $allNotes');
                         return DocsListView(
                           docs: allNotes,
                         );
