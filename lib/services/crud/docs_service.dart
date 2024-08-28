@@ -4,13 +4,14 @@ import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' show join;
+import 'package:vecinapp/extensions/list/filter.dart';
 
 import 'package:vecinapp/services/crud/docs_exceptions.dart';
 import 'dart:developer' as devtools show log;
 
 class DocsService {
   Database? _db;
-
+  DatabaseUser? _user;
   List<DatabaseDoc> _docs = [];
 
   static final DocsService _shared = DocsService._sharedInstance();
@@ -30,7 +31,14 @@ class DocsService {
   late final StreamController<List<DatabaseDoc>> _docsStreamController;
 
   Stream<List<DatabaseDoc>> get allDocs {
-    return _docsStreamController.stream;
+    return _docsStreamController.stream.filter((doc) {
+      final currentUser = _user;
+      if (currentUser != null) {
+        return doc.userId == currentUser.id;
+      } else {
+        throw UserShouldBeSetBeforeReadingAllDocs();
+      }
+    });
   }
 
   Future<DatabaseUser> getOrCreateUser({
@@ -38,9 +46,11 @@ class DocsService {
   }) async {
     try {
       final user = await getUser(authId: authId);
+      _user = user;
       return user;
     } on CouldNotFindUser {
       final createdUser = await createUser(authId: authId);
+      _user = createdUser;
       return createdUser;
     } catch (e) {
       rethrow;

@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:vecinapp/constants/routes.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
 import 'package:vecinapp/services/auth/auth_service.dart';
+import 'package:vecinapp/utilities/show_confirmation_dialog.dart';
 import 'package:vecinapp/utilities/show_error_dialog.dart';
 //import 'dart:developer' as devtools show log;
 
-class VerifyEmailView extends StatefulWidget {
+class VerifyEmailView extends StatelessWidget {
   const VerifyEmailView({super.key});
 
-  @override
-  State<VerifyEmailView> createState() => _VerifyEmailViewState();
-}
+  final double primarySpacing = 64;
+  final double secondarySpacing = 32;
+  final double tertiarySpacing = 16;
+  final double maxWidth = 360;
 
-class _VerifyEmailViewState extends State<VerifyEmailView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,100 +21,89 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Verifica tu correo',
-              style: TextStyle(fontSize: 28),
+            SizedBox(
+              width: maxWidth,
+              child: const Text('Verifica tu correo',
+                  style: TextStyle(fontSize: 28), textAlign: TextAlign.center),
             ),
-            Column(
-              children: [
-                const SizedBox(
-                  width: 300,
-                  child: Text(
-                      //textAlign: TextAlign.center,
-                      'Te enviamos un correo. Haz clic en el enlace y regresa aquí para continuar.'),
-                ),
-                FilledButton(
-                    onPressed: () async {
-                      try {
-                        await AuthService.firebase().reload();
-                        final user = AuthService.firebase().currentUser;
-                        if (user != null) {
-                          if (user.isEmailVerified) {
-                            if (context.mounted) {
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                  appRootRouteName, (route) => false);
-                            }
-                          } else {
-                            if (context.mounted) {
-                              showErrorDialog(
-                                  context, 'Aún no has verificado tu correo');
-                            }
-                          }
-                        }
-                      } on NetworkRequestFailedAuthException {
+            SizedBox(height: tertiarySpacing),
+            SizedBox(
+              width: maxWidth,
+              child: const Text(
+                'Haz clic en el link para continuar.',
+                textAlign: TextAlign.center,
+              ),
+            ),
+            SizedBox(height: secondarySpacing),
+            FilledButton(
+                onPressed: () async {
+                  try {
+                    await AuthService.firebase().reload();
+                    final user = AuthService.firebase().currentUser;
+                    if (user != null) {
+                      if (user.isEmailVerified) {
                         if (context.mounted) {
-                          showErrorDialog(context, 'No hay internet.');
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                              appRootRouteName, (route) => false);
                         }
-                      } on GenericAuthException {
+                      } else {
                         if (context.mounted) {
-                          showErrorDialog(context, 'Algo salio mal.');
+                          showErrorDialog(
+                              context, 'Aún no has verificado tu correo');
                         }
                       }
-                    },
-                    child: const Text('Continuar')),
-              ],
-            ),
-            Column(
-              children: [
-                const SizedBox(
-                  width: 300,
-                  child: Text(
-                      //textAlign: TextAlign.center,
-                      'Si no recibiste el correo, puedes enviarlo otra vez.'),
-                ),
-                // Resend email button
-                OutlinedButton(
-                    onPressed: () async {
-                      try {
-                        await AuthService.firebase().sendEmailVerification();
-                      } on NetworkRequestFailedAuthException {
-                        if (context.mounted) {
-                          showErrorDialog(context, 'No hay internet.');
-                        }
-                      } on TooManyRequestsAuthException {
-                        if (context.mounted) {
-                          showErrorDialog(context,
-                              'Demasiados intentos. Intentalo mas tarde.');
-                        }
-                      } on GenericAuthException {
-                        if (context.mounted) {
-                          showErrorDialog(context, 'Algo salio mal.');
-                        }
-                      }
-                    },
-                    child: const Text('Enviar otro correo')),
-              ],
-            ),
-            Column(
-              children: [
-                const SizedBox(
-                  width: 300,
-                  child: Text(
-                      'Si quieres usar otro correo, puedes cerrar la sesión.'),
-                ),
-                TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Colors.red),
-                  onPressed: () async {
-                    await AuthService.firebase().logOut();
-                    if (context.mounted) {
-                      Navigator.of(context).popAndPushNamed(
-                        appRootRouteName,
-                      );
                     }
-                  },
-                  child: const Text('Salir'),
-                ),
-              ],
+                  } on NetworkRequestFailedAuthException {
+                    if (context.mounted) {
+                      showErrorDialog(context, 'No hay internet.');
+                    }
+                  } on GenericAuthException {
+                    if (context.mounted) {
+                      showErrorDialog(context, 'Algo salio mal.');
+                    }
+                  }
+                },
+                child: const Text('Continuar')),
+            SizedBox(height: tertiarySpacing),
+            OutlinedButton(
+                onPressed: () async {
+                  try {
+                    await AuthService.firebase().sendEmailVerification();
+                  } on NetworkRequestFailedAuthException {
+                    if (context.mounted) {
+                      showErrorDialog(context, 'No hay internet.');
+                    }
+                  } on TooManyRequestsAuthException {
+                    if (context.mounted) {
+                      showErrorDialog(
+                          context, 'Demasiados intentos. Intentalo mas tarde.');
+                    }
+                  } on GenericAuthException {
+                    if (context.mounted) {
+                      showErrorDialog(context, 'Algo salio mal.');
+                    }
+                  }
+                },
+                child: const Text('Enviar otro correo')),
+            SizedBox(height: tertiarySpacing),
+            TextButton(
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              onPressed: () async {
+                final confirmation = await showConfirmationDialog(
+                  context,
+                  '¿Seguro que quieres cerrar sesión?',
+                );
+                if (confirmation != null && confirmation) {
+                  await AuthService.firebase().logOut();
+                  if (context.mounted) {
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      appRootRouteName,
+                      (route) => false,
+                    );
+                  }
+                }
+              },
+              child: const Text('Salir'),
             ),
           ],
         ),

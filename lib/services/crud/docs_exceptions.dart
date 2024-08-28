@@ -21,3 +21,5 @@ class CouldNotOpenDatabase implements Exception {}
 class EmptyTitle implements Exception {}
 
 class EmptyText implements Exception {}
+
+class UserShouldBeSetBeforeReadingAllDocs implements Exception {}
