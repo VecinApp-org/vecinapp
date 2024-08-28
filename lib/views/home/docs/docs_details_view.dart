@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:vecinapp/services/cloud/cloud_doc.dart';
 import 'package:vecinapp/services/cloud/firebase_cloud_storage.dart';
 import 'package:vecinapp/utilities/show_confirmation_dialog.dart';
@@ -20,6 +21,12 @@ class _DocDetailsViewState extends State<DocDetailsView> {
     return Scaffold(
       appBar: AppBar(
         actions: [
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: () {
+              Share.share(widget.doc.shareDoc);
+            },
+          ),
           PopupMenuButton<EditOrDelete>(
             onSelected: (value) async {
               switch (value) {

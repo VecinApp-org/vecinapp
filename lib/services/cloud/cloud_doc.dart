@@ -20,4 +20,10 @@ class CloudDoc {
         ownerUserId = snapshot.data()[ownerUserIdFieldName],
         title = snapshot.data()[titleFieldName] as String,
         text = snapshot.data()[textFieldName] as String;
+
+  @override
+  String toString() =>
+      'CloudDoc(ownerUserId: $ownerUserId, title: $title, text: $text)';
+
+  String get shareDoc => 'Reglamento en VecinApp:\n\n$title\n\n$text';
 }
