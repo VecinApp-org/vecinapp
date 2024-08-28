@@ -327,11 +327,9 @@ class DocsService {
 
   Future<void> open() async {
     if (_db != null) {
-      devtools.log('(open) Database already open');
       throw DatabaseAlreadyOpen();
     }
     try {
-      devtools.log('(open) Opening database');
       final docsPath = await getApplicationDocumentsDirectory();
       final docsDbPath = join(docsPath.path, dbName);
       final db = await openDatabase(docsDbPath);
