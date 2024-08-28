@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vecinapp/services/auth/auth_service.dart';
-import 'package:vecinapp/services/crud/docs_service.dart';
+import 'package:vecinapp/services/cloud/cloud_doc.dart';
+import 'package:vecinapp/services/cloud/firebase_cloud_storage.dart';
 import 'package:vecinapp/constants/routes.dart';
 import 'dart:developer' as devtools show log;
 
@@ -14,19 +15,13 @@ class DocsView extends StatefulWidget {
 }
 
 class _DocsViewState extends State<DocsView> {
-  late final DocsService _docsService;
+  late final FirebaseCloudStorage _docsService;
   String get userId => AuthService.firebase().currentUser!.uid;
 
   @override
   void initState() {
-    _docsService = DocsService();
+    _docsService = FirebaseCloudStorage();
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _docsService.close();
-    super.dispose();
   }
 
   @override
@@ -39,29 +34,19 @@ class _DocsViewState extends State<DocsView> {
         },
         child: const Icon(Icons.add),
       ),
-      body: FutureBuilder(
-        future: _docsService.getOrCreateUser(authId: userId),
+      body: StreamBuilder(
+        stream: _docsService.allDocs(ownerUserId: userId),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              return StreamBuilder(
-                stream: _docsService.allDocs,
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.active:
-                      if (snapshot.hasData) {
-                        final allNotes = snapshot.data as List<DatabaseDoc>;
-                        return DocsListView(
-                          docs: allNotes,
-                        );
-                      } else {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                    default:
-                      return const Center(child: CircularProgressIndicator());
-                  }
-                },
-              );
+            case ConnectionState.active:
+              if (snapshot.hasData) {
+                final allNotes = snapshot.data as Iterable<CloudDoc>;
+                return DocsListView(
+                  docs: allNotes,
+                );
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
             default:
               return const Center(child: CircularProgressIndicator());
           }

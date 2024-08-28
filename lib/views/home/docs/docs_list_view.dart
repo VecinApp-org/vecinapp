@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:vecinapp/services/crud/docs_service.dart';
+import 'package:vecinapp/services/cloud/cloud_doc.dart';
 import 'package:vecinapp/views/home/docs/docs_details_view.dart';
 import 'dart:developer' as devtools show log;
 
 class DocsListView extends StatelessWidget {
-  final List<DatabaseDoc> docs;
+  final Iterable<CloudDoc> docs;
 
   const DocsListView({
     super.key,
@@ -17,7 +17,7 @@ class DocsListView extends StatelessWidget {
     return ListView.builder(
         itemCount: docs.length,
         itemBuilder: (context, index) {
-          final doc = docs[index];
+          final doc = docs.elementAt(index);
           return Column(
             children: [
               ListTile(

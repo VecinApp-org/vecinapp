@@ -1,29 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:vecinapp/services/auth/auth_service.dart';
-import 'package:vecinapp/services/crud/docs_exceptions.dart';
-import 'package:vecinapp/services/crud/docs_service.dart';
+import 'package:vecinapp/services/cloud/cloud_doc.dart';
+import 'package:vecinapp/services/cloud/cloud_storage_exceptions.dart';
+import 'package:vecinapp/services/cloud/firebase_cloud_storage.dart';
 import 'dart:developer' as devtools show log;
 
 import 'package:vecinapp/utilities/show_error_dialog.dart';
 
-class NewDocView extends StatefulWidget {
-  const NewDocView({super.key, this.doc});
+class EditDocView extends StatefulWidget {
+  const EditDocView({super.key, this.doc});
 
-  final DatabaseDoc? doc;
+  final CloudDoc? doc;
 
   @override
-  State<NewDocView> createState() => _NewDocViewState();
+  State<EditDocView> createState() => _EditDocViewState();
 }
 
-class _NewDocViewState extends State<NewDocView> {
+class _EditDocViewState extends State<EditDocView> {
   //DatabaseDoc? _doc;
-  late final DocsService _docsService;
+  late final FirebaseCloudStorage _docsService;
   late final TextEditingController _textController;
   late final TextEditingController _titleController;
 
   @override
   void initState() {
-    _docsService = DocsService();
+    _docsService = FirebaseCloudStorage();
     _textController = TextEditingController();
     _titleController = TextEditingController();
     _setupEditDocIfProvided();
@@ -52,15 +53,14 @@ class _NewDocViewState extends State<NewDocView> {
       if (widget.doc == null) {
         final currentUser = AuthService.firebase().currentUser!;
         final uid = currentUser.uid;
-        final owner = await _docsService.getUser(authId: uid);
-        await _docsService.createDoc(
-          owner: owner,
+        await _docsService.createNewDoc(
+          ownerUserId: uid,
           title: title,
           text: text,
         );
       } else {
         await _docsService.updateDoc(
-          doc: widget.doc!,
+          documentId: widget.doc!.documentId,
           title: title,
           text: text,
         );
@@ -107,22 +107,17 @@ class _NewDocViewState extends State<NewDocView> {
                   if (context.mounted) {
                     Navigator.of(context).pop();
                   }
-                } on EmptyText {
+                } on CloudStorageException catch (e) {
+                  devtools.log('CloudStorageException on save doc: $e');
                   if (context.mounted) {
                     showErrorDialog(
                       context,
-                      'El contenido no puede estar vacío.',
-                    );
-                  }
-                } on EmptyTitle {
-                  if (context.mounted) {
-                    showErrorDialog(
-                      context,
-                      'El título no puede estar vacío.',
+                      'Error al guardar el documento',
                     );
                   }
                 } catch (e) {
-                  devtools.log(e.toString());
+                  devtools.log(
+                      'Unhandled exception saving doc type ${e.runtimeType} Error: $e');
                   if (context.mounted) {
                     showErrorDialog(
                       context,

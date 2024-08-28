@@ -40,7 +40,7 @@ class VecinApp extends StatelessWidget {
             homeDrawerRouteName: (context) => const HomeDrawer(),
             settingsRouteName: (context) =>
                 SettingsView(controller: settingsController),
-            newDocRouteName: (context) => const NewDocView(),
+            newDocRouteName: (context) => const EditDocView(),
           },
           home: const HomeBuilder(),
         );

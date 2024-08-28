@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:vecinapp/services/crud/docs_service.dart';
+import 'package:vecinapp/services/cloud/cloud_doc.dart';
+import 'package:vecinapp/services/cloud/firebase_cloud_storage.dart';
 import 'package:vecinapp/utilities/show_confirmation_dialog.dart';
 import 'package:vecinapp/views/home/docs/edit_doc_view.dart';
 
 class DocDetailsView extends StatefulWidget {
   const DocDetailsView({super.key, required this.doc});
-  final DatabaseDoc doc;
+  final CloudDoc doc;
 
   @override
   State<DocDetailsView> createState() => _DocDetailsViewState();
 }
 
 class _DocDetailsViewState extends State<DocDetailsView> {
-  final DocsService _docsService = DocsService();
+  final _docsService = FirebaseCloudStorage();
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +27,15 @@ class _DocDetailsViewState extends State<DocDetailsView> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => NewDocView(doc: widget.doc),
+                      builder: (context) => EditDocView(doc: widget.doc),
                     ),
                   );
                 case EditOrDelete.delete:
                   final shouldDelete = await showConfirmationDialog(
                       context, '¿Eliminar el documento?');
                   if (shouldDelete == true) {
-                    await _docsService.deleteDoc(id: widget.doc.id);
+                    await _docsService.deleteDoc(
+                        documentId: widget.doc.documentId);
                     if (context.mounted) {
                       Navigator.of(context).pop();
                     }
