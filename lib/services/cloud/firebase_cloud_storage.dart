@@ -46,33 +46,34 @@ class FirebaseCloudStorage {
             isEqualTo: ownerUserId,
           )
           .get()
-          .then(
-        (value) {
-          return value.docs.map(
-            (doc) {
-              return CloudDoc(
-                documentId: doc.id,
-                ownerUserId: doc.data()[ownerUserIdFieldName] as String,
-                title: doc.data()[titleFieldName] as String,
-                text: doc.data()[textFieldName] as String,
-              );
-            },
-          );
-        },
-      );
+          .then((value) {
+        return value.docs.map((doc) {
+          return CloudDoc.fromSnapshot(doc);
+        });
+      });
     } catch (e) {
       throw CouldNotGetDocsException();
     }
   }
 
-  void createNewDoc({
+  Future<CloudDoc> createNewDoc({
     required String ownerUserId,
+    required String title,
+    required String text,
   }) async {
-    await docs.add({
+    final document = await docs.add({
       ownerUserIdFieldName: ownerUserId,
-      titleFieldName: '',
-      textFieldName: '',
+      titleFieldName: title,
+      textFieldName: text,
     });
+    final fetchedDoc = await document.get();
+
+    return CloudDoc(
+      documentId: fetchedDoc.id,
+      ownerUserId: ownerUserId,
+      title: title,
+      text: text,
+    );
   }
 
   static final FirebaseCloudStorage _shared =
