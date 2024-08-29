@@ -11,8 +11,6 @@ import 'package:vecinapp/views/home/docs/edit_doc_view.dart';
 import 'package:vecinapp/views/home/home_drawer.dart';
 import 'package:vecinapp/views/login/login_view.dart';
 import 'package:vecinapp/views/login/verify_email_view.dart';
-import 'package:vecinapp/views/login/welcome_view.dart';
-//import 'package:vecinapp/services/auth/auth_service.dart';
 import 'services/settings/settings_controller.dart';
 import 'views/home/settings_view.dart';
 import 'views/login/register_view.dart';
@@ -37,12 +35,6 @@ class VecinApp extends StatelessWidget {
           darkTheme: ThemeData.dark(),
           themeMode: settingsController.themeMode,
           routes: {
-            appRootRouteName: (context) => const Home(),
-            //welcomeRouteName: (context) => const WelcomeView(),
-            loginRouteName: (context) => const LoginView(),
-            registerRouteName: (context) => const RegisterView(),
-            //verifyEmailRouteName: (context) => const VerifyEmailView(),
-            //homeDrawerRouteName: (context) => const HomeDrawer(),
             settingsRouteName: (context) =>
                 SettingsView(controller: settingsController),
             newDocRouteName: (context) => const EditDocView(),
@@ -80,6 +72,8 @@ class Home extends StatelessWidget {
           return const VerifyEmailView();
         } else if (state is AuthStateLoggedOut) {
           return const LoginView();
+        } else if (state is AuthStateRegistering) {
+          return const RegisterView();
         } else {
           return const Scaffold(
               body: Center(child: CircularProgressIndicator()));
