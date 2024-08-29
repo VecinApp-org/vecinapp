@@ -4,7 +4,6 @@ import 'package:vecinapp/services/auth/auth_exceptions.dart';
 import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
 import 'package:vecinapp/services/auth/bloc/auth_event.dart';
 import 'package:vecinapp/services/auth/bloc/auth_state.dart';
-import 'package:vecinapp/utilities/loading_dialog.dart';
 import 'dart:developer' as devtools show log;
 
 import 'package:vecinapp/utilities/show_error_dialog.dart';
@@ -20,7 +19,6 @@ class _LoginViewState extends State<LoginView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
   late bool _isShowingPassword = false;
-  CloseDialog? _closeLoadingDialogHadler;
 
   @override
   void initState() {
@@ -41,17 +39,6 @@ class _LoginViewState extends State<LoginView> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
         if (state is AuthStateLoggedOut) {
-          final closeDialog = _closeLoadingDialogHadler;
-          if (!state.isLoading && closeDialog != null) {
-            closeDialog();
-            _closeLoadingDialogHadler = null;
-          } else if (state.isLoading && closeDialog == null) {
-            _closeLoadingDialogHadler = showLoadingDialog(
-              context: context,
-              text: 'Cargando...',
-            );
-          }
-
           if (state.exception is InvalidCredentialAuthException) {
             await showErrorDialog(context,
                 'La combinación de correo y contraseña es incorrecta.');

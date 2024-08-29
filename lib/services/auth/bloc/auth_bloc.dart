@@ -1,14 +1,36 @@
 import 'package:bloc/bloc.dart';
+import 'package:vecinapp/services/auth/bloc/auth_state.dart';
 import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/auth/bloc/auth_event.dart';
-import 'package:vecinapp/services/auth/bloc/auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc(AuthProvider provider) : super(const AuthStateUnInitalized()) {
-    // send email verification
-    on<AuthEventSendEmailVerification>((event, emit) async {
-      await provider.sendEmailVerification();
-      emit(state);
+  AuthBloc(AuthProvider provider)
+      : super(const AuthStateUnInitalized(
+          isLoading: true,
+        )) {
+    //initialize
+    on<AuthEventInitialize>((event, emit) async {
+      await provider.initialize();
+      final user = provider.currentUser;
+      if (user == null) {
+        emit(
+          const AuthStateLoggedOut(
+            exception: null,
+            isLoading: false,
+            loadingText: 'Entrando...',
+          ),
+        );
+      } else if (!user.isEmailVerified) {
+        emit(const AuthStateNeedsVerification(
+          isLoading: false,
+        ));
+      } else {
+        emit(AuthStateLoggedIn(
+          exception: null,
+          user: user,
+          isLoading: false,
+        ));
+      }
     });
     // register with email and password
     on<AuthEventRegisterWithEmailAndPassword>((event, emit) async {
@@ -22,39 +44,31 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           passwordConfirmation: passwordConfirmation,
         );
         await provider.sendEmailVerification();
-        emit(const AuthStateNeedsVerification());
+        emit(const AuthStateNeedsVerification(
+          isLoading: false,
+        ));
       } on Exception catch (e) {
-        emit(AuthStateRegistering(exception: e));
+        emit(AuthStateRegistering(
+          exception: e,
+          isLoading: false,
+        ));
       }
     });
-    //initialize
-    on<AuthEventInitialize>((event, emit) async {
-      await provider.initialize();
-      final user = provider.currentUser;
-      if (user == null) {
-        emit(
-          const AuthStateLoggedOut(
-            exception: null,
-            isLoading: false,
-          ),
-        );
-      } else if (!user.isEmailVerified) {
-        emit(const AuthStateNeedsVerification());
-      } else {
-        emit(AuthStateLoggedIn(user));
-      }
+    // send email verification
+    on<AuthEventSendEmailVerification>((event, emit) async {
+      await provider.sendEmailVerification();
+      emit(state);
     });
     //login with email and password
     on<AuthEventLogInWithEmailAndPassword>((event, emit) async {
-      emit(
-        const AuthStateLoggedOut(
+      try {
+        emit(const AuthStateLoggedOut(
           exception: null,
           isLoading: true,
-        ),
-      );
-      final email = event.email;
-      final password = event.password;
-      try {
+          loadingText: 'Entrando...',
+        ));
+        final email = event.email;
+        final password = event.password;
         final user = await provider.logInWithEmailAndPassword(
           email: email,
           password: password,
@@ -68,9 +82,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
         //check if email is verified
         if (!user.isEmailVerified) {
-          emit(const AuthStateNeedsVerification());
+          emit(const AuthStateNeedsVerification(
+            isLoading: false,
+          ));
         } else {
-          emit(AuthStateLoggedIn(user));
+          emit(AuthStateLoggedIn(
+            exception: null,
+            user: user,
+            isLoading: false,
+          ));
         }
       } on Exception catch (e) {
         emit(
@@ -84,24 +104,61 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     //log out
     on<AuthEventLogOut>((event, emit) async {
       try {
+        emit(const AuthStateLoggedOut(
+          exception: null,
+          isLoading: true,
+          loadingText: 'Saliendo...',
+        ));
         await provider.logOut();
-        emit(const AuthStateLoggedOut(exception: null, isLoading: false));
+        emit(const AuthStateLoggedOut(
+          exception: null,
+          isLoading: false,
+        ));
       } on Exception catch (e) {
-        emit(AuthStateLoggedOut(exception: e, isLoading: false));
+        emit(AuthStateLoggedOut(
+          exception: e,
+          isLoading: false,
+        ));
       }
     });
     //delete account
     on<AuthEventDeleteAccount>((event, emit) async {
       try {
+        if (state is AuthStateLoggedIn) {
+          final actualUser = (state as AuthStateLoggedIn).user;
+          emit(AuthStateLoggedIn(
+            user: actualUser,
+            isLoading: true,
+            exception: null,
+          ));
+        }
         await provider.deleteAccount();
-        emit(const AuthStateLoggedOut(exception: null, isLoading: false));
+        emit(const AuthStateLoggedOut(
+          exception: null,
+          isLoading: false,
+        ));
       } on Exception catch (e) {
-        emit(AuthStateLoggedOut(exception: e, isLoading: false));
+        if (state is AuthStateLoggedIn) {
+          final actualUser = (state as AuthStateLoggedIn).user;
+          emit(AuthStateLoggedIn(
+            user: actualUser,
+            exception: e,
+            isLoading: false,
+          ));
+        } else {
+          emit(AuthStateLoggedOut(
+            exception: e,
+            isLoading: false,
+          ));
+        }
       }
     });
-
+    //send to register view
     on<AuthEventShouldRegister>((event, emit) async {
-      emit(const AuthStateRegistering(exception: null));
+      emit(const AuthStateRegistering(
+        exception: null,
+        isLoading: false,
+      ));
     });
   }
 }

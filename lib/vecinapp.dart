@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 //import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 //import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:vecinapp/constants/routes.dart';
+import 'package:vecinapp/helpers/loading/loading_screen.dart';
 import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
 import 'package:vecinapp/services/auth/bloc/auth_event.dart';
 import 'package:vecinapp/services/auth/bloc/auth_state.dart';
@@ -64,7 +65,17 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state.isLoading) {
+          LoadingScreen().show(
+            context: context,
+            text: state.loadingText ?? 'Cargando...',
+          );
+        } else {
+          LoadingScreen().hide();
+        }
+      },
       builder: (context, state) {
         if (state is AuthStateLoggedIn) {
           return const HomeDrawer();
