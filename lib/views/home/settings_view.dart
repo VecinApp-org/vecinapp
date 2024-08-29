@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/constants/routes.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
 import 'package:vecinapp/services/auth/auth_service.dart';
+import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
+import 'package:vecinapp/services/auth/bloc/auth_event.dart';
+import 'package:vecinapp/services/auth/bloc/auth_state.dart';
 import 'package:vecinapp/utilities/show_confirmation_dialog.dart';
 import 'package:vecinapp/utilities/show_error_dialog.dart';
 
@@ -49,25 +53,28 @@ class SettingsView extends StatelessWidget {
           //const Divider(),
           const Spacer(),
           const SizedBox(height: 32),
-          TextButton(
-            onPressed: () async {
-              devtools.log('Logging out...');
-              final confirmation = await showConfirmationDialog(
-                context,
-                '¿Seguro que quieres cerrar sesión?',
-              );
-              if (confirmation != null && confirmation) {
-                await AuthService.firebase().logOut();
-                if (context.mounted) {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    appRootRouteName,
-                    (route) => false,
-                  );
-                }
+          BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if (state is AuthStateLoggedOut) {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  loginRouteName,
+                  (route) => false,
+                );
+              } else if (state is AuthStateLoggedOutFailure) {
+                showErrorDialog(context, state.exception.toString());
+              } else if (state is AuthStateLoggedIn) {
+                showErrorDialog(context, 'Sesión iniciada');
               }
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Cerrar sesión'),
+            child: TextButton(
+              onPressed: () {
+                context.read<AuthBloc>().add(
+                      const AuthEventLogOut(),
+                    );
+              },
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Cerrar sesión'),
+            ),
           ),
           const SizedBox(height: 32),
           TextButton(

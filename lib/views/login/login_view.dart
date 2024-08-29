@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/constants/routes.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
-import 'package:vecinapp/services/auth/auth_service.dart';
+import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
+import 'package:vecinapp/services/auth/bloc/auth_event.dart';
+import 'package:vecinapp/services/auth/bloc/auth_state.dart';
 import 'dart:developer' as devtools show log;
 
 import 'package:vecinapp/utilities/show_error_dialog.dart';
@@ -55,6 +58,7 @@ class _LoginViewState extends State<LoginView> {
                 children: [
                   //Email Field
                   TextField(
+                    autofocus: true,
                     controller: _email,
                     enableSuggestions: false,
                     autocorrect: false,
@@ -96,46 +100,41 @@ class _LoginViewState extends State<LoginView> {
             Column(
               children: [
                 //Login button
-                FilledButton(
-                  onPressed: () async {
-                    devtools.log('Logging in...');
-                    final email = _email.text;
-                    final password = _password.text;
-                    try {
-                      final userCredentail = await AuthService.firebase()
-                          .logIn(email: email, password: password);
-                      devtools.log('Logged in: $userCredentail');
-                      if (context.mounted) {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                            appRootRouteName, (route) => false);
-                      }
-                    } on InvalidEmailAuthException {
-                      if (context.mounted) {
-                        showErrorDialog(context, 'El correo está mal escrito.');
-                      }
-                    } on NetworkRequestFailedAuthException {
-                      if (context.mounted) {
-                        showErrorDialog(context, 'No hay internet.');
-                      }
-                    } on ChannelErrorAuthException {
-                      if (context.mounted) {
-                        showErrorDialog(context, 'Dejaste algo vacío.');
-                      }
-                    } on InvalidCredentialAuthException {
-                      if (context.mounted) {
-                        showErrorDialog(context,
-                            'La contraseña es incorrecta o ese correo no existe.');
-                      }
-                    } on GenericAuthException catch (e) {
-                      devtools
-                          .log('Error logging in: ${e.runtimeType} Error: $e');
-                      if (context.mounted) {
-                        showErrorDialog(
-                            context, 'Algo salió mal iniciando sesión.');
+                BlocListener<AuthBloc, AuthState>(
+                  listener: (context, state) async {
+                    if (state is AuthStateLoggedOut) {
+                      if (state.exception is InvalidCredentialAuthException) {
+                        await showErrorDialog(context,
+                            'La combinación de correo y contraseña es incorrecta.');
+                      } else if (state.exception is InvalidEmailAuthException) {
+                        await showErrorDialog(
+                            context, 'El correo está mal escrito.');
+                      } else if (state.exception
+                          is NetworkRequestFailedAuthException) {
+                        await showErrorDialog(context, 'No hay internet.');
+                      } else if (state.exception is ChannelErrorAuthException) {
+                        await showErrorDialog(context, 'Dejaste algo vacío.');
+                      } else if (state.exception is GenericAuthException) {
+                        await showErrorDialog(context, 'Algo salió mal');
+                      } else if (state.exception != null) {
+                        await showErrorDialog(context, 'Algo salió mal');
                       }
                     }
                   },
-                  child: const Text('Entrar a mi cuenta'),
+                  child: FilledButton(
+                    onPressed: () async {
+                      devtools.log('Logging in...');
+                      final email = _email.text;
+                      final password = _password.text;
+                      context.read<AuthBloc>().add(
+                            AuthEventLogInWithEmailAndPassword(
+                              email,
+                              password,
+                            ),
+                          );
+                    },
+                    child: const Text('Entrar a mi cuenta'),
+                  ),
                 ),
                 const SizedBox(height: 13),
                 //go to register button

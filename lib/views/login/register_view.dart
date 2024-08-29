@@ -55,6 +55,7 @@ class _RegisterViewState extends State<RegisterView> {
               child: Column(
                 children: [
                   TextField(
+                    autofocus: true,
                     controller: _email,
                     enableSuggestions: false,
                     autocorrect: false,

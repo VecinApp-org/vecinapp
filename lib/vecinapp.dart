@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 //import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 //import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:vecinapp/constants/routes.dart';
+import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
+import 'package:vecinapp/services/auth/bloc/auth_event.dart';
+import 'package:vecinapp/services/auth/bloc/auth_state.dart';
+import 'package:vecinapp/services/auth/firebase_auth_provider.dart';
 import 'package:vecinapp/views/home/docs/edit_doc_view.dart';
 import 'package:vecinapp/views/home/home_drawer.dart';
 import 'package:vecinapp/views/login/login_view.dart';
 import 'package:vecinapp/views/login/verify_email_view.dart';
 import 'package:vecinapp/views/login/welcome_view.dart';
-import 'package:vecinapp/services/auth/auth_service.dart';
+//import 'package:vecinapp/services/auth/auth_service.dart';
 import 'services/settings/settings_controller.dart';
 import 'views/home/settings_view.dart';
 import 'views/login/register_view.dart';
@@ -32,17 +37,20 @@ class VecinApp extends StatelessWidget {
           darkTheme: ThemeData.dark(),
           themeMode: settingsController.themeMode,
           routes: {
-            appRootRouteName: (context) => const AppRoot(),
-            welcomeRouteName: (context) => const WelcomeView(),
+            appRootRouteName: (context) => const Home(),
+            //welcomeRouteName: (context) => const WelcomeView(),
             loginRouteName: (context) => const LoginView(),
             registerRouteName: (context) => const RegisterView(),
-            verifyEmailRouteName: (context) => const VerifyEmailView(),
-            homeDrawerRouteName: (context) => const HomeDrawer(),
+            //verifyEmailRouteName: (context) => const VerifyEmailView(),
+            //homeDrawerRouteName: (context) => const HomeDrawer(),
             settingsRouteName: (context) =>
                 SettingsView(controller: settingsController),
             newDocRouteName: (context) => const EditDocView(),
           },
-          home: const HomeBuilder(),
+          home: BlocProvider(
+            create: (context) => AuthBloc(FirebaseAuthProvider()),
+            child: const HomeBuilder(),
+          ),
         );
       },
     );
@@ -54,47 +62,49 @@ class HomeBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    devtools.log('HomeBuilder');
-    return FutureBuilder(
-        future: AuthService.firebase().initialize(),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              return StreamBuilder(
-                  stream: AuthService.firebase().userChanges(),
-                  builder: (context, snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.active:
-                        return const AppRoot();
-                      default:
-                        return const Scaffold(
-                            body: Center(child: CircularProgressIndicator()));
-                    }
-                  });
-            default:
-              return const Scaffold(
-                  body: Center(child: CircularProgressIndicator()));
-          }
-        });
+    context.read<AuthBloc>().add(const AuthEventInitialize());
+    return const Home();
   }
 }
 
-class AppRoot extends StatelessWidget {
-  const AppRoot({super.key});
+class Home extends StatelessWidget {
+  const Home({super.key});
 
   @override
   Widget build(BuildContext context) {
-    devtools.log('AppRoot');
-    final user = AuthService.firebase().currentUser;
-    if (user == null) {
-      return const WelcomeView();
-    } else if (user.isEmailVerified) {
-      return const HomeDrawer();
-    } else {
-      return const VerifyEmailView();
-    }
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        if (state is AuthStateLoggedIn) {
+          return const HomeDrawer();
+        } else if (state is AuthStateNeedsVerification) {
+          return const VerifyEmailView();
+        } else if (state is AuthStateLoggedOut) {
+          return const LoginView();
+        } else {
+          return const Scaffold(
+              body: Center(child: CircularProgressIndicator()));
+        }
+      },
+    );
   }
 }
+
+// class AppRoot extends StatelessWidget {
+//   const AppRoot({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     devtools.log('AppRoot');
+//     final user = AuthService.firebase().currentUser;
+//     if (user == null) {
+//       return const WelcomeView();
+//     } else if (user.isEmailVerified) {
+//       return const HomeDrawer();
+//     } else {
+//       return const VerifyEmailView();
+//     }
+//   }
+// }
 
 
 /* REMOVED FROM MATERIAL APP FOR LATER USE WHEN I LEARN ABOUT LOCALIZATIONS AND DEEPLINKS

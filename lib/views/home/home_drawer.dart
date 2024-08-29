@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/constants/routes.dart';
+import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
+import 'package:vecinapp/services/auth/bloc/auth_event.dart';
 import 'package:vecinapp/views/home/docs/docs_view.dart';
 import 'contacts/contact_list.dart';
 import 'dart:developer' as devtools show log;
@@ -30,6 +33,16 @@ class _HomeDrawerState extends State<HomeDrawer> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              context.read<AuthBloc>().add(
+                    const AuthEventLogOut(),
+                  );
+            },
+          ),
+        ],
         title: const [
           Text(''),
           Text('Contactos'),

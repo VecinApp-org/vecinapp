@@ -3,7 +3,7 @@ import 'package:vecinapp/services/auth/auth_user.dart';
 abstract class AuthProvider {
   Future<void> initialize();
   AuthUser? get currentUser;
-  Future<AuthUser> logIn({
+  Future<AuthUser> logInWithEmailAndPassword({
     required String email,
     required String password,
   });

@@ -11,11 +11,13 @@ environment:
   sdk: ^3.5.1
 
 dependencies:
+  bloc: ^8.1.4
   cloud_firestore: ^5.3.0
   firebase_auth: ^5.1.4
   firebase_core: ^3.3.0
   flutter:
     sdk: flutter
+  flutter_bloc: ^8.1.6
   flutter_localizations:
     sdk: flutter
   path: ^1.9.0
