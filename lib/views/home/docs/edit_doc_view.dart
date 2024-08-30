@@ -52,7 +52,7 @@ class _EditDocViewState extends State<EditDocView> {
     try {
       if (widget.doc == null) {
         final currentUser = AuthService.firebase().currentUser!;
-        final uid = currentUser.uid;
+        final uid = currentUser.uid!;
         await _docsService.createNewDoc(
           ownerUserId: uid,
           title: title,

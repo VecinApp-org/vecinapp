@@ -46,6 +46,6 @@ class AuthEventUserChanges extends AuthEvent {
   const AuthEventUserChanges();
 }
 
-class AuthEventCheckIfEmailIsVerified extends AuthEvent {
-  const AuthEventCheckIfEmailIsVerified();
+class AuthEventConfirmUserIsVerified extends AuthEvent {
+  const AuthEventConfirmUserIsVerified();
 }

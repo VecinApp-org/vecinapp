@@ -49,5 +49,5 @@ class AuthService implements AuthProvider {
   Future<void> deleteAccount() => provider.deleteAccount();
 
   @override
-  Future<void> reload() => provider.reload();
+  Future<AuthUser> confirmUserIsVerified() => provider.confirmUserIsVerified();
 }

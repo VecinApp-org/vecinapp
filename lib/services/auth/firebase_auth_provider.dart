@@ -101,7 +101,7 @@ class FirebaseAuthProvider implements AuthProvider {
 
   @override
   Future<void> logOut() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = currentUser;
     if (user != null) {
       await FirebaseAuth.instance.signOut();
     } else {
@@ -111,10 +111,10 @@ class FirebaseAuthProvider implements AuthProvider {
 
   @override
   Future<void> sendEmailVerification() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = currentUser;
     if (user != null) {
       try {
-        await user.sendEmailVerification();
+        await FirebaseAuth.instance.currentUser!.sendEmailVerification();
       } on FirebaseAuthException catch (e) {
         switch (e.code) {
           case 'network-request-failed':
@@ -140,10 +140,10 @@ class FirebaseAuthProvider implements AuthProvider {
 
   @override
   Future<void> deleteAccount() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = currentUser;
     if (user != null) {
       try {
-        await user.delete();
+        await FirebaseAuth.instance.currentUser!.delete();
       } on FirebaseAuthException catch (e) {
         if (e.code == 'requires-recent-login') {
           throw RequiresRecentLoginAuthException();
@@ -159,17 +159,27 @@ class FirebaseAuthProvider implements AuthProvider {
   }
 
   @override
-  Future<void> reload() async {
-    final user = FirebaseAuth.instance.currentUser;
+  Future<AuthUser> confirmUserIsVerified() async {
+    final user = currentUser;
     if (user != null) {
       try {
-        await user.reload();
+        await FirebaseAuth.instance.currentUser!.reload();
       } on FirebaseAuthException catch (e) {
         if (e.code == 'network-request-failed') {
           throw NetworkRequestFailedAuthException();
         } else {
           throw GenericAuthException();
         }
+      }
+      final userReloaded = currentUser;
+      if (userReloaded != null) {
+        if (userReloaded.isEmailVerified) {
+          return userReloaded;
+        } else {
+          throw UserNotVerifiedAuthException();
+        }
+      } else {
+        throw UserNotLoggedInAuthException();
       }
     } else {
       throw UserNotLoggedInAuthException();

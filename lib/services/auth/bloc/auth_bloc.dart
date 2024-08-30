@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:vecinapp/services/auth/auth_exceptions.dart';
 //import 'package:vecinapp/services/auth/auth_exceptions.dart';
 import 'package:vecinapp/services/auth/bloc/auth_state.dart';
 import 'package:vecinapp/services/auth/auth_provider.dart';
@@ -41,6 +42,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final password = event.password;
       final passwordConfirmation = event.passwordConfirmation;
       try {
+        emit(const AuthStateRegistering(
+          exception: null,
+          isLoading: true,
+        ));
         final user = await provider.createUser(
           email: email,
           password: password,
@@ -65,35 +70,45 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(state);
     });
     //check if email is verified
-    on<AuthEventCheckIfEmailIsVerified>((event, emit) async {
+    on<AuthEventConfirmUserIsVerified>((event, emit) async {
       try {
-        await provider.reload();
-        final user = provider.currentUser;
-        if (user == null) {
-          emit(const AuthStateLoggedOut(
-            exception: null,
-            isLoading: false,
-          ));
-        } else if (!user.isEmailVerified) {
-          emit(AuthStateNeedsVerification(
-            user: user,
-            exception: null,
-            isLoading: false,
-          ));
-        }
+        final userVerified = await provider.confirmUserIsVerified();
+        emit(AuthStateLoggedIn(
+          user: userVerified,
+          exception: null,
+          isLoading: false,
+        ));
       } on Exception catch (e) {
-        final user = provider.currentUser;
-        if (user == null) {
-          emit(const AuthStateLoggedOut(
-            exception: null,
-            isLoading: false,
-          ));
-        } else {
+        final user = provider.currentUser!;
+        if (e is UserNotVerifiedAuthException) {
           emit(
             AuthStateNeedsVerification(
               user: user,
               isLoading: false,
               exception: e,
+            ),
+          );
+        } else if (e is NetworkRequestFailedAuthException) {
+          emit(
+            AuthStateNeedsVerification(
+              user: user,
+              isLoading: false,
+              exception: e,
+            ),
+          );
+        } else if (e is GenericAuthException) {
+          emit(
+            AuthStateNeedsVerification(
+              user: user,
+              isLoading: false,
+              exception: e,
+            ),
+          );
+        } else if (e is UserNotLoggedInAuthException) {
+          emit(
+            AuthStateLoggedOut(
+              exception: e,
+              isLoading: false,
             ),
           );
         }

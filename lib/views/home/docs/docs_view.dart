@@ -16,7 +16,7 @@ class DocsView extends StatefulWidget {
 
 class _DocsViewState extends State<DocsView> {
   late final FirebaseCloudStorage _docsService;
-  String get userId => AuthService.firebase().currentUser!.uid;
+  String get userId => AuthService.firebase().currentUser!.uid!;
 
   @override
   void initState() {

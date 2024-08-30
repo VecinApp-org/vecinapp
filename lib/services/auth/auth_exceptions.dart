@@ -16,6 +16,8 @@ class RequiresRecentLoginAuthException implements Exception {}
 // send email verification exceptions
 class TooManyRequestsAuthException implements Exception {}
 
+class UserNotVerifiedAuthException implements Exception {}
+
 // input exceptions
 class ChannelErrorAuthException implements Exception {}
 

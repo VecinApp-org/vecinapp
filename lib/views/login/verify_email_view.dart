@@ -12,7 +12,7 @@ class VerifyEmailView extends StatelessWidget {
 
   final double primarySpacing = 64;
   final double secondarySpacing = 32;
-  final double tertiarySpacing = 16;
+  final double tertiarySpacing = 8;
   final double maxWidth = 360;
 
   @override
@@ -27,9 +27,11 @@ class VerifyEmailView extends StatelessWidget {
               case NetworkRequestFailedAuthException():
                 showErrorDialog(context, 'Error de red');
               case UserNotLoggedInAuthException():
-                context.read().add(
-                      const AuthEventLogOut(),
-                    );
+                context.read().add(const AuthEventLogOut());
+              case UserNotVerifiedAuthException():
+                showErrorDialog(context, 'Aún no has verificado tu correo.');
+              case GenericAuthException():
+                showErrorDialog(context, 'Algo salió mal');
             }
           }
         };
@@ -53,14 +55,15 @@ class VerifyEmailView extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
               ),
+              SizedBox(height: secondarySpacing),
               FilledButton(
                   onPressed: () {
                     context.read<AuthBloc>().add(
-                          const AuthEventCheckIfEmailIsVerified(),
+                          const AuthEventConfirmUserIsVerified(),
                         );
                   },
                   child: const Text('Continuar')),
-              SizedBox(height: tertiarySpacing),
+              SizedBox(height: secondarySpacing),
               OutlinedButton(
                   onPressed: () {
                     context.read<AuthBloc>().add(
