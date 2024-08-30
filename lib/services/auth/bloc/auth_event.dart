@@ -41,3 +41,11 @@ class AuthEventLogOut extends AuthEvent {
 class AuthEventDeleteAccount extends AuthEvent {
   const AuthEventDeleteAccount();
 }
+
+class AuthEventUserChanges extends AuthEvent {
+  const AuthEventUserChanges();
+}
+
+class AuthEventCheckIfEmailIsVerified extends AuthEvent {
+  const AuthEventCheckIfEmailIsVerified();
+}

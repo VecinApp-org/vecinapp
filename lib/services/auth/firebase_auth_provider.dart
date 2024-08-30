@@ -171,6 +171,8 @@ class FirebaseAuthProvider implements AuthProvider {
           throw GenericAuthException();
         }
       }
+    } else {
+      throw UserNotLoggedInAuthException();
     }
   }
 }

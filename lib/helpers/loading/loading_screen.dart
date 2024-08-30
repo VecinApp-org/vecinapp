@@ -37,8 +37,8 @@ class LoadingScreen {
     textController.add(text);
 
     final state = Overlay.of(context);
-    final renerBox = context.findRenderObject() as RenderBox;
-    final size = renerBox.size;
+    final renderBox = context.findRenderObject() as RenderBox;
+    final size = renderBox.size;
 
     final overlay = OverlayEntry(
       builder: (context) {
@@ -52,8 +52,8 @@ class LoadingScreen {
                 minWidth: size.width * 0.5,
               ),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10.0),
+                color: Theme.of(context).dialogBackgroundColor,
+                borderRadius: BorderRadius.circular(30.0),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -62,9 +62,13 @@ class LoadingScreen {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 10),
-                      const CircularProgressIndicator(),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 32),
+                      const SizedBox(
+                        width: 60,
+                        height: 60,
+                        child: CircularProgressIndicator(),
+                      ),
+                      const SizedBox(height: 32),
                       StreamBuilder(
                         stream: textController.stream,
                         builder: (context, snapshot) {
@@ -76,6 +80,7 @@ class LoadingScreen {
                           }
                         },
                       ),
+                      const SizedBox(height: 16),
                     ],
                   ),
                 ),

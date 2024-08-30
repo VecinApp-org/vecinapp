@@ -8,7 +8,7 @@ abstract class AuthState {
   final String? loadingText;
   const AuthState({
     required this.isLoading,
-    this.loadingText = 'Cargando...',
+    this.loadingText,
   });
 }
 
@@ -17,15 +17,18 @@ class AuthStateUnInitalized extends AuthState {
       : super(isLoading: isLoading);
 }
 
-class AuthStateRegistering extends AuthState {
+class AuthStateRegistering extends AuthState with EquatableMixin {
   final Exception? exception;
   const AuthStateRegistering({
     required this.exception,
     required bool isLoading,
   }) : super(isLoading: isLoading);
+
+  @override
+  List<Object?> get props => [exception, isLoading];
 }
 
-class AuthStateLoggedIn extends AuthState {
+class AuthStateLoggedIn extends AuthState with EquatableMixin {
   final AuthUser user;
   final Exception? exception;
   const AuthStateLoggedIn({
@@ -33,12 +36,24 @@ class AuthStateLoggedIn extends AuthState {
     required this.exception,
     required bool isLoading,
   }) : super(isLoading: isLoading);
+
+  @override
+  List<Object?> get props => [exception, isLoading];
 }
 
-class AuthStateNeedsVerification extends AuthState {
+class AuthStateNeedsVerification extends AuthState with EquatableMixin {
+  final AuthUser user;
+  final Exception? exception;
   const AuthStateNeedsVerification({
+    required this.user,
     required bool isLoading,
-  }) : super(isLoading: isLoading);
+    required this.exception,
+  }) : super(
+          isLoading: isLoading,
+        );
+
+  @override
+  List<Object?> get props => [exception, isLoading];
 }
 
 class AuthStateLoggedOut extends AuthState with EquatableMixin {

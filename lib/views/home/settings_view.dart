@@ -55,14 +55,18 @@ class SettingsView extends StatelessWidget {
               child: const Text('Cerrar sesión'),
             ),
           ),
-          //const SizedBox(height: 32),
-          // TextButton(
-          //   onPressed: () {},
-          //   style: TextButton.styleFrom(
-          //     foregroundColor: Colors.red,
-          //   ),
-          //   child: const Text('Eliminar cuenta'),
-          // ),
+          const SizedBox(height: 32),
+          TextButton(
+            onPressed: () {
+              context.read<AuthBloc>().add(
+                    const AuthEventDeleteAccount(),
+                  );
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('Eliminar cuenta'),
+          ),
           const SizedBox(height: 64),
         ],
       ),

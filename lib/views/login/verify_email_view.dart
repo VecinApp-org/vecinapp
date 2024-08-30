@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vecinapp/services/auth/auth_exceptions.dart';
 import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
 import 'package:vecinapp/services/auth/bloc/auth_event.dart';
 import 'package:vecinapp/services/auth/bloc/auth_state.dart';
+import 'package:vecinapp/utilities/show_error_dialog.dart';
 //import 'dart:developer' as devtools show log;
 
 class VerifyEmailView extends StatelessWidget {
@@ -16,7 +18,22 @@ class VerifyEmailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        (context, state) {
+          if (state is AuthStateNeedsVerification) {
+            switch (state.exception) {
+              case TooManyRequestsAuthException():
+                showErrorDialog(context, 'Esperate tantito');
+              case NetworkRequestFailedAuthException():
+                showErrorDialog(context, 'Error de red');
+              case UserNotLoggedInAuthException():
+                context.read().add(
+                      const AuthEventLogOut(),
+                    );
+            }
+          }
+        };
+      },
       child: Scaffold(
         body: Center(
           child: Column(
@@ -36,6 +53,13 @@ class VerifyEmailView extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
               ),
+              FilledButton(
+                  onPressed: () {
+                    context.read<AuthBloc>().add(
+                          const AuthEventCheckIfEmailIsVerified(),
+                        );
+                  },
+                  child: const Text('Continuar')),
               SizedBox(height: tertiarySpacing),
               OutlinedButton(
                   onPressed: () {
@@ -48,7 +72,7 @@ class VerifyEmailView extends StatelessWidget {
               TextButton(
                 style: TextButton.styleFrom(foregroundColor: Colors.red),
                 onPressed: () {
-                  context.read().add(
+                  context.read<AuthBloc>().add(
                         const AuthEventLogOut(),
                       );
                 },
