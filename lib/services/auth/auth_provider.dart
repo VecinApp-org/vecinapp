@@ -17,4 +17,5 @@ abstract class AuthProvider {
   Stream<AuthUser> userChanges();
   Future<void> deleteAccount();
   Future<AuthUser> confirmUserIsVerified();
+  Future<void> sendPasswordResetEmail({required String email});
 }

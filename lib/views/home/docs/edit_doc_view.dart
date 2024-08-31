@@ -3,9 +3,8 @@ import 'package:vecinapp/services/auth/auth_service.dart';
 import 'package:vecinapp/services/cloud/cloud_doc.dart';
 import 'package:vecinapp/services/cloud/cloud_storage_exceptions.dart';
 import 'package:vecinapp/services/cloud/firebase_cloud_storage.dart';
-import 'dart:developer' as devtools show log;
-
 import 'package:vecinapp/utilities/show_error_dialog.dart';
+import 'dart:developer' as devtools show log;
 
 class EditDocView extends StatefulWidget {
   const EditDocView({super.key, this.doc});
@@ -81,6 +80,7 @@ class _EditDocViewState extends State<EditDocView> {
           padding: const EdgeInsets.all(16.0),
           children: [
             TextField(
+              autofocus: true,
               keyboardType: TextInputType.multiline,
               maxLines: 1,
               decoration: const InputDecoration(
@@ -91,7 +91,6 @@ class _EditDocViewState extends State<EditDocView> {
             ),
             const SizedBox(height: 8.0),
             TextField(
-              autofocus: true,
               keyboardType: TextInputType.multiline,
               maxLines: null,
               decoration: const InputDecoration(
@@ -111,8 +110,8 @@ class _EditDocViewState extends State<EditDocView> {
                   devtools.log('CloudStorageException on save doc: $e');
                   if (context.mounted) {
                     showErrorDialog(
-                      context,
-                      'Error al guardar el documento',
+                      context: context,
+                      text: 'Error al guardar el documento',
                     );
                   }
                 } catch (e) {
@@ -120,8 +119,8 @@ class _EditDocViewState extends State<EditDocView> {
                       'Unhandled exception saving doc type ${e.runtimeType} Error: $e');
                   if (context.mounted) {
                     showErrorDialog(
-                      context,
-                      'Error al guardar el documento',
+                      context: context,
+                      text: 'Error al guardar el documento',
                     );
                   }
                 }

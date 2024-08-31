@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
 import 'package:vecinapp/services/auth/bloc/auth_event.dart';
-import 'package:vecinapp/services/auth/bloc/auth_state.dart';
 
 import '../../services/settings/settings_controller.dart';
 
@@ -43,17 +42,14 @@ class SettingsView extends StatelessWidget {
           //const Divider(),
           const Spacer(),
           const SizedBox(height: 32),
-          BlocListener<AuthBloc, AuthState>(
-            listener: (context, state) {},
-            child: TextButton(
-              onPressed: () {
-                context.read<AuthBloc>().add(
-                      const AuthEventLogOut(),
-                    );
-              },
-              style: TextButton.styleFrom(foregroundColor: Colors.red),
-              child: const Text('Cerrar sesión'),
-            ),
+          TextButton(
+            onPressed: () {
+              context.read<AuthBloc>().add(
+                    const AuthEventLogOut(),
+                  );
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Cerrar sesión'),
           ),
           const SizedBox(height: 32),
           TextButton(

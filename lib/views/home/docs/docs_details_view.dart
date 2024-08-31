@@ -39,7 +39,7 @@ class _DocDetailsViewState extends State<DocDetailsView> {
                   );
                 case EditOrDelete.delete:
                   final shouldDelete = await showConfirmationDialog(
-                      context, '¿Eliminar el documento?');
+                      context: context, text: '¿Eliminar el documento?');
                   if (shouldDelete == true) {
                     await _docsService.deleteDoc(
                         documentId: widget.doc.documentId);

@@ -1,27 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:vecinapp/utilities/generic_dialog.dart';
 
-Future<bool?> showConfirmationDialog<bool>(BuildContext context, String text) {
-  return showDialog<bool>(
+Future<bool> showConfirmationDialog(
+    {required BuildContext context, required String text}) {
+  return showGenericDialog<bool>(
     context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('Confirma la acción'),
-        content: Text(text),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(false);
-            },
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(true);
-            },
-            child: const Text('Confirmar'),
-          ),
-        ],
-      );
+    title: '¿De verdad?',
+    content: text,
+    optionBuilder: () => {
+      'Cancelar': false,
+      'Confirmar': true,
     },
-  );
+  ).then((value) => value ?? false);
 }

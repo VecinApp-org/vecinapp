@@ -5,6 +5,7 @@ import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
 import 'package:vecinapp/services/auth/bloc/auth_event.dart';
 import 'package:vecinapp/services/auth/bloc/auth_state.dart';
 import 'package:vecinapp/utilities/show_error_dialog.dart';
+import 'package:vecinapp/utilities/show_notification_dialog.dart';
 //import 'dart:developer' as devtools show log;
 
 class VerifyEmailView extends StatelessWidget {
@@ -23,15 +24,20 @@ class VerifyEmailView extends StatelessWidget {
           if (state is AuthStateNeedsVerification) {
             switch (state.exception) {
               case TooManyRequestsAuthException():
-                showErrorDialog(context, 'Esperate tantito');
+                showErrorDialog(context: context, text: 'Esperate tantito');
               case NetworkRequestFailedAuthException():
-                showErrorDialog(context, 'Error de red');
+                showErrorDialog(context: context, text: 'No hay internet');
               case UserNotLoggedInAuthException():
                 context.read().add(const AuthEventLogOut());
               case UserNotVerifiedAuthException():
-                showErrorDialog(context, 'Aún no has verificado tu correo.');
+                showNotificationDialog(
+                  context: context,
+                  title: 'Aún no has verificado tu correo',
+                  content:
+                      'Si no encuentras el correo, revisa tu carpeta de Spam. O vuelve a enviar el correo de verificación.\n Si no recibes el correo, puede ser que hayas escrito mal tu correo. En ese caso, puedes salir y volver a intentar crear tu cuenta.',
+                );
               case GenericAuthException():
-                showErrorDialog(context, 'Algo salió mal');
+                showErrorDialog(context: context, text: 'Algo salió mal');
             }
           }
         };

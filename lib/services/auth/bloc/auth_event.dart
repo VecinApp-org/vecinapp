@@ -49,3 +49,13 @@ class AuthEventUserChanges extends AuthEvent {
 class AuthEventConfirmUserIsVerified extends AuthEvent {
   const AuthEventConfirmUserIsVerified();
 }
+
+class AuthEventForgotPassword extends AuthEvent {
+  final String email;
+  const AuthEventForgotPassword(this.email);
+}
+
+class AuthEventSendPasswordResetEmail extends AuthEvent {
+  final String email;
+  const AuthEventSendPasswordResetEmail(this.email);
+}

@@ -10,6 +10,7 @@ import 'package:vecinapp/services/auth/bloc/auth_state.dart';
 import 'package:vecinapp/services/auth/firebase_auth_provider.dart';
 import 'package:vecinapp/views/home/docs/edit_doc_view.dart';
 import 'package:vecinapp/views/home/home_drawer.dart';
+import 'package:vecinapp/views/login/forgot_password_view.dart';
 import 'package:vecinapp/views/login/login_view.dart';
 import 'package:vecinapp/views/login/verify_email_view.dart';
 import 'services/settings/settings_controller.dart';
@@ -85,6 +86,8 @@ class Home extends StatelessWidget {
           return const LoginView();
         } else if (state is AuthStateRegistering) {
           return const RegisterView();
+        } else if (state is AuthStateResettingPassword) {
+          return const ForgotPasswordView();
         } else {
           return const Scaffold(
               body: Center(child: CircularProgressIndicator()));
