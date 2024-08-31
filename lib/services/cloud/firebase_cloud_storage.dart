@@ -31,29 +31,12 @@ class FirebaseCloudStorage {
     }
   }
 
-  Stream<Iterable<CloudDoc>> allDocs({
-    required String ownerUserId,
-  }) =>
-      docs.snapshots().map((event) => event.docs
-          .map((doc) => CloudDoc.fromSnapshot(doc))
-          .where((note) => note.ownerUserId == ownerUserId));
-
-  Future<Iterable<CloudDoc>> getDocs({required String ownerUserId}) async {
-    try {
-      return await docs
-          .where(
-            ownerUserIdFieldName,
-            isEqualTo: ownerUserId,
-          )
-          .get()
-          .then((value) {
-        return value.docs.map((doc) {
-          return CloudDoc.fromSnapshot(doc);
-        });
-      });
-    } catch (e) {
-      throw CouldNotGetDocsException();
-    }
+  Stream<Iterable<CloudDoc>> allDocs({required String ownerUserId}) {
+    final allDocs = docs
+        .where(ownerUserIdFieldName, isEqualTo: ownerUserId)
+        .snapshots()
+        .map((event) => event.docs.map((doc) => CloudDoc.fromSnapshot(doc)));
+    return allDocs;
   }
 
   Future<CloudDoc> createNewDoc({
