@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vecinapp/constants/routes.dart';
 import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
 import 'package:vecinapp/services/auth/bloc/auth_event.dart';
 import 'package:vecinapp/utilities/show_confirmation_dialog.dart';
 import 'package:vecinapp/views/home/rulebooks/rulebooks_view.dart';
+import 'package:vecinapp/views/home/settings_view.dart';
 import 'contacts/contact_list.dart';
 import 'dart:developer' as devtools show log;
 
@@ -17,7 +17,7 @@ class HomeDrawer extends StatefulWidget {
 
 class _HomeDrawerState extends State<HomeDrawer> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  int _navigationDrawerIndex = 2;
+  int _navigationDrawerIndex = 0;
   late bool showNavigationDrawer;
 
   void handleScreenChanged(int selectedScreen) {
@@ -33,10 +33,11 @@ class _HomeDrawerState extends State<HomeDrawer> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      body: const [
-        DashboardView(),
-        ContactList(),
-        RulebooksView(),
+      body: [
+        const DashboardView(),
+        const ContactList(),
+        const RulebooksView(),
+        SettingsView(),
       ][_navigationDrawerIndex],
       drawer: NavigationDrawer(
         onDestinationSelected: (int index) {
@@ -56,10 +57,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                 IconButton(
                   icon: const Icon(Icons.settings),
                   onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      settingsRouteName,
-                    );
+                    handleScreenChanged(3);
                   },
                 ),
                 IconButton(

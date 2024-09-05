@@ -15,7 +15,6 @@ import 'package:vecinapp/views/login/forgot_password_view.dart';
 import 'package:vecinapp/views/login/login_view.dart';
 import 'package:vecinapp/views/login/verify_email_view.dart';
 import 'services/settings/settings_controller.dart';
-import 'views/home/settings_view.dart';
 import 'views/login/register_view.dart';
 import 'dart:developer' as devtools show log;
 
@@ -38,8 +37,6 @@ class VecinApp extends StatelessWidget {
           darkTheme: darkTheme,
           themeMode: settingsController.themeMode,
           routes: {
-            settingsRouteName: (context) =>
-                SettingsView(controller: settingsController),
             newRulebookRouteName: (context) => const EditRulebookView(),
           },
           home: BlocProvider(

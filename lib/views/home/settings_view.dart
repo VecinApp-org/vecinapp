@@ -6,32 +6,39 @@ import 'package:vecinapp/services/auth/bloc/auth_event.dart';
 import '../../services/settings/settings_controller.dart';
 
 class SettingsView extends StatelessWidget {
-  const SettingsView({super.key, required this.controller});
+  SettingsView({super.key});
 
-  final SettingsController controller;
+  final SettingsController controller = SettingsController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () {
+            Scaffold.of(context).openDrawer();
+          },
+        ),
+      ),
       body: Column(
         children: [
           const SizedBox(height: 32),
           const Text('Configuración', style: TextStyle(fontSize: 24)),
           const SizedBox(height: 32),
           ListTile(
-            title: const Text('Modo Oscuro', style: TextStyle(fontSize: 20)),
+            title: const Text('Tema', style: TextStyle(fontSize: 20)),
             trailing: DropdownButton<ThemeMode>(
                 value: controller.themeMode,
                 onChanged: controller.updateThemeMode,
                 items: const [
                   DropdownMenuItem(
                     value: ThemeMode.dark,
-                    child: Text('Prendido'),
+                    child: Text('Noche'),
                   ),
                   DropdownMenuItem(
                     value: ThemeMode.light,
-                    child: Text('Apagado'),
+                    child: Text('Día'),
                   ),
                   DropdownMenuItem(
                     value: ThemeMode.system,
