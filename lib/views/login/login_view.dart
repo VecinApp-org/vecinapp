@@ -130,16 +130,6 @@ class _LoginViewState extends State<LoginView> {
                   child: const Text('Entrar'),
                 ),
                 const SizedBox(height: 13),
-                //go to register button
-                OutlinedButton(
-                  onPressed: () {
-                    context.read<AuthBloc>().add(
-                          const AuthEventShouldRegister(),
-                        );
-                  },
-                  child: const Text('Aún no tengo cuenta'),
-                ),
-                const SizedBox(height: 13),
                 //Forgot password button
                 TextButton(
                   onPressed: () {
@@ -149,6 +139,16 @@ class _LoginViewState extends State<LoginView> {
                         .add(AuthEventForgotPassword(email: email));
                   },
                   child: const Text('Olvidé mi contraseña'),
+                ),
+                const SizedBox(height: 13),
+                //go to register button
+                TextButton(
+                  onPressed: () {
+                    context.read<AuthBloc>().add(
+                          const AuthEventShouldRegister(),
+                        );
+                  },
+                  child: const Text('Crear cuenta nueva'),
                 ),
                 //const SizedBox(height: 55),
               ],

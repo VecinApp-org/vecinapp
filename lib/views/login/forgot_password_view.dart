@@ -72,12 +72,8 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   //Title
-                  const Text('Cambiar contraseña',
-                      style: TextStyle(fontSize: 28)),
-                  const SizedBox(height: 13),
-                  const Text(
-                    'Te enviaremos un correo para que cambies tu contraseña.',
-                  ),
+                  Text('Cambiar contraseña',
+                      style: Theme.of(context).textTheme.headlineLarge),
                   const SizedBox(height: 55),
                   //email textfield
                   TextField(

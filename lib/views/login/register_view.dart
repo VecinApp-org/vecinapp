@@ -164,7 +164,7 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
                 const SizedBox(height: 13),
                 //Go to login page
-                OutlinedButton(
+                TextButton(
                   onPressed: () {
                     context.read<AuthBloc>().add(
                           const AuthEventLogOut(),
