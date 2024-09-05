@@ -8,6 +8,7 @@ import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
 import 'package:vecinapp/services/auth/bloc/auth_event.dart';
 import 'package:vecinapp/services/auth/bloc/auth_state.dart';
 import 'package:vecinapp/services/auth/firebase_auth_provider.dart';
+import 'package:vecinapp/theme/theme_constants.dart';
 import 'package:vecinapp/views/home/rulebooks/edit_rulebook_view.dart';
 import 'package:vecinapp/views/home/home_drawer.dart';
 import 'package:vecinapp/views/login/forgot_password_view.dart';
@@ -33,8 +34,8 @@ class VecinApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           restorationScopeId: 'vecinapp',
           //Theme
-          theme: ThemeData(useMaterial3: true),
-          darkTheme: ThemeData.dark(),
+          theme: lightTheme,
+          darkTheme: darkTheme,
           themeMode: settingsController.themeMode,
           routes: {
             settingsRouteName: (context) =>
