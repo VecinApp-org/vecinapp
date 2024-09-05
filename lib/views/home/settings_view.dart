@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
 import 'package:vecinapp/services/auth/bloc/auth_event.dart';
+import 'package:vecinapp/utilities/show_confirmation_dialog.dart';
 
 import '../../services/settings/settings_controller.dart';
 
@@ -50,20 +51,32 @@ class SettingsView extends StatelessWidget {
           const Spacer(),
           const SizedBox(height: 32),
           TextButton(
-            onPressed: () {
-              context.read<AuthBloc>().add(
-                    const AuthEventLogOut(),
-                  );
+            onPressed: () async {
+              final confirmLogout = await showConfirmationDialog(
+                context: context,
+                text: '¿Quieres salir de tu cuenta?',
+              );
+              if (confirmLogout == true && context.mounted) {
+                context.read<AuthBloc>().add(
+                      const AuthEventLogOut(),
+                    );
+              }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Cerrar sesión'),
           ),
           const SizedBox(height: 32),
           TextButton(
-            onPressed: () {
-              context.read<AuthBloc>().add(
-                    const AuthEventDeleteAccount(),
-                  );
+            onPressed: () async {
+              final confirmLogout = await showConfirmationDialog(
+                context: context,
+                text: '¿Quieres eliminar tu cuenta?',
+              );
+              if (confirmLogout == true && context.mounted) {
+                context.read<AuthBloc>().add(
+                      const AuthEventDeleteAccount(),
+                    );
+              }
             },
             style: TextButton.styleFrom(
               foregroundColor: Colors.red,
