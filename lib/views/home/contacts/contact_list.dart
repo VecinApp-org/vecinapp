@@ -16,29 +16,39 @@ class ContactList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      restorationId: 'contactList',
-      itemCount: contacts.length,
-      itemBuilder: (context, index) {
-        final contact = contacts[index];
-        return Column(
-          children: [
-            ListTile(
-                title: Text(contact.title),
-                leading: const Icon(Icons.person),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          ContactDetailsView(contact: contact),
-                    ),
-                  );
-                }),
-            const Divider(),
-          ],
-        );
-      },
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Contactos'),
+        leading: IconButton(
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+            icon: const Icon(Icons.menu)),
+      ),
+      body: ListView.builder(
+        restorationId: 'contactList',
+        itemCount: contacts.length,
+        itemBuilder: (context, index) {
+          final contact = contacts[index];
+          return Column(
+            children: [
+              ListTile(
+                  title: Text(contact.title),
+                  leading: const Icon(Icons.person),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ContactDetailsView(contact: contact),
+                      ),
+                    );
+                  }),
+              const Divider(),
+            ],
+          );
+        },
+      ),
     );
   }
 }

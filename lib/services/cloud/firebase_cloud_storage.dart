@@ -1,28 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:vecinapp/services/cloud/cloud_doc.dart';
+import 'package:vecinapp/services/cloud/rulebook.dart';
 import 'package:vecinapp/services/cloud/cloud_sorage_constants.dart';
 import 'package:vecinapp/services/cloud/cloud_storage_exceptions.dart';
 
 class FirebaseCloudStorage {
-  final docs = FirebaseFirestore.instance.collection('docs');
+  final rulebooks = FirebaseFirestore.instance.collection('docs');
 
-  Future<void> deleteDoc({
-    required String documentId,
+  Future<void> deleteRulebook({
+    required String rulebookId,
   }) async {
     try {
-      await docs.doc(documentId).delete();
+      await rulebooks.doc(rulebookId).delete();
     } catch (e) {
       throw CouldNotDeleteDocException();
     }
   }
 
-  Future<void> updateDoc({
-    required String documentId,
+  Future<void> updateRulebook({
+    required String rulebookId,
     required String title,
     required String text,
   }) async {
     try {
-      await docs.doc(documentId).update({
+      await rulebooks.doc(rulebookId).update({
         titleFieldName: title,
         textFieldName: text,
       });
@@ -31,28 +31,28 @@ class FirebaseCloudStorage {
     }
   }
 
-  Stream<Iterable<CloudDoc>> allDocs({required String ownerUserId}) {
-    final allDocs = docs
+  Stream<Iterable<Rulebook>> allRulebooks({required String ownerUserId}) {
+    final allRulebooks = rulebooks
         .where(ownerUserIdFieldName, isEqualTo: ownerUserId)
         .snapshots()
-        .map((event) => event.docs.map((doc) => CloudDoc.fromSnapshot(doc)));
-    return allDocs;
+        .map((event) => event.docs.map((doc) => Rulebook.fromSnapshot(doc)));
+    return allRulebooks;
   }
 
-  Future<CloudDoc> createNewDoc({
+  Future<Rulebook> createNewRulebook({
     required String ownerUserId,
     required String title,
     required String text,
   }) async {
-    final document = await docs.add({
+    final rulebook = await rulebooks.add({
       ownerUserIdFieldName: ownerUserId,
       titleFieldName: title,
       textFieldName: text,
     });
-    final fetchedDoc = await document.get();
+    final fetchedRulebook = await rulebook.get();
 
-    return CloudDoc(
-      documentId: fetchedDoc.id,
+    return Rulebook(
+      id: fetchedRulebook.id,
       ownerUserId: ownerUserId,
       title: title,
       text: text,

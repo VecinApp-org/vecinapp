@@ -1,32 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:vecinapp/services/auth/auth_service.dart';
-import 'package:vecinapp/services/cloud/cloud_doc.dart';
+import 'package:vecinapp/services/cloud/rulebook.dart';
 import 'package:vecinapp/services/cloud/cloud_storage_exceptions.dart';
 import 'package:vecinapp/services/cloud/firebase_cloud_storage.dart';
 import 'package:vecinapp/utilities/show_error_dialog.dart';
 import 'dart:developer' as devtools show log;
 
-class EditDocView extends StatefulWidget {
-  const EditDocView({super.key, this.doc});
+class EditRulebookView extends StatefulWidget {
+  const EditRulebookView({super.key, this.rulebook});
 
-  final CloudDoc? doc;
+  final Rulebook? rulebook;
 
   @override
-  State<EditDocView> createState() => _EditDocViewState();
+  State<EditRulebookView> createState() => _EditRulebookViewState();
 }
 
-class _EditDocViewState extends State<EditDocView> {
-  //DatabaseDoc? _doc;
-  late final FirebaseCloudStorage _docsService;
+class _EditRulebookViewState extends State<EditRulebookView> {
+  late final FirebaseCloudStorage _dbService;
   late final TextEditingController _textController;
   late final TextEditingController _titleController;
 
   @override
   void initState() {
-    _docsService = FirebaseCloudStorage();
+    _dbService = FirebaseCloudStorage();
     _textController = TextEditingController();
     _titleController = TextEditingController();
-    _setupEditDocIfProvided();
+    _setupEditRulebookIfProvided();
     super.initState();
   }
 
@@ -37,29 +36,29 @@ class _EditDocViewState extends State<EditDocView> {
     super.dispose();
   }
 
-  void _setupEditDocIfProvided() {
-    if (widget.doc != null) {
-      _textController.text = widget.doc!.text;
-      _titleController.text = widget.doc!.title;
+  void _setupEditRulebookIfProvided() {
+    if (widget.rulebook != null) {
+      _textController.text = widget.rulebook!.text;
+      _titleController.text = widget.rulebook!.title;
     }
   }
 
-  Future<void> _createOrUpdateDoc() async {
+  Future<void> _createOrUpdateRulebook() async {
     final text = _textController.text;
     final title = _titleController.text;
 
     try {
-      if (widget.doc == null) {
+      if (widget.rulebook == null) {
         final currentUser = AuthService.firebase().currentUser!;
         final uid = currentUser.uid!;
-        await _docsService.createNewDoc(
+        await _dbService.createNewRulebook(
           ownerUserId: uid,
           title: title,
           text: text,
         );
       } else {
-        await _docsService.updateDoc(
-          documentId: widget.doc!.documentId,
+        await _dbService.updateRulebook(
+          rulebookId: widget.rulebook!.id,
           title: title,
           text: text,
         );
@@ -71,10 +70,10 @@ class _EditDocViewState extends State<EditDocView> {
 
   @override
   Widget build(BuildContext context) {
-    devtools.log('NewDocView');
+    devtools.log('NewRulebookView');
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Nuevo Documento'),
+          title: const Text('Editar Reglamento'),
         ),
         body: ListView(
           padding: const EdgeInsets.all(16.0),
@@ -102,25 +101,25 @@ class _EditDocViewState extends State<EditDocView> {
             FilledButton(
               onPressed: () async {
                 try {
-                  await _createOrUpdateDoc();
+                  await _createOrUpdateRulebook();
                   if (context.mounted) {
                     Navigator.of(context).pop();
                   }
                 } on CloudStorageException catch (e) {
-                  devtools.log('CloudStorageException on save doc: $e');
+                  devtools.log('CloudStorageException on save rulebook: $e');
                   if (context.mounted) {
                     showErrorDialog(
                       context: context,
-                      text: 'Error al guardar el documento',
+                      text: 'Error al guardar el reglamento',
                     );
                   }
                 } catch (e) {
                   devtools.log(
-                      'Unhandled exception saving doc type ${e.runtimeType} Error: $e');
+                      'Unhandled exception saving rulebook type ${e.runtimeType} Error: $e');
                   if (context.mounted) {
                     showErrorDialog(
                       context: context,
-                      text: 'Error al guardar el documento',
+                      text: 'Error al guardar el reglamento',
                     );
                   }
                 }

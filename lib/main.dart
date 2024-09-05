@@ -6,10 +6,11 @@ import 'dart:developer' as devtools show log;
 
 void main() async {
   devtools.log('main');
-  final settingsController = SettingsController(SettingsService());
-  await settingsController.loadSettings();
 
   WidgetsFlutterBinding.ensureInitialized();
+
+  final settingsController = SettingsController(SettingsService());
+  await settingsController.loadSettings();
 
   runApp(VecinApp(settingsController: settingsController));
 }

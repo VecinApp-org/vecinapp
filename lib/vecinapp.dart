@@ -8,7 +8,7 @@ import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
 import 'package:vecinapp/services/auth/bloc/auth_event.dart';
 import 'package:vecinapp/services/auth/bloc/auth_state.dart';
 import 'package:vecinapp/services/auth/firebase_auth_provider.dart';
-import 'package:vecinapp/views/home/docs/edit_doc_view.dart';
+import 'package:vecinapp/views/home/rulebooks/edit_rulebook_view.dart';
 import 'package:vecinapp/views/home/home_drawer.dart';
 import 'package:vecinapp/views/login/forgot_password_view.dart';
 import 'package:vecinapp/views/login/login_view.dart';
@@ -39,7 +39,7 @@ class VecinApp extends StatelessWidget {
           routes: {
             settingsRouteName: (context) =>
                 SettingsView(controller: settingsController),
-            newDocRouteName: (context) => const EditDocView(),
+            newRulebookRouteName: (context) => const EditRulebookView(),
           },
           home: BlocProvider(
             create: (context) => AuthBloc(FirebaseAuthProvider()),

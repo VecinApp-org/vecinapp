@@ -1,34 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:vecinapp/services/cloud/cloud_doc.dart';
-import 'package:vecinapp/views/home/docs/docs_details_view.dart';
+import 'package:vecinapp/services/cloud/rulebook.dart';
+import 'package:vecinapp/views/home/rulebooks/rulebook_details_view.dart';
 import 'dart:developer' as devtools show log;
 
-class DocsListView extends StatelessWidget {
-  final Iterable<CloudDoc> docs;
+class RulebookListView extends StatelessWidget {
+  final Iterable<Rulebook> rulebooks;
 
-  const DocsListView({
+  const RulebookListView({
     super.key,
-    required this.docs,
+    required this.rulebooks,
   });
 
   @override
   Widget build(BuildContext context) {
-    devtools.log('DocsListView');
+    devtools.log('RulebookListView');
     return ListView.builder(
-        itemCount: docs.length,
+        itemCount: rulebooks.length,
         itemBuilder: (context, index) {
-          final doc = docs.elementAt(index);
+          final rulebook = rulebooks.elementAt(index);
           return Column(
             children: [
               ListTile(
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => DocDetailsView(doc: doc),
+                    builder: (context) =>
+                        RulebookDetailsView(rulebook: rulebook),
                   ),
                 ),
                 title: Text(
-                  doc.title,
+                  rulebook.title,
                   maxLines: 1,
                   softWrap: true,
                   overflow: TextOverflow.ellipsis,

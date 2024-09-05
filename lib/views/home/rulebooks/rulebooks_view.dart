@@ -1,48 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:vecinapp/services/auth/auth_service.dart';
-import 'package:vecinapp/services/cloud/cloud_doc.dart';
+import 'package:vecinapp/services/cloud/rulebook.dart';
 import 'package:vecinapp/services/cloud/firebase_cloud_storage.dart';
 import 'package:vecinapp/constants/routes.dart';
 import 'dart:developer' as devtools show log;
 
-import 'package:vecinapp/views/home/docs/docs_list_view.dart';
+import 'package:vecinapp/views/home/rulebooks/rulebook_list_view.dart';
 
-class DocsView extends StatefulWidget {
-  const DocsView({super.key});
+class RulebooksView extends StatefulWidget {
+  const RulebooksView({super.key});
 
   @override
-  State<DocsView> createState() => _DocsViewState();
+  State<RulebooksView> createState() => _RulebooksViewState();
 }
 
-class _DocsViewState extends State<DocsView> {
-  late final FirebaseCloudStorage _docsService;
+class _RulebooksViewState extends State<RulebooksView> {
+  late final FirebaseCloudStorage _dbService;
   String get userId => AuthService.firebase().currentUser!.uid!;
 
   @override
   void initState() {
-    _docsService = FirebaseCloudStorage();
+    _dbService = FirebaseCloudStorage();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    devtools.log('DocsView');
+    devtools.log('RulebooksView');
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Reglamentos'),
+        leading: IconButton(
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+            icon: const Icon(Icons.menu)),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).pushNamed(newDocRouteName);
+          Navigator.of(context).pushNamed(newRulebookRouteName);
         },
         child: const Icon(Icons.add),
       ),
       body: StreamBuilder(
-        stream: _docsService.allDocs(ownerUserId: userId),
+        stream: _dbService.allRulebooks(ownerUserId: userId),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.active:
               if (snapshot.hasData) {
-                final allNotes = snapshot.data as Iterable<CloudDoc>;
-                return DocsListView(
-                  docs: allNotes,
+                final allNotes = snapshot.data as Iterable<Rulebook>;
+                return RulebookListView(
+                  rulebooks: allNotes,
                 );
               } else {
                 return const Center(child: CircularProgressIndicator());

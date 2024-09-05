@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:vecinapp/services/cloud/cloud_doc.dart';
+import 'package:vecinapp/services/cloud/rulebook.dart';
 import 'package:vecinapp/services/cloud/firebase_cloud_storage.dart';
 import 'package:vecinapp/utilities/show_confirmation_dialog.dart';
-import 'package:vecinapp/views/home/docs/edit_doc_view.dart';
+import 'package:vecinapp/views/home/rulebooks/edit_rulebook_view.dart';
 
-class DocDetailsView extends StatefulWidget {
-  const DocDetailsView({super.key, required this.doc});
-  final CloudDoc doc;
+class RulebookDetailsView extends StatefulWidget {
+  const RulebookDetailsView({super.key, required this.rulebook});
+  final Rulebook rulebook;
 
   @override
-  State<DocDetailsView> createState() => _DocDetailsViewState();
+  State<RulebookDetailsView> createState() => _RulebookDetailsViewState();
 }
 
-class _DocDetailsViewState extends State<DocDetailsView> {
-  final _docsService = FirebaseCloudStorage();
+class _RulebookDetailsViewState extends State<RulebookDetailsView> {
+  final _dbService = FirebaseCloudStorage();
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class _DocDetailsViewState extends State<DocDetailsView> {
           IconButton(
             icon: const Icon(Icons.share),
             onPressed: () {
-              Share.share(widget.doc.shareDoc);
+              Share.share(widget.rulebook.shareRulebook);
             },
           ),
           PopupMenuButton<EditOrDelete>(
@@ -34,15 +34,16 @@ class _DocDetailsViewState extends State<DocDetailsView> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => EditDocView(doc: widget.doc),
+                      builder: (context) =>
+                          EditRulebookView(rulebook: widget.rulebook),
                     ),
                   );
                 case EditOrDelete.delete:
                   final shouldDelete = await showConfirmationDialog(
-                      context: context, text: '¿Eliminar el documento?');
+                      context: context, text: '¿Eliminar el reglamento?');
                   if (shouldDelete == true) {
-                    await _docsService.deleteDoc(
-                        documentId: widget.doc.documentId);
+                    await _dbService.deleteRulebook(
+                        rulebookId: widget.rulebook.id);
                     if (context.mounted) {
                       Navigator.of(context).pop();
                     }
@@ -68,11 +69,11 @@ class _DocDetailsViewState extends State<DocDetailsView> {
         padding: const EdgeInsets.all(32.0),
         children: [
           Text(
-            widget.doc.title,
+            widget.rulebook.title,
             style: const TextStyle(fontSize: 24),
           ),
           const SizedBox(height: 32),
-          Text(widget.doc.text),
+          Text(widget.rulebook.text),
         ],
       ),
     );
