@@ -64,7 +64,6 @@ class AuthStateLoggedOut extends AuthState with EquatableMixin {
     String? loadingText,
   }) : super(
           isLoading: isLoading,
-          loadingText: loadingText,
         );
 
   @override
@@ -79,6 +78,6 @@ class AuthStateResettingPassword extends AuthState {
     required this.exception,
     required this.hasSentEmail,
     required bool isLoading,
-    required this.email,
+    this.email,
   }) : super(isLoading: isLoading);
 }

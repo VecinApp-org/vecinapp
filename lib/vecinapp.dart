@@ -87,7 +87,7 @@ class Home extends StatelessWidget {
         } else if (state is AuthStateRegistering) {
           return const RegisterView();
         } else if (state is AuthStateResettingPassword) {
-          return const ForgotPasswordView();
+          return ForgotPasswordView(email: state.email);
         } else {
           return const Scaffold(
               body: Center(child: CircularProgressIndicator()));

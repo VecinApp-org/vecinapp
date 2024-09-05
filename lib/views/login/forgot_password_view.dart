@@ -8,7 +8,9 @@ import 'package:vecinapp/utilities/show_error_dialog.dart';
 import 'package:vecinapp/utilities/show_notification_dialog.dart';
 
 class ForgotPasswordView extends StatefulWidget {
-  const ForgotPasswordView({super.key});
+  const ForgotPasswordView({super.key, this.email});
+
+  final String? email;
 
   @override
   State<ForgotPasswordView> createState() => _ForgotPasswordViewState();
@@ -19,7 +21,11 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
 
   @override
   void initState() {
-    _controller = TextEditingController();
+    if (widget.email != null) {
+      _controller = TextEditingController(text: widget.email);
+    } else {
+      _controller = TextEditingController();
+    }
     super.initState();
   }
 
@@ -58,47 +64,56 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
       },
       child: Scaffold(
         body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              //Title
-              const Text('Reestablecer contraseña',
-                  style: TextStyle(fontSize: 28)),
-              const SizedBox(height: 55),
-              //email textfield
-              TextField(
-                controller: _controller,
-                enableSuggestions: false,
-                autocorrect: false,
-                autofocus: true,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  constraints: BoxConstraints(maxWidth: 360),
-                  icon: Icon(Icons.email),
-                  hintText: 'Email',
-                ),
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  //Title
+                  const Text('Cambiar contraseña',
+                      style: TextStyle(fontSize: 28)),
+                  const SizedBox(height: 13),
+                  const Text(
+                    'Te enviaremos un correo para que cambies tu contraseña.',
+                  ),
+                  const SizedBox(height: 55),
+                  //email textfield
+                  TextField(
+                    controller: _controller,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    autofocus: true,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      constraints: BoxConstraints(maxWidth: 377),
+                      icon: Icon(Icons.email),
+                      hintText: 'Email',
+                    ),
+                  ),
+                  const SizedBox(height: 55),
+                  //Reset password button
+                  FilledButton(
+                    onPressed: () {
+                      final email = _controller.text;
+                      context
+                          .read<AuthBloc>()
+                          .add(AuthEventSendPasswordResetEmail(email));
+                    },
+                    child: const Text('Enviar correo'),
+                  ),
+                  const SizedBox(height: 13),
+                  //cancel button
+                  TextButton(
+                    onPressed: () {
+                      context.read<AuthBloc>().add(const AuthEventLogOut());
+                    },
+                    child: const Text('Regresar'),
+                  ),
+                ],
               ),
-              const SizedBox(height: 55),
-              //Reset password button
-              FilledButton(
-                onPressed: () {
-                  final email = _controller.text;
-                  context
-                      .read<AuthBloc>()
-                      .add(AuthEventSendPasswordResetEmail(email));
-                },
-                child: const Text('Reestablecer contraseña'),
-              ),
-              const SizedBox(height: 13),
-              //cancel button
-              TextButton(
-                onPressed: () {
-                  context.read<AuthBloc>().add(const AuthEventLogOut());
-                },
-                child: const Text('Cancelar'),
-              ),
-            ],
+            ),
           ),
         ),
       ),
