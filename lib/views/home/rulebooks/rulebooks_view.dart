@@ -30,11 +30,6 @@ class _RulebooksViewState extends State<RulebooksView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Reglamentos'),
-        leading: IconButton(
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-            icon: const Icon(Icons.menu)),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

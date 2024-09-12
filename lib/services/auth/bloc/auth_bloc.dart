@@ -175,14 +175,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     //delete account
     on<AuthEventDeleteAccount>((event, emit) async {
       try {
-        if (state is AuthStateLoggedIn) {
-          final actualUser = (state as AuthStateLoggedIn).user;
-          emit(AuthStateLoggedIn(
-            user: actualUser,
-            isLoading: true,
-            exception: null,
-          ));
-        }
         await provider.deleteAccount();
         emit(const AuthStateLoggedOut(
           exception: null,

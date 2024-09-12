@@ -14,14 +14,7 @@ class SettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () {
-            Scaffold.of(context).openDrawer();
-          },
-        ),
-      ),
+      appBar: AppBar(),
       body: Column(
         children: [
           const SizedBox(height: 32),
@@ -60,6 +53,7 @@ class SettingsView extends StatelessWidget {
                 context.read<AuthBloc>().add(
                       const AuthEventLogOut(),
                     );
+                Navigator.of(context).pop();
               }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -76,6 +70,7 @@ class SettingsView extends StatelessWidget {
                 context.read<AuthBloc>().add(
                       const AuthEventDeleteAccount(),
                     );
+                Navigator.of(context).pop();
               }
             },
             style: TextButton.styleFrom(

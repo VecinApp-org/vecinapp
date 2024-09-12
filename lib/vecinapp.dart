@@ -11,6 +11,8 @@ import 'package:vecinapp/services/auth/firebase_auth_provider.dart';
 import 'package:vecinapp/theme/theme_constants.dart';
 import 'package:vecinapp/views/home/home_view.dart';
 import 'package:vecinapp/views/home/rulebooks/edit_rulebook_view.dart';
+import 'package:vecinapp/views/home/rulebooks/rulebooks_view.dart';
+import 'package:vecinapp/views/home/settings_view.dart';
 import 'package:vecinapp/views/login/forgot_password_view.dart';
 import 'package:vecinapp/views/login/login_view.dart';
 import 'package:vecinapp/views/login/verify_email_view.dart';
@@ -40,7 +42,9 @@ class VecinApp extends StatelessWidget {
             darkTheme: darkTheme,
             themeMode: settingsController.themeMode,
             routes: {
+              rulebooksViewRouteName: (context) => const RulebooksView(),
               newRulebookRouteName: (context) => const EditRulebookView(),
+              settingsViewRouteName: (context) => SettingsView()
             },
             home: const AuthBlocRouter(),
           );

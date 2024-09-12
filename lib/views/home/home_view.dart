@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vecinapp/constants/routes.dart';
 
 List<String> pages = [
   //'Anuncios',
@@ -20,11 +21,11 @@ List<Icon> icons = [
   //const Icon(Icons.handyman_outlined),
 ];
 
-List<Function()> onTap = [
+List<String> routes = [
   //() {},
   //() {},
   //() {},
-  () {},
+  rulebooksViewRouteName,
   //() {},
   //() {},
   //() {},
@@ -33,14 +34,16 @@ List<Function()> onTap = [
 Widget cardBuilder(
   String title,
   Icon icon,
-  Function()? onTap,
+  String routeName,
   BuildContext context,
 ) {
   //debugPaintSizeEnabled = true;
   return Card(
     elevation: 2,
     child: InkWell(
-      onTap: onTap,
+      onTap: () {
+        Navigator.of(context).pushNamed(routeName);
+      },
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -53,7 +56,6 @@ Widget cardBuilder(
             const SizedBox(width: 16),
             Text(
               title,
-              style: Theme.of(context).textTheme.labelLarge,
             ),
           ],
         ),
@@ -77,7 +79,9 @@ class HomeView extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: InkWell(
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).pushNamed(settingsViewRouteName);
+              },
               child: const CircleAvatar(
                 child: Icon(Icons.person),
               ),
@@ -98,7 +102,7 @@ class HomeView extends StatelessWidget {
           return cardBuilder(
             pages[index],
             icons[index],
-            onTap[index],
+            routes[index],
             context,
           );
         },
