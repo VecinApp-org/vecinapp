@@ -15,11 +15,9 @@ class DashboardView extends StatelessWidget {
             },
             icon: const Icon(Icons.menu)),
       ),
-      floatingActionButton:
-          FloatingActionButton.large(onPressed: () {}, child: Icon(Icons.add)),
       body: ListView(
         restorationId: 'homeView',
-        children: <Widget>[
+        children: const <Widget>[
           Card(
             elevation: 10,
             margin: EdgeInsets.all(16),
@@ -51,8 +49,6 @@ class DashboardView extends StatelessWidget {
             subtitle: Text('Sandra: Yo digo que si.'),
           ),
           Divider(height: 0),
-          FilledButton(
-              onPressed: () {}, child: Text('Ver todas las notificaciones'))
         ],
       ),
     );

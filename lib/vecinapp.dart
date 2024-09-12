@@ -9,8 +9,8 @@ import 'package:vecinapp/services/auth/bloc/auth_event.dart';
 import 'package:vecinapp/services/auth/bloc/auth_state.dart';
 import 'package:vecinapp/services/auth/firebase_auth_provider.dart';
 import 'package:vecinapp/theme/theme_constants.dart';
+import 'package:vecinapp/views/home/home_view.dart';
 import 'package:vecinapp/views/home/rulebooks/edit_rulebook_view.dart';
-import 'package:vecinapp/views/home/home_drawer.dart';
 import 'package:vecinapp/views/login/forgot_password_view.dart';
 import 'package:vecinapp/views/login/login_view.dart';
 import 'package:vecinapp/views/login/verify_email_view.dart';
@@ -26,41 +26,32 @@ class VecinApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     devtools.log('MaterialApp');
-    return ListenableBuilder(
-      listenable: settingsController,
-      builder: (BuildContext context, Widget? child) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          restorationScopeId: 'vecinapp',
-          //Theme
-          theme: lightTheme,
-          darkTheme: darkTheme,
-          themeMode: settingsController.themeMode,
-          routes: {
-            newRulebookRouteName: (context) => const EditRulebookView(),
-          },
-          home: BlocProvider(
-            create: (context) => AuthBloc(FirebaseAuthProvider()),
-            child: const HomeBuilder(),
-          ),
-        );
-      },
+    return BlocProvider(
+      create: (context) => AuthBloc(FirebaseAuthProvider()),
+      child: ListenableBuilder(
+        listenable: settingsController,
+        builder: (BuildContext context, Widget? child) {
+          context.read<AuthBloc>().add(const AuthEventInitialize());
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            restorationScopeId: 'vecinapp',
+            //Theme
+            theme: lightTheme,
+            darkTheme: darkTheme,
+            themeMode: settingsController.themeMode,
+            routes: {
+              newRulebookRouteName: (context) => const EditRulebookView(),
+            },
+            home: const AuthBlocRouter(),
+          );
+        },
+      ),
     );
   }
 }
 
-class HomeBuilder extends StatelessWidget {
-  const HomeBuilder({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    context.read<AuthBloc>().add(const AuthEventInitialize());
-    return const Home();
-  }
-}
-
-class Home extends StatelessWidget {
-  const Home({super.key});
+class AuthBlocRouter extends StatelessWidget {
+  const AuthBlocRouter({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +68,7 @@ class Home extends StatelessWidget {
       },
       builder: (context, state) {
         if (state is AuthStateLoggedIn) {
-          return const HomeDrawer();
+          return const HomeView();
         } else if (state is AuthStateNeedsVerification) {
           return const VerifyEmailView();
         } else if (state is AuthStateLoggedOut) {
