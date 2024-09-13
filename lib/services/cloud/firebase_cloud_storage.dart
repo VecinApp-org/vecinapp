@@ -4,6 +4,15 @@ import 'package:vecinapp/services/cloud/cloud_sorage_constants.dart';
 import 'package:vecinapp/services/cloud/cloud_storage_exceptions.dart';
 
 class FirebaseCloudStorage {
+  static final FirebaseCloudStorage _shared =
+      FirebaseCloudStorage._sharedInstance();
+
+  FirebaseCloudStorage._sharedInstance();
+
+  factory FirebaseCloudStorage() {
+    return _shared;
+  }
+
   final rulebooks = FirebaseFirestore.instance.collection('docs');
 
   Future<void> deleteRulebook({
@@ -57,14 +66,5 @@ class FirebaseCloudStorage {
       title: title,
       text: text,
     );
-  }
-
-  static final FirebaseCloudStorage _shared =
-      FirebaseCloudStorage._sharedInstance();
-
-  FirebaseCloudStorage._sharedInstance();
-
-  factory FirebaseCloudStorage() {
-    return _shared;
   }
 }

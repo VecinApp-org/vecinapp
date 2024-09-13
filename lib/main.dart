@@ -9,7 +9,7 @@ import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
 import 'package:vecinapp/services/auth/bloc/auth_event.dart';
 import 'package:vecinapp/services/auth/bloc/auth_state.dart';
 import 'package:vecinapp/services/auth/firebase_auth_provider.dart';
-import 'package:vecinapp/theme/theme_constants.dart';
+import 'package:vecinapp/services/settings/theme_constants.dart';
 import 'package:vecinapp/views/home_view.dart';
 import 'package:vecinapp/views/rulebooks/edit_rulebook_view.dart';
 import 'package:vecinapp/views/rulebooks/rulebooks_view.dart';
@@ -85,24 +85,6 @@ class AuthBlocRouter extends StatelessWidget {
     );
   }
 }
-
-// class AppRoot extends StatelessWidget {
-//   const AppRoot({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     devtools.log('AppRoot');
-//     final user = AuthService.firebase().currentUser;
-//     if (user == null) {
-//       return const WelcomeView();
-//     } else if (user.isEmailVerified) {
-//       return const HomeDrawer();
-//     } else {
-//       return const VerifyEmailView();
-//     }
-//   }
-// }
-
 
 /* REMOVED FROM MATERIAL APP FOR LATER USE WHEN I LEARN ABOUT LOCALIZATIONS AND DEEPLINKS
 //Localizations
