@@ -5,7 +5,7 @@ import 'package:vecinapp/services/cloud/firebase_cloud_storage.dart';
 import 'package:vecinapp/constants/routes.dart';
 import 'dart:developer' as devtools show log;
 
-import 'package:vecinapp/views/home/rulebooks/rulebook_list_view.dart';
+import 'package:vecinapp/views/rulebooks/rulebook_list_view.dart';
 
 class RulebooksView extends StatefulWidget {
   const RulebooksView({super.key});

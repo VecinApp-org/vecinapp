@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
-import 'package:vecinapp/views/home/rulebooks/rulebook_details_view.dart';
+import 'package:vecinapp/views/rulebooks/rulebook_details_view.dart';
 import 'dart:developer' as devtools show log;
 
 class RulebookListView extends StatelessWidget {
