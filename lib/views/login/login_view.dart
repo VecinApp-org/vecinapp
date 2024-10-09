@@ -136,7 +136,7 @@ class _LoginViewState extends State<LoginView> {
                     final email = _email.text;
                     context
                         .read<AppBloc>()
-                        .add(AppEventForgotPassword(email: email));
+                        .add(AppEventGoToForgotPassword(email: email));
                   },
                   child: const Text('Olvidé mi contraseña'),
                 ),

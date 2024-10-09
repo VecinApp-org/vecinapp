@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/auth/auth_service.dart';
+import 'package:vecinapp/services/bloc/app_bloc.dart';
+import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
 import 'package:vecinapp/services/cloud/firebase_cloud_storage.dart';
 import 'package:vecinapp/constants/routes.dart';
@@ -29,6 +32,13 @@ class _RulebooksViewState extends State<RulebooksView> {
     devtools.log('RulebooksView');
     return Scaffold(
       appBar: AppBar(
+        leading: BackButton(
+          onPressed: () {
+            context.read<AppBloc>().add(
+                  const AppEventGoToHomeView(),
+                );
+          },
+        ),
         title: const Text('Reglamentos'),
       ),
       floatingActionButton: FloatingActionButton(

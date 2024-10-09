@@ -1,19 +1,20 @@
 import 'package:bloc/bloc.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
+import 'package:vecinapp/services/auth/auth_user.dart';
 //import 'package:vecinapp/services/auth/auth_exceptions.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
 import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
-  AppBloc(AuthProvider provider)
+  AppBloc(AuthProvider authProvider)
       : super(const AppStateUnInitalized(
           isLoading: true,
         )) {
     //initialize
     on<AppEventInitialize>((event, emit) async {
-      await provider.initialize();
-      final user = provider.currentUser;
+      await authProvider.initialize();
+      final user = authProvider.currentUser;
       if (user == null) {
         emit(
           const AppStateRegistering(
@@ -45,12 +46,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           exception: null,
           isLoading: true,
         ));
-        final user = await provider.createUser(
+        final user = await authProvider.createUser(
           email: email,
           password: password,
           passwordConfirmation: passwordConfirmation,
         );
-        await provider.sendEmailVerification();
+        await authProvider.sendEmailVerification();
         emit(AppStateNeedsVerification(
           user: user,
           exception: null,
@@ -65,20 +66,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
     // send email verification
     on<AppEventSendEmailVerification>((event, emit) async {
-      await provider.sendEmailVerification();
+      await authProvider.sendEmailVerification();
       emit(state);
     });
     //check if email is verified
     on<AppEventConfirmUserIsVerified>((event, emit) async {
       try {
-        final userVerified = await provider.confirmUserIsVerified();
+        final userVerified = await authProvider.confirmUserIsVerified();
         emit(AppStateViewingHome(
           user: userVerified,
           exception: null,
           isLoading: false,
         ));
       } on AuthException catch (e) {
-        final user = provider.currentUser!;
+        final user = authProvider.currentUser!;
         if (e is UserNotVerifiedAuthException) {
           emit(
             AppStateNeedsVerification(
@@ -123,7 +124,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
         final email = event.email;
         final password = event.password;
-        final user = await provider.logInWithEmailAndPassword(
+        final user = await authProvider.logInWithEmailAndPassword(
           email: email,
           password: password,
         );
@@ -160,7 +161,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     //log out
     on<AppEventLogOut>((event, emit) async {
       try {
-        await provider.logOut();
+        await authProvider.logOut();
         emit(const AppStateLoggingIn(
           exception: null,
           isLoading: false,
@@ -175,7 +176,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     //delete account
     on<AppEventDeleteAccount>((event, emit) async {
       try {
-        await provider.deleteAccount();
+        await authProvider.deleteAccount();
         emit(const AppStateLoggingIn(
           exception: null,
           isLoading: false,
@@ -204,7 +205,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
     });
     //forgot password
-    on<AppEventForgotPassword>((event, emit) async {
+    on<AppEventGoToForgotPassword>((event, emit) async {
       emit(AppStateResettingPassword(
         email: event.email,
         exception: null,
@@ -221,7 +222,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           isLoading: true,
           email: event.email,
         ));
-        await provider.sendPasswordResetEmail(email: event.email);
+        await authProvider.sendPasswordResetEmail(email: event.email);
         emit(AppStateResettingPassword(
           email: event.email,
           exception: null,
@@ -240,6 +241,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     on<AppEventGoToRulebooksView>((event, emit) async {
       emit(const AppStateViewingRulebooks(
+        isLoading: false,
+        exception: null,
+      ));
+    });
+
+    on<AppEventGoToHomeView>((event, emit) async {
+      AuthUser user = authProvider.currentUser!;
+      emit(AppStateViewingHome(
+        user: user,
         isLoading: false,
         exception: null,
       ));

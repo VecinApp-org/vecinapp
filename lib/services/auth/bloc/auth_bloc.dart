@@ -204,7 +204,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
     });
     //forgot password
-    on<AppEventForgotPassword>((event, emit) async {
+    on<AppEventGoToForgotPassword>((event, emit) async {
       emit(AppStateResettingPassword(
         email: event.email,
         exception: null,

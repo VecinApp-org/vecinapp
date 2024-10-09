@@ -9,17 +9,23 @@ class AppEventInitialize extends AppEvent {
   const AppEventInitialize();
 }
 
-// Authentication events
+// AUTHENTICATION ROUTING EVENTS
+class AppEventGoToRegistration extends AppEvent {
+  const AppEventGoToRegistration();
+}
+
+class AppEventGoToForgotPassword extends AppEvent {
+  final String? email;
+  const AppEventGoToForgotPassword({String? email}) : email = email ?? '';
+}
+
+// AUTHENTICATION EVENTS
 class AppEventRegisterWithEmailAndPassword extends AppEvent {
   final String email;
   final String password;
   final String passwordConfirmation;
   const AppEventRegisterWithEmailAndPassword(
       this.email, this.password, this.passwordConfirmation);
-}
-
-class AppEventGoToRegistration extends AppEvent {
-  const AppEventGoToRegistration();
 }
 
 class AppEventSendEmailVerification extends AppEvent {
@@ -51,17 +57,20 @@ class AppEventConfirmUserIsVerified extends AppEvent {
   const AppEventConfirmUserIsVerified();
 }
 
-class AppEventForgotPassword extends AppEvent {
-  final String? email;
-  const AppEventForgotPassword({String? email}) : email = email ?? '';
-}
-
 class AppEventSendPasswordResetEmail extends AppEvent {
   final String email;
   const AppEventSendPasswordResetEmail(this.email);
 }
 
-// Rulebook events
+// MAIN APP ROUTING EVENTS
+class AppEventGoToHomeView extends AppEvent {
+  const AppEventGoToHomeView();
+}
+
 class AppEventGoToRulebooksView extends AppEvent {
   const AppEventGoToRulebooksView();
+}
+
+class AppEventGoToSettingsView extends AppEvent {
+  const AppEventGoToSettingsView();
 }

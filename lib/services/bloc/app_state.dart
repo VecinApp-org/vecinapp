@@ -23,24 +23,9 @@ class AppStateUnInitalized extends AppState {
         );
 }
 
-//Authentication states
+//AUTHENTICATION STATES
 class AppStateRegistering extends AppState with EquatableMixin {
   const AppStateRegistering({
-    required exception,
-    required bool isLoading,
-  }) : super(
-          isLoading: isLoading,
-          exception: exception,
-        );
-
-  @override
-  List<Object?> get props => [exception, isLoading];
-}
-
-class AppStateViewingHome extends AppState with EquatableMixin {
-  final AuthUser user;
-  const AppStateViewingHome({
-    required this.user,
     required exception,
     required bool isLoading,
   }) : super(
@@ -95,7 +80,28 @@ class AppStateResettingPassword extends AppState {
         );
 }
 
-//rulebook states
+//MAIN APP STATES
+class AppStateViewingHome extends AppState with EquatableMixin {
+  final AuthUser user;
+  const AppStateViewingHome({
+    required this.user,
+    required exception,
+    required bool isLoading,
+  }) : super(
+          isLoading: isLoading,
+          exception: exception,
+        );
+
+  @override
+  List<Object?> get props => [exception, isLoading];
+}
+
+class AppStateViewingSettings extends AppState {
+  const AppStateViewingSettings({
+    required bool isLoading,
+    required exception,
+  }) : super(isLoading: isLoading, exception: exception);
+}
 
 class AppStateViewingRulebooks extends AppState {
   //final Iterable<Rulebook> rulebooks;
