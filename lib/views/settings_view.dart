@@ -61,7 +61,6 @@ class SettingsView extends StatelessWidget {
                 context.read<AppBloc>().add(
                       const AppEventLogOut(),
                     );
-                Navigator.of(context).pop();
               }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -78,7 +77,6 @@ class SettingsView extends StatelessWidget {
                 context.read<AppBloc>().add(
                       const AppEventDeleteAccount(),
                     );
-                Navigator.of(context).pop();
               }
             },
             style: TextButton.styleFrom(
