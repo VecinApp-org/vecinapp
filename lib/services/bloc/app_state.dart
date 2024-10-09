@@ -12,6 +12,7 @@ abstract class AppState {
   });
 }
 
+//login states
 class AppStateUnInitalized extends AppState {
   const AppStateUnInitalized({required bool isLoading})
       : super(isLoading: isLoading);
@@ -56,9 +57,9 @@ class AppStateNeedsVerification extends AppState with EquatableMixin {
   List<Object?> get props => [exception, isLoading];
 }
 
-class AppStateLoggedOut extends AppState with EquatableMixin {
+class AppStateLoggingIn extends AppState with EquatableMixin {
   final Exception? exception;
-  const AppStateLoggedOut({
+  const AppStateLoggingIn({
     required this.exception,
     required bool isLoading,
     String? loadingText,

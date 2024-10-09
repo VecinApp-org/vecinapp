@@ -105,7 +105,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           );
         } else if (e is UserNotLoggedInAuthException) {
           emit(
-            AppStateLoggedOut(
+            AppStateLoggingIn(
               exception: e,
               isLoading: false,
             ),
@@ -116,7 +116,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     //login with email and password
     on<AppEventLogInWithEmailAndPassword>((event, emit) async {
       try {
-        emit(const AppStateLoggedOut(
+        emit(const AppStateLoggingIn(
           exception: null,
           isLoading: true,
           loadingText: 'Entrando...',
@@ -129,7 +129,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
         //disable loading
         emit(
-          const AppStateLoggedOut(
+          const AppStateLoggingIn(
             exception: null,
             isLoading: false,
           ),
@@ -150,7 +150,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         }
       } on AuthException catch (e) {
         emit(
-          AppStateLoggedOut(
+          AppStateLoggingIn(
             exception: e,
             isLoading: false,
           ),
@@ -161,12 +161,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppEventLogOut>((event, emit) async {
       try {
         await provider.logOut();
-        emit(const AppStateLoggedOut(
+        emit(const AppStateLoggingIn(
           exception: null,
           isLoading: false,
         ));
       } on AuthException catch (e) {
-        emit(AppStateLoggedOut(
+        emit(AppStateLoggingIn(
           exception: e,
           isLoading: false,
         ));
@@ -176,7 +176,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppEventDeleteAccount>((event, emit) async {
       try {
         await provider.deleteAccount();
-        emit(const AppStateLoggedOut(
+        emit(const AppStateLoggingIn(
           exception: null,
           isLoading: false,
         ));
@@ -189,7 +189,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             isLoading: false,
           ));
         } else {
-          emit(AppStateLoggedOut(
+          emit(AppStateLoggingIn(
             exception: e,
             isLoading: false,
           ));

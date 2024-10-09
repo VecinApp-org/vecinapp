@@ -39,7 +39,7 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     return BlocListener<AppBloc, AppState>(
       listener: (context, state) async {
-        if (state is AppStateLoggedOut) {
+        if (state is AppStateLoggingIn) {
           if (state.exception is InvalidCredentialAuthException) {
             await showErrorDialog(
                 context: context,
