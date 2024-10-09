@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
-import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
-import 'package:vecinapp/services/auth/bloc/auth_event.dart';
-import 'package:vecinapp/services/auth/bloc/auth_state.dart';
-import 'package:vecinapp/utilities/show_error_dialog.dart';
-import 'package:vecinapp/utilities/show_notification_dialog.dart';
+import 'package:vecinapp/services/bloc/app_bloc.dart';
+import 'package:vecinapp/services/bloc/app_event.dart';
+import 'package:vecinapp/services/bloc/app_state.dart';
+import 'package:vecinapp/utilities/dialogs/show_error_dialog.dart';
+import 'package:vecinapp/utilities/dialogs/show_notification_dialog.dart';
 
 class ForgotPasswordView extends StatefulWidget {
   const ForgotPasswordView({super.key, this.email});
@@ -37,9 +37,9 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthBloc, AuthState>(
+    return BlocListener<AppBloc, AppState>(
       listener: (context, state) {
-        if (state is AuthStateResettingPassword) {
+        if (state is AppStateResettingPassword) {
           if (state.hasSentEmail) {
             _controller.clear();
             showNotificationDialog(
@@ -94,8 +94,8 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                     onPressed: () {
                       final email = _controller.text;
                       context
-                          .read<AuthBloc>()
-                          .add(AuthEventSendPasswordResetEmail(email));
+                          .read<AppBloc>()
+                          .add(AppEventSendPasswordResetEmail(email));
                     },
                     child: const Text('Enviar correo'),
                   ),
@@ -103,7 +103,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                   //cancel button
                   TextButton(
                     onPressed: () {
-                      context.read<AuthBloc>().add(const AuthEventLogOut());
+                      context.read<AppBloc>().add(const AppEventLogOut());
                     },
                     child: const Text('Regresar'),
                   ),

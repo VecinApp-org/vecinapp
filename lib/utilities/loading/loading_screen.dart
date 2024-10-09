@@ -1,6 +1,6 @@
 import 'dart:async' show StreamController;
 import 'package:flutter/material.dart';
-import 'package:vecinapp/helpers/loading/loading_screen_controller.dart';
+import 'package:vecinapp/utilities/loading/loading_screen_controller.dart';
 
 class LoadingScreen {
   factory LoadingScreen() => _shared;

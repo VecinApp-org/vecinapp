@@ -4,10 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 //import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 //import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:vecinapp/constants/routes.dart';
-import 'package:vecinapp/helpers/loading/loading_screen.dart';
-import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
-import 'package:vecinapp/services/auth/bloc/auth_event.dart';
-import 'package:vecinapp/services/auth/bloc/auth_state.dart';
+import 'package:vecinapp/utilities/loading/loading_screen.dart';
+import 'package:vecinapp/services/bloc/app_bloc.dart';
+import 'package:vecinapp/services/bloc/app_event.dart';
+import 'package:vecinapp/services/bloc/app_state.dart';
 import 'package:vecinapp/services/auth/firebase_auth_provider.dart';
 import 'package:vecinapp/services/settings/theme_constants.dart';
 import 'package:vecinapp/views/home_view.dart';
@@ -25,11 +25,11 @@ void main() async {
   await settingsController.loadSettings();
   runApp(
     BlocProvider(
-      create: (context) => AuthBloc(FirebaseAuthProvider()),
+      create: (context) => AppBloc(FirebaseAuthProvider()),
       child: ListenableBuilder(
         listenable: settingsController,
         builder: (BuildContext context, Widget? child) {
-          context.read<AuthBloc>().add(const AuthEventInitialize());
+          context.read<AppBloc>().add(const AppEventInitialize());
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             restorationScopeId: 'vecinapp',
@@ -55,7 +55,7 @@ class AuthBlocRouter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthBloc, AuthState>(
+    return BlocConsumer<AppBloc, AppState>(
       listener: (context, state) {
         if (state.isLoading) {
           LoadingScreen().show(
@@ -67,15 +67,15 @@ class AuthBlocRouter extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        if (state is AuthStateLoggedIn) {
+        if (state is AppStateLoggedIn) {
           return const HomeView();
-        } else if (state is AuthStateNeedsVerification) {
+        } else if (state is AppStateNeedsVerification) {
           return const VerifyEmailView();
-        } else if (state is AuthStateLoggedOut) {
+        } else if (state is AppStateLoggedOut) {
           return const LoginView();
-        } else if (state is AuthStateRegistering) {
+        } else if (state is AppStateRegistering) {
           return const RegisterView();
-        } else if (state is AuthStateResettingPassword) {
+        } else if (state is AppStateResettingPassword) {
           return ForgotPasswordView(email: state.email);
         } else {
           return const Scaffold(

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
-import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
-import 'package:vecinapp/services/auth/bloc/auth_event.dart';
-import 'package:vecinapp/services/auth/bloc/auth_state.dart';
-import 'package:vecinapp/utilities/show_error_dialog.dart';
-import 'package:vecinapp/utilities/show_notification_dialog.dart';
+import 'package:vecinapp/services/bloc/app_bloc.dart';
+import 'package:vecinapp/services/bloc/app_event.dart';
+import 'package:vecinapp/services/bloc/app_state.dart';
+import 'package:vecinapp/utilities/dialogs/show_error_dialog.dart';
+import 'package:vecinapp/utilities/dialogs/show_notification_dialog.dart';
 //import 'dart:developer' as devtools show log;
 
 class VerifyEmailView extends StatelessWidget {
@@ -18,17 +18,17 @@ class VerifyEmailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthBloc, AuthState>(
+    return BlocListener<AppBloc, AppState>(
       listener: (context, state) {
         (context, state) {
-          if (state is AuthStateNeedsVerification) {
+          if (state is AppStateNeedsVerification) {
             switch (state.exception) {
               case TooManyRequestsAuthException():
                 showErrorDialog(context: context, text: 'Esperate tantito');
               case NetworkRequestFailedAuthException():
                 showErrorDialog(context: context, text: 'No hay internet');
               case UserNotLoggedInAuthException():
-                context.read().add(const AuthEventLogOut());
+                context.read().add(const AppEventLogOut());
               case UserNotVerifiedAuthException():
                 showNotificationDialog(
                   context: context,
@@ -64,16 +64,16 @@ class VerifyEmailView extends StatelessWidget {
               SizedBox(height: secondarySpacing),
               FilledButton(
                   onPressed: () {
-                    context.read<AuthBloc>().add(
-                          const AuthEventConfirmUserIsVerified(),
+                    context.read<AppBloc>().add(
+                          const AppEventConfirmUserIsVerified(),
                         );
                   },
                   child: const Text('Continuar')),
               SizedBox(height: secondarySpacing),
               OutlinedButton(
                   onPressed: () {
-                    context.read<AuthBloc>().add(
-                          const AuthEventSendEmailVerification(),
+                    context.read<AppBloc>().add(
+                          const AppEventSendEmailVerification(),
                         );
                   },
                   child: const Text('Enviar otro correo')),
@@ -81,8 +81,8 @@ class VerifyEmailView extends StatelessWidget {
               TextButton(
                 style: TextButton.styleFrom(foregroundColor: Colors.red),
                 onPressed: () {
-                  context.read<AuthBloc>().add(
-                        const AuthEventLogOut(),
+                  context.read<AppBloc>().add(
+                        const AppEventLogOut(),
                       );
                 },
                 child: const Text('Salir'),

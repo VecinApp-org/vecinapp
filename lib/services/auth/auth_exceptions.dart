@@ -1,32 +1,36 @@
-// login exceptions
-class InvalidCredentialAuthException implements Exception {}
+class AuthException implements Exception {
+  const AuthException();
+}
 
-class WrongPasswordAuthException implements Exception {}
+// login exceptions
+class InvalidCredentialAuthException implements AuthException {}
+
+class WrongPasswordAuthException implements AuthException {}
 
 // register exceptions
-class EmailAlreadyInUseAuthException implements Exception {}
+class EmailAlreadyInUseAuthException implements AuthException {}
 
-class WeakPasswordAuthException implements Exception {}
+class WeakPasswordAuthException implements AuthException {}
 
-class PasswordConfirmationDoesNotMatchAuthException implements Exception {}
+class PasswordConfirmationDoesNotMatchAuthException implements AuthException {}
 
 // delete user exceptions
-class RequiresRecentLoginAuthException implements Exception {}
+class RequiresRecentLoginAuthException implements AuthException {}
 
 // send email verification exceptions
-class TooManyRequestsAuthException implements Exception {}
+class TooManyRequestsAuthException implements AuthException {}
 
-class UserNotVerifiedAuthException implements Exception {}
+class UserNotVerifiedAuthException implements AuthException {}
 
 // input exceptions
-class ChannelErrorAuthException implements Exception {}
+class ChannelErrorAuthException implements AuthException {}
 
-class InvalidEmailAuthException implements Exception {}
+class InvalidEmailAuthException implements AuthException {}
 
 // network exceptions
-class NetworkRequestFailedAuthException implements Exception {}
+class NetworkRequestFailedAuthException implements AuthException {}
 
 // general exceptions
-class GenericAuthException implements Exception {}
+class GenericAuthException implements AuthException {}
 
-class UserNotLoggedInAuthException implements Exception {}
+class UserNotLoggedInAuthException implements AuthException {}

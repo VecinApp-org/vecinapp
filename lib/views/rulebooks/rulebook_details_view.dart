@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
 import 'package:vecinapp/services/cloud/firebase_cloud_storage.dart';
-import 'package:vecinapp/utilities/show_confirmation_dialog.dart';
+import 'package:vecinapp/utilities/dialogs/show_confirmation_dialog.dart';
 import 'package:vecinapp/views/rulebooks/edit_rulebook_view.dart';
 
 class RulebookDetailsView extends StatefulWidget {

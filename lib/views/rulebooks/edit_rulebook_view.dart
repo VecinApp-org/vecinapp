@@ -3,7 +3,7 @@ import 'package:vecinapp/services/auth/auth_service.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
 import 'package:vecinapp/services/cloud/cloud_storage_exceptions.dart';
 import 'package:vecinapp/services/cloud/firebase_cloud_storage.dart';
-import 'package:vecinapp/utilities/show_error_dialog.dart';
+import 'package:vecinapp/utilities/dialogs/show_error_dialog.dart';
 import 'dart:developer' as devtools show log;
 
 class EditRulebookView extends StatefulWidget {

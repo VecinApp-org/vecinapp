@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
-import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
-import 'package:vecinapp/services/auth/bloc/auth_event.dart';
-import 'package:vecinapp/services/auth/bloc/auth_state.dart';
-import 'package:vecinapp/utilities/show_error_dialog.dart';
+import 'package:vecinapp/services/bloc/app_bloc.dart';
+import 'package:vecinapp/services/bloc/app_event.dart';
+import 'package:vecinapp/services/bloc/app_state.dart';
+import 'package:vecinapp/utilities/dialogs/show_error_dialog.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key, this.email});
@@ -40,9 +40,9 @@ class _RegisterViewState extends State<RegisterView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthBloc, AuthState>(
+    return BlocListener<AppBloc, AppState>(
       listener: (context, state) {
-        if (state is AuthStateRegistering) {
+        if (state is AppStateRegistering) {
           if (state.exception is WeakPasswordAuthException) {
             showErrorDialog(
                 context: context, text: 'La contraseña es muy débil');
@@ -152,8 +152,8 @@ class _RegisterViewState extends State<RegisterView> {
                     final email = _email.text;
                     final password = _password.text;
                     final password2 = _password2.text;
-                    context.read<AuthBloc>().add(
-                          AuthEventRegisterWithEmailAndPassword(
+                    context.read<AppBloc>().add(
+                          AppEventRegisterWithEmailAndPassword(
                             email,
                             password,
                             password2,
@@ -166,8 +166,8 @@ class _RegisterViewState extends State<RegisterView> {
                 //Go to login page
                 TextButton(
                   onPressed: () {
-                    context.read<AuthBloc>().add(
-                          const AuthEventLogOut(),
+                    context.read<AppBloc>().add(
+                          const AppEventLogOut(),
                         );
                   },
                   child: const Text('Ya tengo una cuenta'),

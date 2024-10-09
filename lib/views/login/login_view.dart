@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
-import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
-import 'package:vecinapp/services/auth/bloc/auth_event.dart';
-import 'package:vecinapp/services/auth/bloc/auth_state.dart';
-import 'package:vecinapp/utilities/show_error_dialog.dart';
+import 'package:vecinapp/services/bloc/app_bloc.dart';
+import 'package:vecinapp/services/bloc/app_event.dart';
+import 'package:vecinapp/services/bloc/app_state.dart';
+import 'package:vecinapp/utilities/dialogs/show_error_dialog.dart';
 import 'dart:developer' as devtools show log;
 
 class LoginView extends StatefulWidget {
@@ -37,9 +37,9 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthBloc, AuthState>(
+    return BlocListener<AppBloc, AppState>(
       listener: (context, state) async {
-        if (state is AuthStateLoggedOut) {
+        if (state is AppStateLoggedOut) {
           if (state.exception is InvalidCredentialAuthException) {
             await showErrorDialog(
                 context: context,
@@ -120,8 +120,8 @@ class _LoginViewState extends State<LoginView> {
                     devtools.log('Logging in...');
                     final email = _email.text;
                     final password = _password.text;
-                    context.read<AuthBloc>().add(
-                          AuthEventLogInWithEmailAndPassword(
+                    context.read<AppBloc>().add(
+                          AppEventLogInWithEmailAndPassword(
                             email,
                             password,
                           ),
@@ -135,8 +135,8 @@ class _LoginViewState extends State<LoginView> {
                   onPressed: () {
                     final email = _email.text;
                     context
-                        .read<AuthBloc>()
-                        .add(AuthEventForgotPassword(email: email));
+                        .read<AppBloc>()
+                        .add(AppEventForgotPassword(email: email));
                   },
                   child: const Text('Olvidé mi contraseña'),
                 ),
@@ -144,8 +144,8 @@ class _LoginViewState extends State<LoginView> {
                 //go to register button
                 TextButton(
                   onPressed: () {
-                    context.read<AuthBloc>().add(
-                          const AuthEventShouldRegister(),
+                    context.read<AppBloc>().add(
+                          const AppEventGoToRegistration(),
                         );
                   },
                   child: const Text('Crear cuenta nueva'),

@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:vecinapp/utilities/generic_dialog.dart';
+import 'package:vecinapp/utilities/dialogs/generic_dialog.dart';
 
-Future<void> showNotificationDialog({
+Future<void> showErrorDialog({
   required BuildContext context,
-  required String title,
-  required String content,
+  required String text,
 }) async {
   await showGenericDialog<void>(
       context: context,
-      title: title,
-      content: content,
+      title: '¡Ah caray!',
+      content: text,
       optionBuilder: () => {
             'OK': null,
           });

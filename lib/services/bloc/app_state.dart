@@ -3,23 +3,23 @@ import 'package:flutter/foundation.dart' show immutable;
 import 'package:vecinapp/services/auth/auth_user.dart';
 
 @immutable
-abstract class AuthState {
+abstract class AppState {
   final bool isLoading;
   final String? loadingText;
-  const AuthState({
+  const AppState({
     required this.isLoading,
     this.loadingText,
   });
 }
 
-class AuthStateUnInitalized extends AuthState {
-  const AuthStateUnInitalized({required bool isLoading})
+class AppStateUnInitalized extends AppState {
+  const AppStateUnInitalized({required bool isLoading})
       : super(isLoading: isLoading);
 }
 
-class AuthStateRegistering extends AuthState with EquatableMixin {
+class AppStateRegistering extends AppState with EquatableMixin {
   final Exception? exception;
-  const AuthStateRegistering({
+  const AppStateRegistering({
     required this.exception,
     required bool isLoading,
   }) : super(isLoading: isLoading);
@@ -28,10 +28,10 @@ class AuthStateRegistering extends AuthState with EquatableMixin {
   List<Object?> get props => [exception, isLoading];
 }
 
-class AuthStateLoggedIn extends AuthState with EquatableMixin {
+class AppStateLoggedIn extends AppState with EquatableMixin {
   final AuthUser user;
   final Exception? exception;
-  const AuthStateLoggedIn({
+  const AppStateLoggedIn({
     required this.user,
     required this.exception,
     required bool isLoading,
@@ -41,10 +41,10 @@ class AuthStateLoggedIn extends AuthState with EquatableMixin {
   List<Object?> get props => [exception, isLoading];
 }
 
-class AuthStateNeedsVerification extends AuthState with EquatableMixin {
+class AppStateNeedsVerification extends AppState with EquatableMixin {
   final AuthUser user;
   final Exception? exception;
-  const AuthStateNeedsVerification({
+  const AppStateNeedsVerification({
     required this.user,
     required bool isLoading,
     required this.exception,
@@ -56,9 +56,9 @@ class AuthStateNeedsVerification extends AuthState with EquatableMixin {
   List<Object?> get props => [exception, isLoading];
 }
 
-class AuthStateLoggedOut extends AuthState with EquatableMixin {
+class AppStateLoggedOut extends AppState with EquatableMixin {
   final Exception? exception;
-  const AuthStateLoggedOut({
+  const AppStateLoggedOut({
     required this.exception,
     required bool isLoading,
     String? loadingText,
@@ -70,11 +70,11 @@ class AuthStateLoggedOut extends AuthState with EquatableMixin {
   List<Object?> get props => [exception, isLoading];
 }
 
-class AuthStateResettingPassword extends AuthState {
+class AppStateResettingPassword extends AppState {
   final Exception? exception;
   final bool hasSentEmail;
   final String? email;
-  const AuthStateResettingPassword({
+  const AppStateResettingPassword({
     required this.exception,
     required this.hasSentEmail,
     required bool isLoading,

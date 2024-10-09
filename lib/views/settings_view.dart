@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vecinapp/services/auth/bloc/auth_bloc.dart';
-import 'package:vecinapp/services/auth/bloc/auth_event.dart';
-import 'package:vecinapp/utilities/show_confirmation_dialog.dart';
+import 'package:vecinapp/services/bloc/app_bloc.dart';
+import 'package:vecinapp/services/bloc/app_event.dart';
+import 'package:vecinapp/utilities/dialogs/show_confirmation_dialog.dart';
 
 import '../services/settings/settings_controller.dart';
 
@@ -50,8 +50,8 @@ class SettingsView extends StatelessWidget {
                 text: '¿Quieres salir de tu cuenta?',
               );
               if (confirmLogout == true && context.mounted) {
-                context.read<AuthBloc>().add(
-                      const AuthEventLogOut(),
+                context.read<AppBloc>().add(
+                      const AppEventLogOut(),
                     );
                 Navigator.of(context).pop();
               }
@@ -67,8 +67,8 @@ class SettingsView extends StatelessWidget {
                 text: '¿Quieres eliminar tu cuenta?',
               );
               if (confirmLogout == true && context.mounted) {
-                context.read<AuthBloc>().add(
-                      const AuthEventDeleteAccount(),
+                context.read<AppBloc>().add(
+                      const AppEventDeleteAccount(),
                     );
                 Navigator.of(context).pop();
               }
