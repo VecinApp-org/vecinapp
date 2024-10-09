@@ -85,7 +85,9 @@ class HomeView extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: InkWell(
               onTap: () {
-                Navigator.of(context).pushNamed(settingsViewRouteName);
+                context.read<AppBloc>().add(
+                      const AppEventGoToSettingsView(),
+                    );
               },
               child: const CircleAvatar(
                 child: Icon(Icons.person),

@@ -13,6 +13,7 @@ import 'package:vecinapp/views/login/verify_email_view.dart';
 import 'package:vecinapp/views/rulebooks/edit_rulebook_view.dart';
 import 'package:vecinapp/views/rulebooks/rulebook_details_view.dart';
 import 'package:vecinapp/views/rulebooks/rulebooks_view.dart';
+import 'package:vecinapp/views/settings_view.dart';
 
 class AppBlocRouter extends StatelessWidget {
   const AppBlocRouter({super.key});
@@ -41,6 +42,8 @@ class AppBlocRouter extends StatelessWidget {
           return const VerifyEmailView();
         } else if (state is AppStateViewingHome) {
           return const HomeView();
+        } else if (state is AppStateViewingSettings) {
+          return SettingsView();
         } else if (state is AppStateViewingRulebooks) {
           return const RulebooksView();
         } else if (state is AppStateEditingRulebook) {

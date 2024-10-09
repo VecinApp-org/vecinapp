@@ -254,5 +254,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         exception: null,
       ));
     });
+
+    on<AppEventGoToSettingsView>((event, emit) async {
+      emit(const AppStateViewingSettings(
+        isLoading: false,
+        exception: null,
+      ));
+    });
   }
 }

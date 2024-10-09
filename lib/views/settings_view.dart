@@ -14,7 +14,15 @@ class SettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        leading: BackButton(
+          onPressed: () {
+            context.read<AppBloc>().add(
+                  const AppEventGoToHomeView(),
+                );
+          },
+        ),
+      ),
       body: Column(
         children: [
           const SizedBox(height: 32),
