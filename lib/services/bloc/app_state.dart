@@ -1,42 +1,52 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:vecinapp/services/auth/auth_user.dart';
+import 'package:vecinapp/services/cloud/rulebook.dart';
 
 @immutable
 abstract class AppState {
   final bool isLoading;
+  final Exception? exception;
   final String? loadingText;
   const AppState({
     required this.isLoading,
+    required this.exception,
     this.loadingText,
   });
 }
 
-//login states
 class AppStateUnInitalized extends AppState {
   const AppStateUnInitalized({required bool isLoading})
-      : super(isLoading: isLoading);
+      : super(
+          isLoading: isLoading,
+          exception: null,
+        );
 }
 
+//Authentication states
 class AppStateRegistering extends AppState with EquatableMixin {
-  final Exception? exception;
   const AppStateRegistering({
-    required this.exception,
+    required exception,
     required bool isLoading,
-  }) : super(isLoading: isLoading);
+  }) : super(
+          isLoading: isLoading,
+          exception: exception,
+        );
 
   @override
   List<Object?> get props => [exception, isLoading];
 }
 
-class AppStateLoggedIn extends AppState with EquatableMixin {
+class AppStateViewingHome extends AppState with EquatableMixin {
   final AuthUser user;
-  final Exception? exception;
-  const AppStateLoggedIn({
+  const AppStateViewingHome({
     required this.user,
-    required this.exception,
+    required exception,
     required bool isLoading,
-  }) : super(isLoading: isLoading);
+  }) : super(
+          isLoading: isLoading,
+          exception: exception,
+        );
 
   @override
   List<Object?> get props => [exception, isLoading];
@@ -44,13 +54,13 @@ class AppStateLoggedIn extends AppState with EquatableMixin {
 
 class AppStateNeedsVerification extends AppState with EquatableMixin {
   final AuthUser user;
-  final Exception? exception;
   const AppStateNeedsVerification({
     required this.user,
     required bool isLoading,
-    required this.exception,
+    required exception,
   }) : super(
           isLoading: isLoading,
+          exception: exception,
         );
 
   @override
@@ -58,13 +68,13 @@ class AppStateNeedsVerification extends AppState with EquatableMixin {
 }
 
 class AppStateLoggingIn extends AppState with EquatableMixin {
-  final Exception? exception;
   const AppStateLoggingIn({
-    required this.exception,
+    required exception,
     required bool isLoading,
     String? loadingText,
   }) : super(
           isLoading: isLoading,
+          exception: exception,
         );
 
   @override
@@ -72,13 +82,44 @@ class AppStateLoggingIn extends AppState with EquatableMixin {
 }
 
 class AppStateResettingPassword extends AppState {
-  final Exception? exception;
   final bool hasSentEmail;
   final String? email;
   const AppStateResettingPassword({
-    required this.exception,
+    required exception,
     required this.hasSentEmail,
     required bool isLoading,
     this.email,
-  }) : super(isLoading: isLoading);
+  }) : super(
+          isLoading: isLoading,
+          exception: exception,
+        );
+}
+
+//rulebook states
+
+class AppStateViewingRulebooks extends AppState {
+  //final Iterable<Rulebook> rulebooks;
+  const AppStateViewingRulebooks({
+    //required this.rulebooks,
+    required bool isLoading,
+    required exception,
+  }) : super(isLoading: isLoading, exception: exception);
+}
+
+class AppStateEditingRulebook extends AppState {
+  final Rulebook rulebook;
+  const AppStateEditingRulebook({
+    required this.rulebook,
+    required bool isLoading,
+    required exception,
+  }) : super(isLoading: isLoading, exception: exception);
+}
+
+class AppStateViewingRulebook extends AppState {
+  final Rulebook rulebook;
+  const AppStateViewingRulebook({
+    required this.rulebook,
+    required bool isLoading,
+    required exception,
+  }) : super(isLoading: isLoading, exception: exception);
 }

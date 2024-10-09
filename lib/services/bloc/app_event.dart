@@ -60,3 +60,8 @@ class AppEventSendPasswordResetEmail extends AppEvent {
   final String email;
   const AppEventSendPasswordResetEmail(this.email);
 }
+
+// Rulebook events
+class AppEventGoToRulebooksView extends AppEvent {
+  const AppEventGoToRulebooksView();
+}

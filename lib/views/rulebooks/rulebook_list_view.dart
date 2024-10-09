@@ -21,13 +21,15 @@ class RulebookListView extends StatelessWidget {
           return Column(
             children: [
               ListTile(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        RulebookDetailsView(rulebook: rulebook),
-                  ),
-                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          RulebookDetailsView(rulebook: rulebook),
+                    ),
+                  );
+                },
                 title: Text(
                   rulebook.title,
                   maxLines: 1,

@@ -10,6 +10,9 @@ import 'package:vecinapp/views/login/forgot_password_view.dart';
 import 'package:vecinapp/views/login/login_view.dart';
 import 'package:vecinapp/views/login/register_view.dart';
 import 'package:vecinapp/views/login/verify_email_view.dart';
+import 'package:vecinapp/views/rulebooks/edit_rulebook_view.dart';
+import 'package:vecinapp/views/rulebooks/rulebook_details_view.dart';
+import 'package:vecinapp/views/rulebooks/rulebooks_view.dart';
 
 class AppBlocRouter extends StatelessWidget {
   const AppBlocRouter({super.key});
@@ -36,8 +39,14 @@ class AppBlocRouter extends StatelessWidget {
           return ForgotPasswordView(email: state.email);
         } else if (state is AppStateNeedsVerification) {
           return const VerifyEmailView();
-        } else if (state is AppStateLoggedIn) {
+        } else if (state is AppStateViewingHome) {
           return const HomeView();
+        } else if (state is AppStateViewingRulebooks) {
+          return const RulebooksView();
+        } else if (state is AppStateEditingRulebook) {
+          return EditRulebookView(rulebook: state.rulebook);
+        } else if (state is AppStateViewingRulebook) {
+          return RulebookDetailsView(rulebook: state.rulebook);
         } else {
           return const Scaffold(
               body: Center(child: CircularProgressIndicator()));

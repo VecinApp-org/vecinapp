@@ -237,12 +237,5 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
       }
     });
-
-    on<AppEventGoToRulebooksView>((event, emit) async {
-      emit(const AppStateViewingRulebooks(
-        isLoading: false,
-        exception: null,
-      ));
-    });
   }
 }
