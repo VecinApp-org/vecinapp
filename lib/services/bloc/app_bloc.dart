@@ -41,7 +41,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
       }
     });
-    // register with email and password
+
     on<AppEventRegisterWithEmailAndPassword>((event, emit) async {
       final email = event.email;
       final password = event.password;
@@ -69,12 +69,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
       }
     });
-    // send email verification
+
     on<AppEventSendEmailVerification>((event, emit) async {
       await _authProvider.sendEmailVerification();
       emit(state);
     });
-    //check if email is verified
+
     on<AppEventConfirmUserIsVerified>((event, emit) async {
       try {
         final userVerified = await _authProvider.confirmUserIsVerified();
@@ -119,7 +119,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         }
       }
     });
-    //login with email and password
+
     on<AppEventLogInWithEmailAndPassword>((event, emit) async {
       try {
         emit(const AppStateLoggingIn(
@@ -163,7 +163,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
       }
     });
-    //log out
+
     on<AppEventLogOut>((event, emit) async {
       try {
         await _authProvider.logOut();
@@ -178,7 +178,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
       }
     });
-    //delete account
+
     on<AppEventDeleteAccount>((event, emit) async {
       try {
         await _authProvider.deleteAccount();
@@ -202,14 +202,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         }
       }
     });
-    //send to register view
+
+    //Authentication Routing Events
     on<AppEventGoToRegistration>((event, emit) async {
       emit(const AppStateRegistering(
         exception: null,
         isLoading: false,
       ));
     });
-    //forgot password
+
     on<AppEventGoToForgotPassword>((event, emit) async {
       emit(AppStateResettingPassword(
         email: event.email,
@@ -218,7 +219,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         isLoading: false,
       ));
     });
-    //send password reset email
+
+    //Authentication Events
     on<AppEventSendPasswordResetEmail>((event, emit) async {
       try {
         emit(AppStateResettingPassword(
@@ -244,6 +246,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
     });
 
+    //Main App Routing
     on<AppEventGoToRulebooksView>((event, emit) async {
       emit(const AppStateViewingRulebooks(
         isLoading: false,

@@ -16,7 +16,6 @@ import 'package:vecinapp/views/settings_view.dart';
 
 class VecinApp extends StatelessWidget {
   const VecinApp({super.key, required this.settingsController});
-
   final SettingsController settingsController;
 
   @override

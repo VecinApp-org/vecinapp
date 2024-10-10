@@ -9,6 +9,7 @@ class FirebaseCloudProvider implements CloudProvider {
 
   final rulebooks = FirebaseFirestore.instance.collection('docs');
 
+  @override
   Future<void> deleteRulebook({
     required String rulebookId,
   }) async {
@@ -19,6 +20,7 @@ class FirebaseCloudProvider implements CloudProvider {
     }
   }
 
+  @override
   Future<void> updateRulebook({
     required String rulebookId,
     required String title,
@@ -34,6 +36,7 @@ class FirebaseCloudProvider implements CloudProvider {
     }
   }
 
+  @override
   Stream<Iterable<Rulebook>> allRulebooks({required String ownerUserId}) {
     final allRulebooks = rulebooks
         .where(ownerUserIdFieldName, isEqualTo: ownerUserId)
@@ -42,6 +45,7 @@ class FirebaseCloudProvider implements CloudProvider {
     return allRulebooks;
   }
 
+  @override
   Future<Rulebook> createNewRulebook({
     required String ownerUserId,
     required String title,
