@@ -16,13 +16,13 @@ class EditRulebookView extends StatefulWidget {
 }
 
 class _EditRulebookViewState extends State<EditRulebookView> {
-  late final FirebaseCloudStorage _dbService;
+  late final FirebaseCloudProvider _dbService;
   late final TextEditingController _textController;
   late final TextEditingController _titleController;
 
   @override
   void initState() {
-    _dbService = FirebaseCloudStorage();
+    _dbService = FirebaseCloudProvider();
     _textController = TextEditingController();
     _titleController = TextEditingController();
     _setupEditRulebookIfProvided();

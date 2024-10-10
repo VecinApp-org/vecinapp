@@ -129,3 +129,13 @@ class AppStateViewingRulebook extends AppState {
     required exception,
   }) : super(isLoading: isLoading, exception: exception);
 }
+
+extension GetUser on AppState {
+  AuthUser? get user {
+    if (this is AppStateViewingHome) {
+      return (this as AppStateViewingHome).user;
+    } else {
+      return null;
+    }
+  }
+}

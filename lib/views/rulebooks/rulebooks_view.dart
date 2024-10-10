@@ -18,12 +18,12 @@ class RulebooksView extends StatefulWidget {
 }
 
 class _RulebooksViewState extends State<RulebooksView> {
-  late final FirebaseCloudStorage _dbService;
+  late final FirebaseCloudProvider _dbService;
   String get userId => AuthService.firebase().currentUser!.uid!;
 
   @override
   void initState() {
-    _dbService = FirebaseCloudStorage();
+    _dbService = FirebaseCloudProvider();
     super.initState();
   }
 

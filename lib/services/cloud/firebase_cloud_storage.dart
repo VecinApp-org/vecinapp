@@ -1,17 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:vecinapp/services/cloud/cloud_provider.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
 import 'package:vecinapp/services/cloud/cloud_sorage_constants.dart';
 import 'package:vecinapp/services/cloud/cloud_storage_exceptions.dart';
 
-class FirebaseCloudStorage {
-  static final FirebaseCloudStorage _shared =
-      FirebaseCloudStorage._sharedInstance();
-
-  FirebaseCloudStorage._sharedInstance();
-
-  factory FirebaseCloudStorage() {
-    return _shared;
-  }
+class FirebaseCloudProvider implements CloudProvider {
+  Future<void> initialize() async {}
 
   final rulebooks = FirebaseFirestore.instance.collection('docs');
 

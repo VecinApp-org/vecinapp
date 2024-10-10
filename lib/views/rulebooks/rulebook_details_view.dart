@@ -14,7 +14,7 @@ class RulebookDetailsView extends StatefulWidget {
 }
 
 class _RulebookDetailsViewState extends State<RulebookDetailsView> {
-  final _dbService = FirebaseCloudStorage();
+  final _dbService = FirebaseCloudProvider();
 
   @override
   Widget build(BuildContext context) {
