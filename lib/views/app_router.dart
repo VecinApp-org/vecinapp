@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vecinapp/utilities/dialogs/show_error_dialog.dart';
 import 'package:vecinapp/utilities/loading/loading_screen.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
@@ -28,6 +29,13 @@ class AppBlocRouter extends StatelessWidget {
             text: state.loadingText ?? '',
           );
         }
+        final exception = state.exception;
+        if (exception != null) {
+          showErrorDialog(
+            text: exception.toString(),
+            context: context,
+          );
+        }
       },
       builder: (context, state) {
         if (state is AppStateRegistering) {
@@ -46,7 +54,7 @@ class AppBlocRouter extends StatelessWidget {
           return RulebooksView(rulebooks: state.rulebooks);
         } else if (state is AppStateEditingRulebook) {
           return EditRulebookView(rulebook: state.rulebook);
-        } else if (state is AppStateViewingRulebook) {
+        } else if (state is AppStateViewingRulebookDetails) {
           return RulebookDetailsView(rulebook: state.rulebook);
         } else {
           return Container(); // This should never happen

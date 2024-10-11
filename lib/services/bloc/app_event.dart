@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart' show immutable;
+import 'package:vecinapp/services/cloud/rulebook.dart';
 
 @immutable
 abstract class AppEvent {
@@ -67,10 +68,26 @@ class AppEventGoToHomeView extends AppEvent {
   const AppEventGoToHomeView();
 }
 
+class AppEventGoToSettingsView extends AppEvent {
+  const AppEventGoToSettingsView();
+}
+
 class AppEventGoToRulebooksView extends AppEvent {
   const AppEventGoToRulebooksView();
 }
 
-class AppEventGoToSettingsView extends AppEvent {
-  const AppEventGoToSettingsView();
+class AppEventGoToEditRulebookView extends AppEvent {
+  final Rulebook? rulebook;
+  const AppEventGoToEditRulebookView({this.rulebook});
+}
+
+class AppEventGoToRulebookDetailsView extends AppEvent {
+  final Rulebook rulebook;
+  const AppEventGoToRulebookDetailsView({required this.rulebook});
+}
+
+// MAIN APP EVENTS
+class AppEventDeleteRulebook extends AppEvent {
+  final String rulebookId;
+  const AppEventDeleteRulebook({required this.rulebookId});
 }

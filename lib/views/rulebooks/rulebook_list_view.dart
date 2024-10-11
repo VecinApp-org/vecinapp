@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vecinapp/services/bloc/app_bloc.dart';
+import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
-import 'package:vecinapp/views/rulebooks/rulebook_details_view.dart';
-import 'dart:developer' as devtools show log;
 
 class RulebookListView extends StatelessWidget {
   final Iterable<Rulebook> rulebooks;
@@ -13,7 +14,6 @@ class RulebookListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    devtools.log('RulebookListView');
     return ListView.builder(
         itemCount: rulebooks.length,
         itemBuilder: (context, index) {
@@ -22,13 +22,11 @@ class RulebookListView extends StatelessWidget {
             children: [
               ListTile(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          RulebookDetailsView(rulebook: rulebook),
-                    ),
-                  );
+                  context.read<AppBloc>().add(
+                        AppEventGoToRulebookDetailsView(
+                          rulebook: rulebook,
+                        ),
+                      );
                 },
                 title: Text(
                   rulebook.title,

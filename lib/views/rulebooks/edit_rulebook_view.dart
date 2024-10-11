@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/auth/auth_service.dart';
-import 'package:vecinapp/services/cloud/rulebook.dart';
+import 'package:vecinapp/services/bloc/app_bloc.dart';
+import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/cloud/cloud_storage_exceptions.dart';
 import 'package:vecinapp/services/cloud/firebase_cloud_storage.dart';
+import 'package:vecinapp/services/cloud/rulebook.dart';
 import 'package:vecinapp/utilities/dialogs/show_error_dialog.dart';
 import 'dart:developer' as devtools show log;
 
@@ -70,9 +73,13 @@ class _EditRulebookViewState extends State<EditRulebookView> {
 
   @override
   Widget build(BuildContext context) {
-    devtools.log('NewRulebookView');
     return Scaffold(
         appBar: AppBar(
+          leading: BackButton(
+            onPressed: () {
+              context.read<AppBloc>().add(const AppEventGoToRulebooksView());
+            },
+          ),
           title: const Text('Editar Reglamento'),
         ),
         body: ListView(
@@ -103,7 +110,9 @@ class _EditRulebookViewState extends State<EditRulebookView> {
                 try {
                   await _createOrUpdateRulebook();
                   if (context.mounted) {
-                    Navigator.of(context).pop();
+                    context
+                        .read<AppBloc>()
+                        .add(const AppEventGoToRulebooksView());
                   }
                 } on CloudStorageException catch (e) {
                   devtools.log('CloudStorageException on save rulebook: $e');

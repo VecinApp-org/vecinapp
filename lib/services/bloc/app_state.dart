@@ -115,17 +115,17 @@ class AppStateViewingRulebooks extends AppState {
 }
 
 class AppStateEditingRulebook extends AppState {
-  final Rulebook rulebook;
+  final Rulebook? rulebook;
   const AppStateEditingRulebook({
-    required this.rulebook,
+    this.rulebook,
     required bool isLoading,
     required exception,
   }) : super(isLoading: isLoading, exception: exception);
 }
 
-class AppStateViewingRulebook extends AppState {
+class AppStateViewingRulebookDetails extends AppState {
   final Rulebook rulebook;
-  const AppStateViewingRulebook({
+  const AppStateViewingRulebookDetails({
     required this.rulebook,
     required bool isLoading,
     required exception,

@@ -42,6 +42,39 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
     });
 
+    //Authentication Routing Events
+    on<AppEventGoToRegistration>((event, emit) async {
+      emit(const AppStateRegistering(
+        exception: null,
+        isLoading: false,
+      ));
+    });
+
+    on<AppEventGoToForgotPassword>((event, emit) async {
+      emit(AppStateResettingPassword(
+        email: event.email,
+        exception: null,
+        hasSentEmail: false,
+        isLoading: false,
+      ));
+    });
+
+    on<AppEventLogOut>((event, emit) async {
+      try {
+        await _authProvider.logOut();
+        emit(const AppStateLoggingIn(
+          exception: null,
+          isLoading: false,
+        ));
+      } on AuthException catch (e) {
+        emit(AppStateLoggingIn(
+          exception: e,
+          isLoading: false,
+        ));
+      }
+    });
+
+    //Authentication Events
     on<AppEventRegisterWithEmailAndPassword>((event, emit) async {
       final email = event.email;
       final password = event.password;
@@ -164,21 +197,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
     });
 
-    on<AppEventLogOut>((event, emit) async {
-      try {
-        await _authProvider.logOut();
-        emit(const AppStateLoggingIn(
-          exception: null,
-          isLoading: false,
-        ));
-      } on AuthException catch (e) {
-        emit(AppStateLoggingIn(
-          exception: e,
-          isLoading: false,
-        ));
-      }
-    });
-
     on<AppEventDeleteAccount>((event, emit) async {
       try {
         await _authProvider.deleteAccount();
@@ -203,24 +221,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
     });
 
-    //Authentication Routing Events
-    on<AppEventGoToRegistration>((event, emit) async {
-      emit(const AppStateRegistering(
-        exception: null,
-        isLoading: false,
-      ));
-    });
-
-    on<AppEventGoToForgotPassword>((event, emit) async {
-      emit(AppStateResettingPassword(
-        email: event.email,
-        exception: null,
-        hasSentEmail: false,
-        isLoading: false,
-      ));
-    });
-
-    //Authentication Events
     on<AppEventSendPasswordResetEmail>((event, emit) async {
       try {
         emit(AppStateResettingPassword(
@@ -247,23 +247,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     //Main App Routing
-    on<AppEventGoToRulebooksView>((event, emit) async {
-      final user = _authProvider.currentUser;
-      if (user == null) {
-        emit(const AppStateLoggingIn(
-          exception: null,
-          isLoading: false,
-        ));
-        return;
-      }
-      final rulebooks = _cloudProvider.allRulebooks(ownerUserId: user.uid!);
-      emit(AppStateViewingRulebooks(
-        rulebooks: rulebooks,
-        isLoading: false,
-        exception: null,
-      ));
-    });
-
     on<AppEventGoToHomeView>((event, emit) async {
       final user = _authProvider.currentUser;
       if (user == null) {
@@ -281,7 +264,64 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     on<AppEventGoToSettingsView>((event, emit) async {
+      final user = _authProvider.currentUser;
+      if (user == null) {
+        emit(const AppStateLoggingIn(
+          exception: null,
+          isLoading: false,
+        ));
+        return;
+      }
       emit(const AppStateViewingSettings(
+        isLoading: false,
+        exception: null,
+      ));
+    });
+
+    on<AppEventGoToRulebooksView>((event, emit) async {
+      final user = _authProvider.currentUser;
+      if (user == null) {
+        emit(const AppStateLoggingIn(
+          exception: null,
+          isLoading: false,
+        ));
+        return;
+      }
+      final rulebooks = _cloudProvider.allRulebooks(ownerUserId: user.uid!);
+      emit(AppStateViewingRulebooks(
+        rulebooks: rulebooks,
+        isLoading: false,
+        exception: null,
+      ));
+    });
+
+    on<AppEventGoToEditRulebookView>((event, emit) async {
+      final user = _authProvider.currentUser;
+      if (user == null) {
+        emit(const AppStateLoggingIn(
+          exception: null,
+          isLoading: false,
+        ));
+        return;
+      }
+      emit(AppStateEditingRulebook(
+        rulebook: event.rulebook,
+        isLoading: false,
+        exception: null,
+      ));
+    });
+
+    on<AppEventGoToRulebookDetailsView>((event, emit) async {
+      final user = _authProvider.currentUser;
+      if (user == null) {
+        emit(const AppStateLoggingIn(
+          exception: null,
+          isLoading: false,
+        ));
+        return;
+      }
+      emit(AppStateViewingRulebookDetails(
+        rulebook: event.rulebook,
         isLoading: false,
         exception: null,
       ));

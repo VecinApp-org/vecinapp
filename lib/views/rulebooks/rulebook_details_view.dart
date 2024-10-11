@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:vecinapp/services/bloc/app_bloc.dart';
+import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
-import 'package:vecinapp/services/cloud/firebase_cloud_storage.dart';
 import 'package:vecinapp/utilities/dialogs/show_confirmation_dialog.dart';
-import 'package:vecinapp/views/rulebooks/edit_rulebook_view.dart';
 
 class RulebookDetailsView extends StatefulWidget {
   const RulebookDetailsView({super.key, required this.rulebook});
@@ -14,12 +15,17 @@ class RulebookDetailsView extends StatefulWidget {
 }
 
 class _RulebookDetailsViewState extends State<RulebookDetailsView> {
-  final _dbService = FirebaseCloudProvider();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: BackButton(
+          onPressed: () {
+            context.read<AppBloc>().add(
+                  const AppEventGoToRulebooksView(),
+                );
+          },
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.share),
@@ -31,21 +37,21 @@ class _RulebookDetailsViewState extends State<RulebookDetailsView> {
             onSelected: (value) async {
               switch (value) {
                 case EditOrDelete.edit:
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          EditRulebookView(rulebook: widget.rulebook),
-                    ),
-                  );
+                  context.read<AppBloc>().add(
+                        AppEventGoToEditRulebookView(
+                          rulebook: widget.rulebook,
+                        ),
+                      );
                 case EditOrDelete.delete:
                   final shouldDelete = await showConfirmationDialog(
                       context: context, text: '¿Eliminar el reglamento?');
                   if (shouldDelete == true) {
-                    await _dbService.deleteRulebook(
-                        rulebookId: widget.rulebook.id);
                     if (context.mounted) {
-                      Navigator.of(context).pop();
+                      context.read<AppBloc>().add(
+                            AppEventDeleteRulebook(
+                              rulebookId: widget.rulebook.id,
+                            ),
+                          );
                     }
                   }
               }

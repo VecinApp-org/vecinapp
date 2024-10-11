@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
-import 'package:vecinapp/constants/routes.dart';
-import 'dart:developer' as devtools show log;
 
 import 'package:vecinapp/views/rulebooks/rulebook_list_view.dart';
 
@@ -19,7 +17,6 @@ class RulebooksView extends StatefulWidget {
 class _RulebooksViewState extends State<RulebooksView> {
   @override
   Widget build(BuildContext context) {
-    devtools.log('RulebooksView');
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
@@ -33,7 +30,9 @@ class _RulebooksViewState extends State<RulebooksView> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).pushNamed(newRulebookRouteName);
+          context.read<AppBloc>().add(
+                const AppEventGoToEditRulebookView(),
+              );
         },
         child: const Icon(Icons.add),
       ),
