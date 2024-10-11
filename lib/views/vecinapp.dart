@@ -5,13 +5,10 @@ import 'package:vecinapp/views/app_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 //import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 //import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:vecinapp/constants/routes.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/auth/firebase_auth_provider.dart';
 import 'package:vecinapp/services/settings/theme_constants.dart';
-import 'package:vecinapp/views/rulebooks/edit_rulebook_view.dart';
-import 'package:vecinapp/views/settings_view.dart';
 
 class VecinApp extends StatelessWidget {
   const VecinApp({super.key, required this.settingsController});
@@ -34,10 +31,6 @@ class VecinApp extends StatelessWidget {
             theme: lightTheme,
             darkTheme: darkTheme,
             themeMode: settingsController.themeMode,
-            routes: {
-              newRulebookRouteName: (context) => const EditRulebookView(),
-              settingsViewRouteName: (context) => SettingsView()
-            },
             home: const AppBlocRouter(),
           ),
         );

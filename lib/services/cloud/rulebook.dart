@@ -26,4 +26,16 @@ class Rulebook {
       'Rulebook (ownerUserId: $ownerUserId, title: $title, text: $text)';
 
   String get shareRulebook => 'Reglamento en VecinApp:\n\n$title\n\n$text';
+
+  Rulebook copyWith({
+    required String newTitle,
+    required String newText,
+  }) {
+    return Rulebook(
+      id: id,
+      ownerUserId: ownerUserId,
+      title: newTitle,
+      text: newText,
+    );
+  }
 }

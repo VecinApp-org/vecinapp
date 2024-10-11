@@ -133,8 +133,14 @@ class AppStateViewingRulebookDetails extends AppState {
 }
 
 //EXTENSIONS
-extension GetUser on AppState {
-  AuthUser? get user {
-    return this.user;
+extension GetRulebook on AppState {
+  Rulebook? get rulebook {
+    if (this is AppStateEditingRulebook) {
+      return (this as AppStateEditingRulebook).rulebook;
+    }
+    if (this is AppStateViewingRulebookDetails) {
+      return (this as AppStateViewingRulebookDetails).rulebook;
+    }
+    return null;
   }
 }

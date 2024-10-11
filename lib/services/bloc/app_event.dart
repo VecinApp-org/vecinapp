@@ -86,8 +86,16 @@ class AppEventGoToRulebookDetailsView extends AppEvent {
   const AppEventGoToRulebookDetailsView({required this.rulebook});
 }
 
-// MAIN APP EVENTS
+// CLOUD EVENTS
+class AppEventCreateOrUpdateRulebook extends AppEvent {
+  final String title;
+  final String text;
+  const AppEventCreateOrUpdateRulebook({
+    required this.title,
+    required this.text,
+  });
+}
+
 class AppEventDeleteRulebook extends AppEvent {
-  final String rulebookId;
-  const AppEventDeleteRulebook({required this.rulebookId});
+  const AppEventDeleteRulebook();
 }

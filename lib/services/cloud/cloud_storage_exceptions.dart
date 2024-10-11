@@ -9,3 +9,5 @@ class CouldNotGetDocsException extends CloudStorageException {}
 class CouldNotUpdateDocException extends CloudStorageException {}
 
 class CouldNotDeleteDocException extends CloudStorageException {}
+
+class ChannelErrorDocException extends CloudStorageException {}

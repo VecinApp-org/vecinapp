@@ -26,6 +26,9 @@ class FirebaseCloudProvider implements CloudProvider {
     required String title,
     required String text,
   }) async {
+    if (title.isEmpty || text.isEmpty) {
+      throw ChannelErrorDocException();
+    }
     try {
       await rulebooks.doc(rulebookId).update({
         titleFieldName: title,
@@ -51,6 +54,9 @@ class FirebaseCloudProvider implements CloudProvider {
     required String title,
     required String text,
   }) async {
+    if (title.isEmpty || text.isEmpty) {
+      throw ChannelErrorDocException();
+    }
     final rulebook = await rulebooks.add({
       ownerUserIdFieldName: ownerUserId,
       titleFieldName: title,

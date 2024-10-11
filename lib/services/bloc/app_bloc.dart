@@ -1,10 +1,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
-//import 'package:vecinapp/services/auth/auth_exceptions.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
 import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
+import 'package:vecinapp/services/cloud/cloud_storage_exceptions.dart';
+import 'package:vecinapp/services/cloud/rulebook.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
   final AuthProvider _authProvider;
@@ -322,6 +323,110 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
       emit(AppStateViewingRulebookDetails(
         rulebook: event.rulebook,
+        isLoading: false,
+        exception: null,
+      ));
+    });
+
+    //Cloud Events
+    on<AppEventCreateOrUpdateRulebook>((event, emit) async {
+      //check if user is logged in
+      final user = _authProvider.currentUser;
+      if (user == null) {
+        emit(const AppStateLoggingIn(
+          exception: null,
+          isLoading: false,
+        ));
+        return;
+      }
+      //enable loading indicator
+      emit(AppStateEditingRulebook(
+        rulebook: state.rulebook,
+        isLoading: true,
+        exception: null,
+      ));
+      late final Rulebook newRulebook;
+      try {
+        if (state.rulebook != null) {
+          //update rulebook if provided
+          await _cloudProvider.updateRulebook(
+            rulebookId: state.rulebook!.id,
+            title: event.title,
+            text: event.text,
+          );
+          newRulebook = state.rulebook!.copyWith(
+            newTitle: event.title,
+            newText: event.text,
+          );
+        } else {
+          //create new rulebook if not provided
+          newRulebook = await _cloudProvider.createNewRulebook(
+            ownerUserId: user.uid!,
+            title: event.title,
+            text: event.text,
+          );
+        }
+      } on CloudStorageException catch (e) {
+        emit(AppStateEditingRulebook(
+          rulebook: state.rulebook,
+          isLoading: false,
+          exception: e,
+        ));
+        return;
+      } on Exception catch (e) {
+        emit(AppStateEditingRulebook(
+          rulebook: state.rulebook,
+          isLoading: false,
+          exception: e,
+        ));
+        return;
+      }
+      //Send user to rulebook details view
+      emit(AppStateViewingRulebookDetails(
+        rulebook: newRulebook,
+        isLoading: false,
+        exception: null,
+      ));
+    });
+
+    on<AppEventDeleteRulebook>((event, emit) async {
+      //check if user is logged in
+      final user = _authProvider.currentUser;
+      if (user == null) {
+        emit(const AppStateLoggingIn(
+          exception: null,
+          isLoading: false,
+        ));
+        return;
+      }
+      //enable loading indicator
+      emit(AppStateViewingRulebookDetails(
+        rulebook: state.rulebook!,
+        isLoading: true,
+        exception: null,
+      ));
+      try {
+        await _cloudProvider.deleteRulebook(
+          rulebookId: state.rulebook!.id,
+        );
+      } on CloudStorageException catch (e) {
+        emit(AppStateViewingRulebookDetails(
+          rulebook: state.rulebook!,
+          isLoading: false,
+          exception: e,
+        ));
+        return;
+      } on Exception catch (e) {
+        emit(AppStateViewingRulebookDetails(
+          rulebook: state.rulebook!,
+          isLoading: false,
+          exception: e,
+        ));
+        return;
+      }
+      //Send user to rulebooks view
+      emit(AppStateViewingRulebooks(
+        rulebooks: _cloudProvider.allRulebooks(ownerUserId: user.uid!),
         isLoading: false,
         exception: null,
       ));

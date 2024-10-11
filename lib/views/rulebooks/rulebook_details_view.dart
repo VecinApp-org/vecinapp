@@ -48,9 +48,7 @@ class _RulebookDetailsViewState extends State<RulebookDetailsView> {
                   if (shouldDelete == true) {
                     if (context.mounted) {
                       context.read<AppBloc>().add(
-                            AppEventDeleteRulebook(
-                              rulebookId: widget.rulebook.id,
-                            ),
+                            const AppEventDeleteRulebook(),
                           );
                     }
                   }
