@@ -248,7 +248,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     //Main App Routing
     on<AppEventGoToRulebooksView>((event, emit) async {
-      emit(const AppStateViewingRulebooks(
+      final user = _authProvider.currentUser;
+      if (user == null) {
+        emit(const AppStateLoggingIn(
+          exception: null,
+          isLoading: false,
+        ));
+        return;
+      }
+      final rulebooks = _cloudProvider.allRulebooks(ownerUserId: user.uid!);
+      emit(AppStateViewingRulebooks(
+        rulebooks: rulebooks,
         isLoading: false,
         exception: null,
       ));

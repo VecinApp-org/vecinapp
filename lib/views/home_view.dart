@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vecinapp/constants/routes.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 
@@ -28,7 +27,7 @@ List<String> routes = [
   //() {},
   //() {},
   //() {},
-  rulebooksViewRouteName,
+  'Reglamentos',
   //() {},
   //() {},
   //() {},

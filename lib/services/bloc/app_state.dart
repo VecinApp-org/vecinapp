@@ -8,9 +8,11 @@ abstract class AppState {
   final bool isLoading;
   final Exception? exception;
   final String? loadingText;
+  final AuthUser? user;
   const AppState({
     required this.isLoading,
     required this.exception,
+    this.user,
     this.loadingText,
   });
 }
@@ -104,9 +106,9 @@ class AppStateViewingSettings extends AppState {
 }
 
 class AppStateViewingRulebooks extends AppState {
-  //final Iterable<Rulebook> rulebooks;
+  final Stream<Iterable<Rulebook>> rulebooks;
   const AppStateViewingRulebooks({
-    //required this.rulebooks,
+    required this.rulebooks,
     required bool isLoading,
     required exception,
   }) : super(isLoading: isLoading, exception: exception);
@@ -130,12 +132,9 @@ class AppStateViewingRulebook extends AppState {
   }) : super(isLoading: isLoading, exception: exception);
 }
 
+//EXTENSIONS
 extension GetUser on AppState {
   AuthUser? get user {
-    if (this is AppStateViewingHome) {
-      return (this as AppStateViewingHome).user;
-    } else {
-      return null;
-    }
+    return this.user;
   }
 }

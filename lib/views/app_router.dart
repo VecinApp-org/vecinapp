@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-//import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-//import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:vecinapp/utilities/loading/loading_screen.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
@@ -45,14 +43,13 @@ class AppBlocRouter extends StatelessWidget {
         } else if (state is AppStateViewingSettings) {
           return SettingsView();
         } else if (state is AppStateViewingRulebooks) {
-          return const RulebooksView();
+          return RulebooksView(rulebooks: state.rulebooks);
         } else if (state is AppStateEditingRulebook) {
           return EditRulebookView(rulebook: state.rulebook);
         } else if (state is AppStateViewingRulebook) {
           return RulebookDetailsView(rulebook: state.rulebook);
         } else {
-          return const Scaffold(
-              body: Center(child: CircularProgressIndicator()));
+          return Container(); // This should never happen
         }
       },
     );
