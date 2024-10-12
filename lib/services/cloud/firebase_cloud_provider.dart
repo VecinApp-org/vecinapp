@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
-import 'package:vecinapp/services/cloud/cloud_sorage_constants.dart';
-import 'package:vecinapp/services/cloud/cloud_storage_exceptions.dart';
+import 'package:vecinapp/services/cloud/cloud_constants.dart';
+import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
 
 class FirebaseCloudProvider implements CloudProvider {
   Future<void> initialize() async {}

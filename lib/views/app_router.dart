@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
-import 'package:vecinapp/services/cloud/cloud_storage_exceptions.dart';
+import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
 import 'package:vecinapp/utilities/dialogs/show_error_dialog.dart';
 import 'package:vecinapp/utilities/loading/loading_screen.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
@@ -65,7 +65,7 @@ class AppBlocRouter extends StatelessWidget {
             } else if (exception is ChannelErrorAuthException) {
               message = 'Dejaste algo vacío';
             }
-          } else if (exception is CloudStorageException) {
+          } else if (exception is CloudException) {
             if (exception is CouldNotCreateRulebooksException) {
               message = 'No se pudo crear el documento';
             } else if (exception is CouldNotDeleteRulebookException) {

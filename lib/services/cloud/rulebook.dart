@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:vecinapp/services/cloud/cloud_sorage_constants.dart';
+import 'package:vecinapp/services/cloud/cloud_constants.dart';
 import 'package:flutter/foundation.dart';
 
 @immutable

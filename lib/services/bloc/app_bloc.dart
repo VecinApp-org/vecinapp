@@ -5,7 +5,7 @@ import 'package:vecinapp/services/bloc/app_state.dart';
 import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
-import 'package:vecinapp/services/cloud/cloud_storage_exceptions.dart';
+import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
@@ -367,7 +367,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             text: event.text,
           );
         }
-      } on CloudStorageException catch (e) {
+      } on CloudException catch (e) {
         emit(AppStateEditingRulebook(
           rulebook: state.rulebook,
           isLoading: false,
@@ -410,7 +410,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         await _cloudProvider.deleteRulebook(
           rulebookId: state.rulebook!.id,
         );
-      } on CloudStorageException catch (e) {
+      } on CloudException catch (e) {
         emit(AppStateViewingRulebookDetails(
           rulebook: state.rulebook!,
           isLoading: false,
