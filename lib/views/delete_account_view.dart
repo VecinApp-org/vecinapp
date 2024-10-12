@@ -12,6 +12,7 @@ class DeleteAccountView extends StatefulWidget {
 
 class _DeleteAccountViewState extends State<DeleteAccountView> {
   late final TextEditingController _controller;
+  late bool _isShowingPassword = false;
 
   @override
   void initState() {
@@ -46,22 +47,43 @@ class _DeleteAccountViewState extends State<DeleteAccountView> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 //Title
-                Text('Eliminar cuenta',
+                Text('Confirma tu contraseña',
                     style: Theme.of(context).textTheme.headlineLarge),
                 const SizedBox(height: 55),
                 //email textfield
                 TextField(
                   controller: _controller,
+                  obscureText: !_isShowingPassword,
                   enableSuggestions: false,
                   autocorrect: false,
-                  decoration: const InputDecoration(
-                    constraints: BoxConstraints(maxWidth: 377),
-                    icon: Icon(Icons.password),
-                    hintText: 'Contraseña',
-                  ),
+                  decoration: InputDecoration(
+                      constraints: const BoxConstraints(maxWidth: 377),
+                      icon: const Icon(Icons.key),
+                      hintText: 'Contraseña',
+                      suffixIcon: IconButton(onPressed: () {
+                        setState(() {
+                          _isShowingPassword = !_isShowingPassword;
+                        });
+                      }, icon: Builder(
+                        builder: (context) {
+                          if (_isShowingPassword) {
+                            return const Icon(Icons.visibility);
+                          } else {
+                            return const Icon(Icons.visibility_off);
+                          }
+                        },
+                      ))),
                 ),
                 const SizedBox(height: 55),
                 //Reset password button
+                OutlinedButton(
+                  onPressed: () {
+                    context.read<AppBloc>().add(const AppEventLogOut());
+                  },
+                  child: const Text('Regresar'),
+                ),
+                const SizedBox(height: 13),
+                //cancel button
                 FilledButton(
                   style: FilledButton.styleFrom(
                     backgroundColor: Colors.red,
@@ -73,14 +95,6 @@ class _DeleteAccountViewState extends State<DeleteAccountView> {
                         ));
                   },
                   child: const Text('Eliminar cuenta'),
-                ),
-                const SizedBox(height: 13),
-                //cancel button
-                TextButton(
-                  onPressed: () {
-                    context.read<AppBloc>().add(const AppEventLogOut());
-                  },
-                  child: const Text('Regresar'),
                 ),
               ],
             ),
