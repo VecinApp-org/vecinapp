@@ -5,8 +5,6 @@ class AuthException implements Exception {
 // login exceptions
 class InvalidCredentialAuthException implements AuthException {}
 
-class WrongPasswordAuthException implements AuthException {}
-
 // register exceptions
 class EmailAlreadyInUseAuthException implements AuthException {}
 

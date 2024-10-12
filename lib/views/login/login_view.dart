@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vecinapp/services/auth/auth_exceptions.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
-import 'package:vecinapp/services/bloc/app_state.dart';
-import 'package:vecinapp/utilities/dialogs/show_error_dialog.dart';
 import 'dart:developer' as devtools show log;
 
 class LoginView extends StatefulWidget {
@@ -37,122 +34,99 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AppBloc, AppState>(
-      listener: (context, state) async {
-        if (state is AppStateLoggingIn) {
-          if (state.exception is InvalidCredentialAuthException) {
-            await showErrorDialog(
-                context: context,
-                text: 'La combinación de correo y contraseña es incorrecta.');
-          } else if (state.exception is InvalidEmailAuthException) {
-            await showErrorDialog(
-                context: context, text: 'El correo está mal escrito.');
-          } else if (state.exception is NetworkRequestFailedAuthException) {
-            await showErrorDialog(context: context, text: 'No hay internet.');
-          } else if (state.exception is ChannelErrorAuthException) {
-            await showErrorDialog(
-                context: context, text: 'Dejaste algo vacío.');
-          } else if (state.exception is GenericAuthException) {
-            await showErrorDialog(context: context, text: 'Algo salió mal');
-          } else if (state.exception != null) {
-            await showErrorDialog(context: context, text: 'Algo salió mal');
-          }
-        }
-      },
-      child: Scaffold(
-        restorationId: 'loginView',
-        appBar: AppBar(),
-        body: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                //Logo
-                Text('VecinApp',
-                    style: Theme.of(context).textTheme.displayMedium),
-                const SizedBox(height: 55),
-                //Title
-                //Text('Iniciar sesión',
-                //    style: Theme.of(context).textTheme.headlineMedium),
-                //const SizedBox(height: 13),
-                //Email Field
-                TextField(
-                  autofocus: true,
-                  controller: _email,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    constraints: BoxConstraints(maxWidth: 377),
-                    icon: Icon(Icons.email),
-                    hintText: 'Email',
-                  ),
+    return Scaffold(
+      restorationId: 'loginView',
+      appBar: AppBar(),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              //Logo
+              Text('VecinApp',
+                  style: Theme.of(context).textTheme.displayMedium),
+              const SizedBox(height: 55),
+              //Title
+              //Text('Iniciar sesión',
+              //    style: Theme.of(context).textTheme.headlineMedium),
+              //const SizedBox(height: 13),
+              //Email Field
+              TextField(
+                autofocus: true,
+                controller: _email,
+                enableSuggestions: false,
+                autocorrect: false,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(
+                  constraints: BoxConstraints(maxWidth: 377),
+                  icon: Icon(Icons.email),
+                  hintText: 'Email',
                 ),
-                const SizedBox(height: 13),
-                //Password Field
-                TextField(
-                  controller: _password,
-                  obscureText: !_isShowingPassword,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  decoration: InputDecoration(
-                    constraints: const BoxConstraints(maxWidth: 377),
-                    icon: const Icon(Icons.key),
-                    hintText: 'Contraseña',
-                    suffixIcon: IconButton(onPressed: () {
-                      setState(() {
-                        _isShowingPassword = !_isShowingPassword;
-                      });
-                    }, icon: Builder(builder: (context) {
-                      if (_isShowingPassword) {
-                        return const Icon(Icons.visibility);
-                      } else {
-                        return const Icon(Icons.visibility_off);
-                      }
-                    })),
-                  ),
+              ),
+              const SizedBox(height: 13),
+              //Password Field
+              TextField(
+                controller: _password,
+                obscureText: !_isShowingPassword,
+                enableSuggestions: false,
+                autocorrect: false,
+                decoration: InputDecoration(
+                  constraints: const BoxConstraints(maxWidth: 377),
+                  icon: const Icon(Icons.key),
+                  hintText: 'Contraseña',
+                  suffixIcon: IconButton(onPressed: () {
+                    setState(() {
+                      _isShowingPassword = !_isShowingPassword;
+                    });
+                  }, icon: Builder(builder: (context) {
+                    if (_isShowingPassword) {
+                      return const Icon(Icons.visibility);
+                    } else {
+                      return const Icon(Icons.visibility_off);
+                    }
+                  })),
                 ),
-                const SizedBox(height: 55),
-                //Login button
-                FilledButton(
-                  onPressed: () async {
-                    devtools.log('Logging in...');
-                    final email = _email.text;
-                    final password = _password.text;
-                    context.read<AppBloc>().add(
-                          AppEventLogInWithEmailAndPassword(
-                            email,
-                            password,
-                          ),
-                        );
-                  },
-                  child: const Text('Entrar'),
-                ),
-                const SizedBox(height: 13),
-                //Forgot password button
-                TextButton(
-                  onPressed: () {
-                    final email = _email.text;
-                    context
-                        .read<AppBloc>()
-                        .add(AppEventGoToForgotPassword(email: email));
-                  },
-                  child: const Text('Olvidé mi contraseña'),
-                ),
-                const SizedBox(height: 13),
-                //go to register button
-                TextButton(
-                  onPressed: () {
-                    context.read<AppBloc>().add(
-                          const AppEventGoToRegistration(),
-                        );
-                  },
-                  child: const Text('Crear cuenta nueva'),
-                ),
-                //const SizedBox(height: 55),
-              ],
-            ),
+              ),
+              const SizedBox(height: 55),
+              //Login button
+              FilledButton(
+                onPressed: () async {
+                  devtools.log('Logging in...');
+                  final email = _email.text;
+                  final password = _password.text;
+                  context.read<AppBloc>().add(
+                        AppEventLogInWithEmailAndPassword(
+                          email,
+                          password,
+                        ),
+                      );
+                },
+                child: const Text('Entrar'),
+              ),
+              const SizedBox(height: 13),
+              //Forgot password button
+              TextButton(
+                onPressed: () {
+                  final email = _email.text;
+                  context
+                      .read<AppBloc>()
+                      .add(AppEventGoToForgotPassword(email: email));
+                },
+                child: const Text('Olvidé mi contraseña'),
+              ),
+              const SizedBox(height: 13),
+              //go to register button
+              TextButton(
+                onPressed: () {
+                  context.read<AppBloc>().add(
+                        const AppEventGoToRegistration(),
+                      );
+                },
+                child: const Text('Crear cuenta nueva'),
+              ),
+              //const SizedBox(height: 55),
+            ],
           ),
         ),
       ),

@@ -16,7 +16,7 @@ class FirebaseCloudProvider implements CloudProvider {
     try {
       await rulebooks.doc(rulebookId).delete();
     } catch (e) {
-      throw CouldNotDeleteDocException();
+      throw CouldNotDeleteRulebookException();
     }
   }
 
@@ -27,7 +27,7 @@ class FirebaseCloudProvider implements CloudProvider {
     required String text,
   }) async {
     if (title.isEmpty || text.isEmpty) {
-      throw ChannelErrorDocException();
+      throw ChannelErrorRulebookException();
     }
     try {
       await rulebooks.doc(rulebookId).update({
@@ -35,7 +35,7 @@ class FirebaseCloudProvider implements CloudProvider {
         textFieldName: text,
       });
     } catch (e) {
-      throw CouldNotUpdateDocException();
+      throw CouldNotUpdateRulebooksException();
     }
   }
 
@@ -55,7 +55,7 @@ class FirebaseCloudProvider implements CloudProvider {
     required String text,
   }) async {
     if (title.isEmpty || text.isEmpty) {
-      throw ChannelErrorDocException();
+      throw ChannelErrorRulebookException();
     }
     final rulebook = await rulebooks.add({
       ownerUserIdFieldName: ownerUserId,

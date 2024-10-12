@@ -22,21 +22,18 @@ class FirebaseAuthProvider implements AuthProvider {
     required String password,
     required String passwordConfirmation,
   }) async {
+    if (passwordConfirmation.isEmpty || password.isEmpty || email.isEmpty) {
+      throw ChannelErrorAuthException();
+    }
+    if (password != passwordConfirmation) {
+      throw PasswordConfirmationDoesNotMatchAuthException();
+    }
     try {
-      if (password != passwordConfirmation) {
-        throw PasswordConfirmationDoesNotMatchAuthException();
-      } else {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-        final user = currentUser;
-        if (user != null) {
-          return user;
-        } else {
-          throw UserNotLoggedInAuthException();
-        }
-      }
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return currentUser!;
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'email-already-in-use':
@@ -52,6 +49,8 @@ class FirebaseAuthProvider implements AuthProvider {
         default:
           throw GenericAuthException();
       }
+    } catch (_) {
+      throw GenericAuthException();
     }
   }
 

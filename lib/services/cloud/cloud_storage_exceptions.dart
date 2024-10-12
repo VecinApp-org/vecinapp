@@ -2,12 +2,12 @@ class CloudStorageException implements Exception {
   const CloudStorageException();
 }
 
-class CouldNotCreateDocException extends CloudStorageException {}
+class CouldNotCreateRulebooksException extends CloudStorageException {}
 
-class CouldNotGetDocsException extends CloudStorageException {}
+class CouldNotGetRulebooksException extends CloudStorageException {}
 
-class CouldNotUpdateDocException extends CloudStorageException {}
+class CouldNotUpdateRulebooksException extends CloudStorageException {}
 
-class CouldNotDeleteDocException extends CloudStorageException {}
+class CouldNotDeleteRulebookException extends CloudStorageException {}
 
-class ChannelErrorDocException extends CloudStorageException {}
+class ChannelErrorRulebookException extends CloudStorageException {}

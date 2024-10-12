@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vecinapp/services/auth/auth_exceptions.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
-import 'package:vecinapp/utilities/dialogs/show_error_dialog.dart';
 import 'package:vecinapp/utilities/dialogs/show_notification_dialog.dart';
 
 class ForgotPasswordView extends StatefulWidget {
@@ -47,18 +45,6 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
               title: 'Revisa tu correo',
               content: 'Enviamos un correo para restablecer tu contraseña.',
             );
-          }
-          if (state.email != null) {
-            _controller = TextEditingController(text: state.email);
-          }
-          if (state.exception != null) {
-            if (state.exception is NetworkRequestFailedAuthException) {
-              showErrorDialog(context: context, text: 'No hay internet');
-            } else if (state.exception is ChannelErrorAuthException) {
-              showErrorDialog(context: context, text: 'Dejaste algo vacío');
-            } else {
-              showErrorDialog(context: context, text: 'Algo salio mal');
-            }
           }
         }
       },
