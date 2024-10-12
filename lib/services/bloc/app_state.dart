@@ -132,6 +132,13 @@ class AppStateViewingRulebookDetails extends AppState {
   }) : super(isLoading: isLoading, exception: exception);
 }
 
+class AppStateDeletingAccount extends AppState {
+  const AppStateDeletingAccount({
+    required bool isLoading,
+    required exception,
+  }) : super(isLoading: isLoading, exception: exception);
+}
+
 //EXTENSIONS
 extension GetRulebook on AppState {
   Rulebook? get rulebook {

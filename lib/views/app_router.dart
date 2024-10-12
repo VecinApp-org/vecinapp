@@ -6,6 +6,7 @@ import 'package:vecinapp/utilities/dialogs/show_error_dialog.dart';
 import 'package:vecinapp/utilities/loading/loading_screen.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
+import 'package:vecinapp/views/delete_account_view.dart';
 import 'package:vecinapp/views/home_view.dart';
 import 'package:vecinapp/views/login/forgot_password_view.dart';
 import 'package:vecinapp/views/login/login_view.dart';
@@ -107,6 +108,8 @@ class AppBlocRouter extends StatelessWidget {
           return EditRulebookView(rulebook: state.rulebook);
         } else if (state is AppStateViewingRulebookDetails) {
           return RulebookDetailsView(rulebook: state.rulebook);
+        } else if (state is AppStateDeletingAccount) {
+          return const DeleteAccountView();
         } else {
           return Container(); // This should never happen
         }

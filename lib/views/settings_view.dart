@@ -75,7 +75,7 @@ class SettingsView extends StatelessWidget {
               );
               if (confirmLogout == true && context.mounted) {
                 context.read<AppBloc>().add(
-                      const AppEventDeleteAccount(),
+                      const AppEventGoToDeleteAccountView(),
                     );
               }
             },

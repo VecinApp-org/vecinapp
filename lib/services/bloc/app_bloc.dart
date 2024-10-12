@@ -203,17 +203,22 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
         return;
       }
+      emit(const AppStateDeletingAccount(
+        isLoading: true,
+        exception: null,
+      ));
       try {
+        await _authProvider.logInWithEmailAndPassword(
+          email: user.email!,
+          password: event.password,
+        );
         await _authProvider.deleteAccount();
       } on AuthException catch (e) {
-        if (state is AppStateViewingHome) {
-          final actualUser = (state as AppStateViewingHome).user;
-          emit(AppStateViewingHome(
-            user: actualUser,
-            exception: e,
-            isLoading: false,
-          ));
-        }
+        emit(AppStateDeletingAccount(
+          isLoading: false,
+          exception: e,
+        ));
+        return;
       } catch (_) {
         rethrow;
       }
@@ -329,6 +334,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
     });
 
+    on<AppEventGoToDeleteAccountView>((event, emit) async {
+      final user = _authProvider.currentUser;
+      if (user == null) {
+        emit(const AppStateLoggingIn(
+          exception: null,
+          isLoading: false,
+        ));
+        return;
+      }
+      emit(const AppStateDeletingAccount(
+        isLoading: false,
+        exception: null,
+      ));
+    });
     //Cloud Events
     on<AppEventCreateOrUpdateRulebook>((event, emit) async {
       //check if user is logged in

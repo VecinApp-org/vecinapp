@@ -47,7 +47,8 @@ class AppEventLogOut extends AppEvent {
 }
 
 class AppEventDeleteAccount extends AppEvent {
-  const AppEventDeleteAccount();
+  final String password;
+  const AppEventDeleteAccount({required this.password});
 }
 
 class AppEventUserChanges extends AppEvent {
@@ -84,6 +85,10 @@ class AppEventGoToEditRulebookView extends AppEvent {
 class AppEventGoToRulebookDetailsView extends AppEvent {
   final Rulebook rulebook;
   const AppEventGoToRulebookDetailsView({required this.rulebook});
+}
+
+class AppEventGoToDeleteAccountView extends AppEvent {
+  const AppEventGoToDeleteAccountView();
 }
 
 // CLOUD EVENTS
