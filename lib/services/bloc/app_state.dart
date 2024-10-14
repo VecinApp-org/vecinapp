@@ -84,9 +84,7 @@ class AppStateResettingPassword extends AppState {
 
 //MAIN APP STATES
 class AppStateViewingHome extends AppState with EquatableMixin {
-  final AuthUser user;
   const AppStateViewingHome({
-    required this.user,
     required exception,
     required bool isLoading,
   }) : super(
@@ -98,7 +96,7 @@ class AppStateViewingHome extends AppState with EquatableMixin {
   List<Object?> get props => [exception, isLoading];
 }
 
-class AppStateViewingProfile extends AppState {
+class AppStateViewingProfile extends AppState with EquatableMixin {
   const AppStateViewingProfile({
     required AuthUser user,
     required bool isLoading,
@@ -108,6 +106,9 @@ class AppStateViewingProfile extends AppState {
           exception: exception,
           user: user,
         );
+
+  @override
+  List<Object?> get props => [user, exception, isLoading];
   @override
   String toString() {
     return 'AppStateViewingProfile{user: $user, isLoading: $isLoading, exception: $exception}';

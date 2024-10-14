@@ -57,6 +57,7 @@ class FirebaseAuthProvider implements AuthProvider {
   @override
   AuthUser? get currentUser {
     final user = FirebaseAuth.instance.currentUser;
+    devtools.log(user.toString());
     if (user != null) {
       return AuthUser.fromFirebase(user);
     } else {
@@ -159,29 +160,31 @@ class FirebaseAuthProvider implements AuthProvider {
 
   @override
   Future<AuthUser> confirmUserIsVerified() async {
-    final user = currentUser;
-    if (user != null) {
-      try {
-        await FirebaseAuth.instance.currentUser!.reload();
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'network-request-failed') {
-          throw NetworkRequestFailedAuthException();
-        } else {
-          throw GenericAuthException();
-        }
-      }
-      final userReloaded = currentUser;
-      if (userReloaded != null) {
-        if (userReloaded.isEmailVerified) {
-          return userReloaded;
-        } else {
-          throw UserNotVerifiedAuthException();
-        }
-      } else {
-        throw UserNotLoggedInAuthException();
-      }
-    } else {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
       throw UserNotLoggedInAuthException();
+    }
+
+    try {
+      await user.reload();
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'network-request-failed') {
+        throw NetworkRequestFailedAuthException();
+      } else {
+        throw GenericAuthException();
+      }
+    }
+
+    final userReloaded = currentUser;
+
+    if (userReloaded == null) {
+      throw UserNotLoggedInAuthException();
+    }
+
+    if (userReloaded.isEmailVerified) {
+      return userReloaded;
+    } else {
+      throw UserNotVerifiedAuthException();
     }
   }
 
@@ -201,5 +204,42 @@ class FirebaseAuthProvider implements AuthProvider {
     } catch (_) {
       throw GenericAuthException();
     }
+  }
+
+  @override
+  Future<AuthUser> updateUserDisplayName(String displayName) async {
+    final user = currentUser;
+    if (user == null) {
+      throw UserNotLoggedInAuthException();
+    }
+
+    if (displayName.isEmpty) {
+      throw ChannelErrorAuthException();
+    }
+
+    if (displayName == user.displayName) {
+      return user;
+    }
+
+    try {
+      await FirebaseAuth.instance.currentUser!.updateDisplayName(displayName);
+      await FirebaseAuth.instance.currentUser!.reload();
+    } on FirebaseAuthException catch (e) {
+      devtools.log(e.code.toString());
+      if (e.code == 'network-request-failed') {
+        throw NetworkRequestFailedAuthException();
+      } else {
+        throw GenericAuthException();
+      }
+    } catch (_) {
+      throw GenericAuthException();
+    }
+
+    final AuthUser? userReloaded = currentUser;
+    if (userReloaded == null) {
+      throw UserNotLoggedInAuthException();
+    }
+
+    return userReloaded;
   }
 }

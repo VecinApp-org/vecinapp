@@ -29,16 +29,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             isLoading: false,
           ),
         );
-      } else if (!user.isEmailVerified) {
+        return;
+      }
+
+      if (!user.isEmailVerified) {
         emit(AppStateNeedsVerification(
           user: user,
           exception: null,
           isLoading: false,
         ));
+        return;
       } else {
-        emit(AppStateViewingHome(
+        emit(const AppStateViewingHome(
           exception: null,
-          user: user,
           isLoading: false,
         ));
       }
@@ -107,9 +110,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     on<AppEventConfirmUserIsVerified>((event, emit) async {
       try {
-        final userVerified = await _authProvider.confirmUserIsVerified();
-        emit(AppStateViewingHome(
-          user: userVerified,
+        await _authProvider.confirmUserIsVerified();
+        emit(const AppStateViewingHome(
           exception: null,
           isLoading: false,
         ));
@@ -178,9 +180,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             isLoading: false,
           ));
         } else {
-          emit(AppStateViewingHome(
+          emit(const AppStateViewingHome(
             exception: null,
-            user: user,
             isLoading: false,
           ));
         }
@@ -257,6 +258,39 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
     });
 
+    on<AppEventUpdateUserDisplayName>((event, emit) async {
+      final user = _authProvider.currentUser;
+      if (user == null) {
+        emit(const AppStateLoggingIn(
+          exception: null,
+          isLoading: false,
+        ));
+        return;
+      }
+      emit(AppStateViewingProfile(
+        user: user,
+        exception: null,
+        isLoading: true,
+      ));
+      late final AuthUser updatedUser;
+      try {
+        updatedUser =
+            await _authProvider.updateUserDisplayName(event.displayName);
+      } on AuthException catch (e) {
+        emit(AppStateViewingProfile(
+          user: user,
+          exception: e,
+          isLoading: false,
+        ));
+        return;
+      }
+      emit(AppStateViewingProfile(
+        user: updatedUser,
+        exception: null,
+        isLoading: false,
+      ));
+    });
+
     //Main App Routing
     on<AppEventGoToHomeView>((event, emit) async {
       final user = _authProvider.currentUser;
@@ -266,8 +300,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           isLoading: false,
         ));
       } else {
-        emit(AppStateViewingHome(
-          user: user,
+        emit(const AppStateViewingHome(
           isLoading: false,
           exception: null,
         ));

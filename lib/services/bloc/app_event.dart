@@ -64,6 +64,11 @@ class AppEventSendPasswordResetEmail extends AppEvent {
   const AppEventSendPasswordResetEmail(this.email);
 }
 
+class AppEventUpdateUserDisplayName extends AppEvent {
+  final String displayName;
+  const AppEventUpdateUserDisplayName({required this.displayName});
+}
+
 // MAIN APP ROUTING EVENTS
 class AppEventGoToHomeView extends AppEvent {
   const AppEventGoToHomeView();

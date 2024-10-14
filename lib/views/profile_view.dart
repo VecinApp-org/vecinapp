@@ -3,8 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
-
-import 'dart:developer' as devtools show log;
+import 'package:vecinapp/utilities/dialogs/single_text_input_dialog.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
@@ -21,7 +20,18 @@ class ProfileView extends StatelessWidget {
       ),
       body: BlocBuilder<AppBloc, AppState>(
         builder: (context, state) {
-          devtools.log(state.toString());
+          String? phoneNumber = state.user!.phoneNumber;
+          if (phoneNumber == null || phoneNumber.isEmpty) {
+            phoneNumber = 'Sin Teléfono';
+          }
+          String? displayName = state.user!.displayName;
+          if (displayName == null || displayName.isEmpty) {
+            displayName = 'Sin Nombre';
+          }
+          String? email = state.user!.email;
+          if (email == null || email.isEmpty) {
+            email = 'Sin Email';
+          }
           return ListView(
             padding: const EdgeInsets.all(16.0),
             children: [
@@ -46,18 +56,30 @@ class ProfileView extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 32),
-              Text(state.user?.displayName ?? 'Sin Nombre',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headlineSmall),
+              InkWell(
+                onTap: () async {
+                  final newUserDisplayName = await showTextInputDialog(
+                    context: context,
+                    title: 'Cambiar nombre',
+                    hintText: 'Nombre',
+                  );
+                  if (newUserDisplayName != null && context.mounted) {
+                    context.read<AppBloc>().add(AppEventUpdateUserDisplayName(
+                        displayName: newUserDisplayName));
+                  }
+                },
+                child: Text(displayName,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineSmall),
+              ),
               const SizedBox(height: 32),
               ListTile(
                 leading: const Icon(Icons.alternate_email),
-                title: Text(state.user?.email ?? 'Sin email'),
+                title: Text(email),
               ),
               ListTile(
                 leading: const Icon(Icons.phone),
-                title:
-                    Text(state.user?.phoneNumber ?? 'Sin número de teléfono'),
+                title: Text(phoneNumber),
               ),
               const ListTile(
                 leading: Icon(Icons.home),
