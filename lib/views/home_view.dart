@@ -85,7 +85,7 @@ class HomeView extends StatelessWidget {
             child: InkWell(
               onTap: () {
                 context.read<AppBloc>().add(
-                      const AppEventGoToSettingsView(),
+                      const AppEventGoToProfileView(),
                     );
               },
               child: const CircleAvatar(

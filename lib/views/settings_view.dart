@@ -18,7 +18,7 @@ class SettingsView extends StatelessWidget {
         leading: BackButton(
           onPressed: () {
             context.read<AppBloc>().add(
-                  const AppEventGoToHomeView(),
+                  const AppEventGoToProfileView(),
                 );
           },
         ),
@@ -26,10 +26,12 @@ class SettingsView extends StatelessWidget {
       body: Column(
         children: [
           const SizedBox(height: 32),
-          const Text('Configuración', style: TextStyle(fontSize: 24)),
-          const SizedBox(height: 32),
+          //const Text('Configuración', style: TextStyle(fontSize: 24)),
+          //const SizedBox(height: 32),
+          const Divider(),
           ListTile(
-            title: const Text('Tema', style: TextStyle(fontSize: 20)),
+            leading: const Icon(Icons.light_mode_outlined),
+            title: const Text('Tema'),
             trailing: DropdownButton<ThemeMode>(
                 value: controller.themeMode,
                 onChanged: controller.updateThemeMode,
@@ -48,8 +50,9 @@ class SettingsView extends StatelessWidget {
                   )
                 ]),
           ),
-          //const Divider(),
+          const Divider(),
           const Spacer(),
+          const Divider(),
           const SizedBox(height: 32),
           TextButton(
             onPressed: () async {

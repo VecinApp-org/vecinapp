@@ -12,6 +12,7 @@ import 'package:vecinapp/views/login/forgot_password_view.dart';
 import 'package:vecinapp/views/login/login_view.dart';
 import 'package:vecinapp/views/login/register_view.dart';
 import 'package:vecinapp/views/login/verify_email_view.dart';
+import 'package:vecinapp/views/profile_view.dart';
 import 'package:vecinapp/views/rulebooks/edit_rulebook_view.dart';
 import 'package:vecinapp/views/rulebooks/rulebook_details_view.dart';
 import 'package:vecinapp/views/rulebooks/rulebooks_view.dart';
@@ -100,6 +101,8 @@ class AppBlocRouter extends StatelessWidget {
           return const VerifyEmailView();
         } else if (state is AppStateViewingHome) {
           return const HomeView();
+        } else if (state is AppStateViewingProfile) {
+          return const ProfileView();
         } else if (state is AppStateViewingSettings) {
           return SettingsView();
         } else if (state is AppStateViewingRulebooks) {

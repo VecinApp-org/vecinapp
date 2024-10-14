@@ -220,7 +220,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
         return;
       } catch (_) {
-        rethrow;
+        emit(AppStateDeletingAccount(
+          isLoading: false,
+          exception: GenericAuthException(),
+        ));
+        return;
       }
       emit(const AppStateLoggingIn(
         exception: null,
@@ -268,6 +272,22 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           exception: null,
         ));
       }
+    });
+
+    on<AppEventGoToProfileView>((event, emit) async {
+      final user = _authProvider.currentUser;
+      if (user == null) {
+        emit(const AppStateLoggingIn(
+          exception: null,
+          isLoading: false,
+        ));
+        return;
+      }
+      emit(AppStateViewingProfile(
+        user: user,
+        isLoading: false,
+        exception: null,
+      ));
     });
 
     on<AppEventGoToSettingsView>((event, emit) async {

@@ -98,6 +98,22 @@ class AppStateViewingHome extends AppState with EquatableMixin {
   List<Object?> get props => [exception, isLoading];
 }
 
+class AppStateViewingProfile extends AppState {
+  const AppStateViewingProfile({
+    required AuthUser user,
+    required bool isLoading,
+    required exception,
+  }) : super(
+          isLoading: isLoading,
+          exception: exception,
+          user: user,
+        );
+  @override
+  String toString() {
+    return 'AppStateViewingProfile{user: $user, isLoading: $isLoading, exception: $exception}';
+  }
+}
+
 class AppStateViewingSettings extends AppState {
   const AppStateViewingSettings({
     required bool isLoading,

@@ -69,6 +69,10 @@ class AppEventGoToHomeView extends AppEvent {
   const AppEventGoToHomeView();
 }
 
+class AppEventGoToProfileView extends AppEvent {
+  const AppEventGoToProfileView();
+}
+
 class AppEventGoToSettingsView extends AppEvent {
   const AppEventGoToSettingsView();
 }
