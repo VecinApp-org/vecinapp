@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vecinapp/services/cloud/firebase_cloud_provider.dart';
 import 'package:vecinapp/services/settings/settings_controller.dart';
+import 'package:vecinapp/services/storage/firebase_storage_provider.dart';
 import 'package:vecinapp/views/app_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 //import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -23,6 +24,7 @@ class VecinApp extends StatelessWidget {
           create: (context) => AppBloc(
             authProvider: FirebaseAuthProvider(),
             cloudProvider: FirebaseCloudProvider(),
+            storageProvider: FirebaseStorageProvider(),
           )..add(const AppEventInitialize()),
           child: MaterialApp(
             debugShowCheckedModeBanner: false,

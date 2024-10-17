@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
@@ -10,6 +11,7 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final picker = ImagePicker();
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
@@ -17,6 +19,28 @@ class ProfileView extends StatelessWidget {
             context.read<AppBloc>().add(const AppEventGoToHomeView());
           },
         ),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final image = await picker.pickImage(
+                source: ImageSource.gallery,
+              );
+              if (image == null) {
+                return;
+              }
+              if (context.mounted) {
+                context.read<AppBloc>().add(
+                      AppEventUpdateUserPhoto(
+                        imagePath: image.path,
+                      ),
+                    );
+              }
+            },
+            icon: const Icon(
+              Icons.upload,
+            ),
+          ),
+        ],
       ),
       body: BlocBuilder<AppBloc, AppState>(
         builder: (context, state) {
@@ -61,7 +85,7 @@ class ProfileView extends StatelessWidget {
                   final newUserDisplayName = await showTextInputDialog(
                     context: context,
                     title: 'Cambiar nombre',
-                    hintText: 'Nombre',
+                    hintText: state.user!.displayName ?? 'Ingresa tu nombre',
                   );
                   if (newUserDisplayName != null && context.mounted) {
                     context.read<AppBloc>().add(AppEventUpdateUserDisplayName(

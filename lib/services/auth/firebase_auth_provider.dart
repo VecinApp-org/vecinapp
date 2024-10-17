@@ -57,7 +57,6 @@ class FirebaseAuthProvider implements AuthProvider {
   @override
   AuthUser? get currentUser {
     final user = FirebaseAuth.instance.currentUser;
-    devtools.log(user.toString());
     if (user != null) {
       return AuthUser.fromFirebase(user);
     } else {
@@ -207,7 +206,7 @@ class FirebaseAuthProvider implements AuthProvider {
   }
 
   @override
-  Future<AuthUser> updateUserDisplayName(String displayName) async {
+  Future<void> updateUserDisplayName(String displayName) async {
     final user = currentUser;
     if (user == null) {
       throw UserNotLoggedInAuthException();
@@ -218,7 +217,7 @@ class FirebaseAuthProvider implements AuthProvider {
     }
 
     if (displayName == user.displayName) {
-      return user;
+      return;
     }
 
     try {
@@ -234,12 +233,37 @@ class FirebaseAuthProvider implements AuthProvider {
     } catch (_) {
       throw GenericAuthException();
     }
+  }
 
-    final AuthUser? userReloaded = currentUser;
-    if (userReloaded == null) {
+  @override
+  Future<void> updateUserPhotoUrl({required String photoUrl}) async {
+    final user = currentUser;
+    if (user == null) {
       throw UserNotLoggedInAuthException();
     }
 
-    return userReloaded;
+    if (photoUrl.isEmpty) {
+      throw ChannelErrorAuthException();
+    }
+
+    if (photoUrl == user.photoUrl) {
+      return;
+    }
+
+    try {
+      await FirebaseAuth.instance.currentUser!.updatePhotoURL(photoUrl);
+      await FirebaseAuth.instance.currentUser!.reload();
+    } on FirebaseAuthException catch (e) {
+      devtools.log(e.code.toString());
+      if (e.code == 'network-request-failed') {
+        throw NetworkRequestFailedAuthException();
+      } else {
+        devtools.log(e.code.toString());
+        throw GenericAuthException();
+      }
+    } catch (e) {
+      devtools.log(e.toString());
+      throw GenericAuthException();
+    }
   }
 }

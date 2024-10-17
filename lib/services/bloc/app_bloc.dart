@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
 import 'package:vecinapp/services/auth/auth_user.dart';
@@ -7,15 +9,20 @@ import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
+import 'package:vecinapp/services/storage/storage_exceptions.dart';
+import 'package:vecinapp/services/storage/storage_provider.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
   final AuthProvider _authProvider;
   final CloudProvider _cloudProvider;
+  final StorageProvider _storageProvider;
   AppBloc({
     required AuthProvider authProvider,
     required CloudProvider cloudProvider,
+    required StorageProvider storageProvider,
   })  : _authProvider = authProvider,
         _cloudProvider = cloudProvider,
+        _storageProvider = storageProvider,
         super(const AppStateUnInitalized(
           isLoading: true,
         )) {
@@ -272,10 +279,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         exception: null,
         isLoading: true,
       ));
-      late final AuthUser updatedUser;
+
       try {
-        updatedUser =
-            await _authProvider.updateUserDisplayName(event.displayName);
+        await _authProvider.updateUserDisplayName(event.displayName);
       } on AuthException catch (e) {
         emit(AppStateViewingProfile(
           user: user,
@@ -284,6 +290,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
         return;
       }
+
+      final AuthUser updatedUser = _authProvider.currentUser!;
       emit(AppStateViewingProfile(
         user: updatedUser,
         exception: null,
@@ -291,6 +299,51 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
     });
 
+    on<AppEventUpdateUserPhoto>((event, emit) async {
+      final user = _authProvider.currentUser;
+      if (user == null) {
+        emit(const AppStateLoggingIn(
+          exception: null,
+          isLoading: false,
+        ));
+        return;
+      }
+
+      emit(AppStateViewingProfile(
+        user: user,
+        exception: null,
+        isLoading: true,
+      ));
+
+      try {
+        final File image = File(event.imagePath);
+        final newphotoUrl = await _storageProvider.uploadProfileImage(
+          image: image,
+          userId: user.uid!,
+        );
+        await _authProvider.updateUserPhotoUrl(photoUrl: newphotoUrl);
+      } on StorageException catch (e) {
+        emit(AppStateViewingProfile(
+          user: user,
+          exception: e,
+          isLoading: false,
+        ));
+        return;
+      } on AuthException catch (e) {
+        emit(AppStateViewingProfile(
+          user: user,
+          exception: e,
+          isLoading: false,
+        ));
+        return;
+      }
+
+      emit(AppStateViewingProfile(
+        user: user,
+        exception: null,
+        isLoading: false,
+      ));
+    });
     //Main App Routing
     on<AppEventGoToHomeView>((event, emit) async {
       final user = _authProvider.currentUser;

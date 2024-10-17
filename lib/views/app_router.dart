@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
+import 'package:vecinapp/services/storage/storage_exceptions.dart';
 import 'package:vecinapp/utilities/dialogs/show_error_dialog.dart';
 import 'package:vecinapp/utilities/loading/loading_screen.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
@@ -79,8 +80,10 @@ class AppBlocRouter extends StatelessWidget {
             } else if (exception is ChannelErrorRulebookException) {
               message = 'Los reglamentos deben tener título y contenido';
             } else {
-              message = 'Error de almacenamiento desconocido';
+              message = 'Error de base de datos desconocido';
             }
+          } else if (exception is StorageException) {
+            message = 'Error de almacenamiento desconocido';
           } else {
             message = 'Error mitológico';
           }
