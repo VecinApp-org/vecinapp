@@ -10,7 +10,6 @@ import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
-import 'package:vecinapp/services/storage/storage_exceptions.dart';
 import 'package:vecinapp/services/storage/storage_provider.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
@@ -301,6 +300,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     on<AppEventUpdateUserPhoto>((event, emit) async {
+      //check if user is logged in
       final user = _authProvider.currentUser;
       if (user == null) {
         emit(const AppStateLoggingIn(
@@ -310,6 +310,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
 
+      //start loading
       emit(AppStateViewingProfile(
         user: user,
         exception: null,
@@ -319,19 +320,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       try {
         final File image = File(event.imagePath);
-        final newphotoUrl = await _storageProvider.uploadProfileImage(
+        await _storageProvider.uploadProfileImage(
           image: image,
           userId: user.uid!,
         );
-        await _authProvider.updateUserPhotoUrl(photoUrl: newphotoUrl);
-      } on StorageException catch (e) {
-        emit(AppStateViewingProfile(
-          user: user,
-          exception: e,
-          isLoading: false,
-        ));
-        return;
-      } on AuthException catch (e) {
+      } catch (e) {
         emit(AppStateViewingProfile(
           user: user,
           exception: e,
