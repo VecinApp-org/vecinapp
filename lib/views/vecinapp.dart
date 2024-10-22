@@ -17,26 +17,25 @@ class VecinApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: settingsController,
-      builder: (BuildContext context, Widget? child) {
-        return BlocProvider(
-          create: (context) => AppBloc(
-            authProvider: FirebaseAuthProvider(),
-            cloudProvider: FirebaseCloudProvider(),
-            storageProvider: FirebaseStorageProvider(),
-          )..add(const AppEventInitialize()),
-          child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            restorationScopeId: 'vecinapp',
-            //Theme
-            theme: lightTheme,
-            darkTheme: darkTheme,
-            themeMode: settingsController.themeMode,
-            home: const AppBlocRouter(),
-          ),
-        );
-      },
+    return BlocProvider(
+      create: (context) => AppBloc(
+        authProvider: FirebaseAuthProvider(),
+        cloudProvider: FirebaseCloudProvider(),
+        storageProvider: FirebaseStorageProvider(),
+      )..add(const AppEventInitialize()),
+      child: ListenableBuilder(
+          listenable: settingsController,
+          builder: (BuildContext context, Widget? child) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              restorationScopeId: 'vecinapp',
+              //Theme
+              theme: lightTheme,
+              darkTheme: darkTheme,
+              themeMode: settingsController.themeMode,
+              home: const AppBlocRouter(),
+            );
+          }),
     );
   }
 }

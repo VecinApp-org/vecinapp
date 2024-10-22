@@ -40,14 +40,14 @@ class AppStateRegistering extends AppState with EquatableMixin {
 }
 
 class AppStateNeedsVerification extends AppState with EquatableMixin {
-  final AuthUser user;
   const AppStateNeedsVerification({
-    required this.user,
+    required user,
     required bool isLoading,
     required exception,
   }) : super(
           isLoading: isLoading,
           exception: exception,
+          user: user,
         );
 
   @override
@@ -98,13 +98,15 @@ class AppStateViewingHome extends AppState with EquatableMixin {
 
 class AppStateViewingProfile extends AppState with EquatableMixin {
   const AppStateViewingProfile({
-    required AuthUser user,
     required bool isLoading,
     required exception,
+    required AuthUser user,
+    String? loadingText,
   }) : super(
           isLoading: isLoading,
           exception: exception,
           user: user,
+          loadingText: loadingText,
         );
 
   @override

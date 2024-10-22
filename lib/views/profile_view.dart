@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,6 +13,7 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final profilePicture = context.watch<AppBloc>().profilePicture();
     final picker = ImagePicker();
     return Scaffold(
       appBar: AppBar(
@@ -60,23 +63,33 @@ class ProfileView extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             children: [
               const SizedBox(height: 32),
-              Container(
-                width: 120,
-                height: 120,
-                clipBehavior: Clip.antiAlias,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.blue,
-                ),
-                child: Image.network(
-                  state.user?.photoUrl ?? '',
-                  errorBuilder: (context, error, stackTrace) {
-                    return Image.asset('assets/images/flutter_logo.png');
-                  },
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return const CircularProgressIndicator();
-                  },
+              Center(
+                child: Container(
+                  width: 120,
+                  height: 120,
+                  clipBehavior: Clip.antiAlias,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                  child: StreamBuilder(
+                      stream: profilePicture,
+                      builder: (context, snapshot) {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.done:
+                            if (snapshot.hasData) {
+                              return Image.memory(snapshot.data as Uint8List,
+                                  fit: BoxFit.cover);
+                            } else {
+                              return const Icon(Icons.person);
+                            }
+                          default:
+                            return const CircularProgressIndicator(
+                              strokeAlign: BorderSide.strokeAlignInside,
+                              strokeWidth: 4,
+                            );
+                        }
+                      }),
                 ),
               ),
               const SizedBox(height: 32),

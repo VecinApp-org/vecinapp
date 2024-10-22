@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
@@ -313,6 +314,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         user: user,
         exception: null,
         isLoading: true,
+        loadingText: 'Subiendo imagen...',
       ));
 
       try {
@@ -337,7 +339,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
         return;
       }
-
       emit(AppStateViewingProfile(
         user: user,
         exception: null,
@@ -557,5 +558,18 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         exception: null,
       ));
     });
+  }
+
+  Stream<Uint8List?> profilePicture() async* {
+    final user = _authProvider.currentUser;
+    if (user == null) {
+      yield null;
+      return;
+    }
+    try {
+      yield await _storageProvider.getProfileImage(userId: user.uid!);
+    } catch (e) {
+      yield null;
+    }
   }
 }
