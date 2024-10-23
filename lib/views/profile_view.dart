@@ -20,28 +20,6 @@ class ProfileView extends StatelessWidget {
             context.read<AppBloc>().add(const AppEventGoToHomeView());
           },
         ),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              final image = await picker.pickImage(
-                source: ImageSource.gallery,
-              );
-              if (image == null) {
-                return;
-              }
-              if (context.mounted) {
-                context.read<AppBloc>().add(
-                      AppEventUpdateUserPhoto(
-                        imagePath: image.path,
-                      ),
-                    );
-              }
-            },
-            icon: const Icon(
-              Icons.upload,
-            ),
-          ),
-        ],
       ),
       body: BlocBuilder<AppBloc, AppState>(
         builder: (context, state) {
@@ -61,9 +39,26 @@ class ProfileView extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             children: [
               const SizedBox(height: 32),
-              const Center(
-                child: ProfilePicture(
-                  radius: 60.0,
+              Center(
+                child: InkWell(
+                  onTap: () async {
+                    final image = await picker.pickImage(
+                      source: ImageSource.gallery,
+                    );
+                    if (image == null) {
+                      return;
+                    }
+                    if (context.mounted) {
+                      context.read<AppBloc>().add(
+                            AppEventUpdateUserPhoto(
+                              imagePath: image.path,
+                            ),
+                          );
+                    }
+                  },
+                  child: const ProfilePicture(
+                    radius: 60.0,
+                  ),
                 ),
               ),
               const SizedBox(height: 32),
