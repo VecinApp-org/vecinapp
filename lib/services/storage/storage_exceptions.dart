@@ -4,6 +4,8 @@ class StorageException implements Exception {
 
 class GenericStorageException implements StorageException {}
 
-class CouldNotUploadImageException implements StorageException {}
+class CouldNotUploadImageStorageException implements StorageException {}
 
 class ImageNotFoundStorageException implements StorageException {}
+
+class ImageTooLargeStorageException implements StorageException {}

@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:vecinapp/services/storage/storage_exceptions.dart';
 import 'package:vecinapp/services/storage/storage_provider.dart';
 import 'dart:developer' as devtools show log;
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class FirebaseStorageProvider implements StorageProvider {
   @override
@@ -15,22 +16,40 @@ class FirebaseStorageProvider implements StorageProvider {
     if (image.path.isEmpty) {
       throw GenericStorageException();
     }
+    const int maxSizeInBytes = 6 * 1024 * 1024;
+    if (image.lengthSync() > maxSizeInBytes) {
+      throw ImageTooLargeStorageException();
+    }
     try {
+      // compress the image
+      devtools.log('Compressing image...');
+      final compressedImage = await FlutterImageCompress.compressWithFile(
+        image.path,
+        minWidth: 500,
+        minHeight: 500,
+        quality: 80,
+      );
+
+      // check if the image is compressed
+      if (compressedImage == null) {
+        devtools.log('Failed to compress image...');
+        throw CouldNotUploadImageStorageException();
+      }
+      devtools.log('Compressed image...');
+      final cacheDir = await getApplicationDocumentsDirectory();
+      final cacheFile = File('${cacheDir.path}/$userId/profile_image');
       // upload the image to Firebase Storage
       await FirebaseStorage.instance
           .ref('user/$userId')
           .child('profile_image')
-          .putFile(image)
+          .putFile(cacheFile)
           .onError((error, stackTrace) => throw GenericStorageException());
       // save the image to the cache directory
-
-      final cacheDir = await getApplicationDocumentsDirectory();
-      final cacheFile = File('${cacheDir.path}/$userId/profile_image');
       cacheFile.createSync(recursive: true);
-      cacheFile.writeAsBytesSync(image.readAsBytesSync());
+      cacheFile.writeAsBytesSync(compressedImage);
     } on Exception catch (e) {
       devtools.log(e.toString() + e.hashCode.toString());
-      throw CouldNotUploadImageException();
+      rethrow;
     }
   }
 

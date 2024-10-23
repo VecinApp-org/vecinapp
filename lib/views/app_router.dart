@@ -83,7 +83,13 @@ class AppBlocRouter extends StatelessWidget {
               message = 'Error de base de datos desconocido';
             }
           } else if (exception is StorageException) {
-            message = 'Error de almacenamiento desconocido';
+            if (exception is ImageTooLargeStorageException) {
+              message = 'La imagen es demasiado grande';
+            } else if (exception is CouldNotUploadImageStorageException) {
+              message = 'No se pudo cargar la imagen';
+            } else {
+              message = 'Error de almacenamiento desconocido';
+            }
           } else {
             message = 'Error mitológico';
           }
