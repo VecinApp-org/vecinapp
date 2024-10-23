@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -7,13 +5,13 @@ import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
 import 'package:vecinapp/utilities/dialogs/single_text_input_dialog.dart';
+import 'package:vecinapp/utilities/widgets/profile_picture.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final profilePicture = context.watch<AppBloc>().profilePicture();
     final picker = ImagePicker();
     return Scaffold(
       appBar: AppBar(
@@ -63,51 +61,37 @@ class ProfileView extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             children: [
               const SizedBox(height: 32),
-              Center(
-                child: Container(
-                  width: 120,
-                  height: 120,
-                  clipBehavior: Clip.antiAlias,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                  ),
-                  child: StreamBuilder(
-                      stream: profilePicture,
-                      builder: (context, snapshot) {
-                        switch (snapshot.connectionState) {
-                          case ConnectionState.done:
-                            if (snapshot.hasData) {
-                              return Image.memory(snapshot.data as Uint8List,
-                                  fit: BoxFit.cover);
-                            } else {
-                              return const Icon(Icons.person);
-                            }
-                          default:
-                            return const CircularProgressIndicator(
-                              strokeAlign: BorderSide.strokeAlignInside,
-                              strokeWidth: 4,
-                            );
-                        }
-                      }),
+              const Center(
+                child: ProfilePicture(
+                  radius: 60.0,
                 ),
               ),
               const SizedBox(height: 32),
-              InkWell(
-                onTap: () async {
-                  final newUserDisplayName = await showTextInputDialog(
-                    context: context,
-                    title: 'Cambiar nombre',
-                    hintText: state.user!.displayName ?? 'Ingresa tu nombre',
-                  );
-                  if (newUserDisplayName != null && context.mounted) {
-                    context.read<AppBloc>().add(AppEventUpdateUserDisplayName(
-                        displayName: newUserDisplayName));
-                  }
-                },
-                child: Text(displayName,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineSmall),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(width: 50),
+                  Text(displayName,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineSmall),
+                  IconButton(
+                    onPressed: () async {
+                      final newUserDisplayName = await showTextInputDialog(
+                        context: context,
+                        initialValue: state.user!.displayName,
+                        title: 'Cambiar nombre',
+                        hintText: 'Nombre',
+                      );
+                      if (newUserDisplayName != null && context.mounted) {
+                        context.read<AppBloc>().add(
+                            AppEventUpdateUserDisplayName(
+                                displayName: newUserDisplayName));
+                      }
+                    },
+                    icon: const Icon(Icons.edit),
+                  )
+                ],
               ),
               const SizedBox(height: 32),
               ListTile(

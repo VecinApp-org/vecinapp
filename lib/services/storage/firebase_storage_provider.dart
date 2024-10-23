@@ -36,7 +36,6 @@ class FirebaseStorageProvider implements StorageProvider {
 
   @override
   Future<Uint8List> getProfileImage({required String userId}) async {
-    devtools.log('Getting image');
     // create a cache directory
     final cacheDir = await getApplicationDocumentsDirectory();
     final cacheFile = File('${cacheDir.path}/$userId/profile_image');

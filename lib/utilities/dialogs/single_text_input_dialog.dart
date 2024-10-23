@@ -4,8 +4,9 @@ Future<String?> showTextInputDialog({
   required BuildContext context,
   required String title,
   required String hintText,
+  required String? initialValue,
 }) {
-  final controller = TextEditingController();
+  final controller = TextEditingController(text: initialValue);
 
   return showDialog<String>(
     context: context,
@@ -13,6 +14,7 @@ Future<String?> showTextInputDialog({
       return AlertDialog(
         title: Text(title),
         content: TextField(
+          autofocus: true,
           controller: controller,
           decoration: InputDecoration(
             hintText: hintText,

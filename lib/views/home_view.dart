@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
+import 'package:vecinapp/utilities/widgets/profile_picture.dart';
 
 List<String> pages = [
   //'Anuncios',
@@ -88,9 +89,7 @@ class HomeView extends StatelessWidget {
                       const AppEventGoToProfileView(),
                     );
               },
-              child: const CircleAvatar(
-                child: Icon(Icons.person),
-              ),
+              child: const ProfilePicture(radius: 20),
             ),
           ),
         ],
