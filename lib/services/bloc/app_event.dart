@@ -69,11 +69,6 @@ class AppEventUpdateUserDisplayName extends AppEvent {
   const AppEventUpdateUserDisplayName({required this.displayName});
 }
 
-class AppEventUpdateProfilePhoto extends AppEvent {
-  final String imagePath;
-  const AppEventUpdateProfilePhoto({required this.imagePath});
-}
-
 // MAIN APP ROUTING EVENTS
 class AppEventGoToHomeView extends AppEvent {
   const AppEventGoToHomeView();
@@ -121,4 +116,9 @@ class AppEventDeleteRulebook extends AppEvent {
 
 class AppEventDeleteProfilePhoto extends AppEvent {
   const AppEventDeleteProfilePhoto();
+}
+
+class AppEventUpdateProfilePhoto extends AppEvent {
+  final String imagePath;
+  const AppEventUpdateProfilePhoto({required this.imagePath});
 }
