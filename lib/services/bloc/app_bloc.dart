@@ -299,45 +299,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
     });
 
-    on<AppEventUpdateUserPhoto>((event, emit) async {
-      //check if user is logged in
-      final user = _authProvider.currentUser;
-      if (user == null) {
-        emit(const AppStateLoggingIn(
-          exception: null,
-          isLoading: false,
-        ));
-        return;
-      }
-
-      //start loading
-      emit(AppStateViewingProfile(
-        user: user,
-        exception: null,
-        isLoading: true,
-        loadingText: 'Subiendo imagen...',
-      ));
-
-      try {
-        final File image = File(event.imagePath);
-        await _storageProvider.uploadProfileImage(
-          image: image,
-          userId: user.uid!,
-        );
-      } catch (e) {
-        emit(AppStateViewingProfile(
-          user: user,
-          exception: e,
-          isLoading: false,
-        ));
-        return;
-      }
-      emit(AppStateViewingProfile(
-        user: user,
-        exception: null,
-        isLoading: false,
-      ));
-    });
     //Main App Routing
     on<AppEventGoToHomeView>((event, emit) async {
       final user = _authProvider.currentUser;
@@ -551,6 +512,84 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         exception: null,
       ));
     });
+
+    on<AppEventUpdateUserPhoto>((event, emit) async {
+      //check if user is logged in
+      final user = _authProvider.currentUser;
+      if (user == null) {
+        emit(const AppStateLoggingIn(
+          exception: null,
+          isLoading: false,
+        ));
+        return;
+      }
+
+      //start loading
+      emit(AppStateViewingProfile(
+        user: user,
+        exception: null,
+        isLoading: true,
+        loadingText: 'Subiendo imagen...',
+      ));
+
+      try {
+        final File image = File(event.imagePath);
+        await _storageProvider.uploadProfileImage(
+          image: image,
+          userId: user.uid!,
+        );
+      } catch (e) {
+        emit(AppStateViewingProfile(
+          user: user,
+          exception: e,
+          isLoading: false,
+        ));
+        return;
+      }
+      emit(AppStateViewingProfile(
+        user: user,
+        exception: null,
+        isLoading: false,
+      ));
+    });
+
+    on<AppEventDeleteProfilePhoto>(
+      (event, emit) async {
+        //check if user is logged in
+        final user = _authProvider.currentUser;
+        if (user == null) {
+          emit(const AppStateLoggingIn(
+            exception: null,
+            isLoading: false,
+          ));
+          return;
+        }
+
+        //start loading
+        emit(AppStateViewingProfile(
+          user: user,
+          exception: null,
+          isLoading: true,
+          loadingText: 'Eliminando imagen...',
+        ));
+
+        try {
+          await _storageProvider.deleteProfileImage(userId: user.uid!);
+        } catch (e) {
+          emit(AppStateViewingProfile(
+            user: user,
+            exception: e,
+            isLoading: false,
+          ));
+        }
+
+        emit(AppStateViewingProfile(
+          user: user,
+          exception: null,
+          isLoading: false,
+        ));
+      },
+    );
   }
 
   Stream<Uint8List?> profilePicture() async* {

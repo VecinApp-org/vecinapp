@@ -20,6 +20,14 @@ class ProfileView extends StatelessWidget {
             context.read<AppBloc>().add(const AppEventGoToHomeView());
           },
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              context.read<AppBloc>().add(const AppEventDeleteProfilePhoto());
+            },
+            icon: const Icon(Icons.delete),
+          )
+        ],
       ),
       body: BlocBuilder<AppBloc, AppState>(
         builder: (context, state) {

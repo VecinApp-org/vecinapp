@@ -118,3 +118,7 @@ class AppEventCreateOrUpdateRulebook extends AppEvent {
 class AppEventDeleteRulebook extends AppEvent {
   const AppEventDeleteRulebook();
 }
+
+class AppEventDeleteProfilePhoto extends AppEvent {
+  const AppEventDeleteProfilePhoto();
+}

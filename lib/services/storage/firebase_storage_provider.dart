@@ -98,4 +98,20 @@ class FirebaseStorageProvider implements StorageProvider {
       rethrow;
     }
   }
+
+  @override
+  Future<void> deleteProfileImage({required String userId}) async {
+    // delete the image from Firebase Storage
+    await FirebaseStorage.instance
+        .ref('user/$userId')
+        .child('profile_image')
+        .delete()
+        .then((value) => devtools.log('Profile image deleted'))
+        .onError((error, stackTrace) => devtools.log(error.toString()));
+
+    // delete the image from the cache directory
+    final cacheDir = await getApplicationDocumentsDirectory();
+    final cacheFile = File('${cacheDir.path}/$userId/profile_image');
+    cacheFile.deleteSync();
+  }
 }
