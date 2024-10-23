@@ -58,7 +58,7 @@ class ProfileView extends StatelessWidget {
                     }
                     if (context.mounted) {
                       context.read<AppBloc>().add(
-                            AppEventUpdateUserPhoto(
+                            AppEventUpdateProfilePhoto(
                               imagePath: image.path,
                             ),
                           );

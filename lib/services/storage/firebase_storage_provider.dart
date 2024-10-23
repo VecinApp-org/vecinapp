@@ -13,9 +13,7 @@ class FirebaseStorageProvider implements StorageProvider {
     required File image,
     required String userId,
   }) async {
-    if (image.path.isEmpty) {
-      throw GenericStorageException();
-    }
+    // check if the image is too large
     const int maxSizeInBytes = 6 * 1024 * 1024;
     if (image.lengthSync() > maxSizeInBytes) {
       throw ImageTooLargeStorageException();
@@ -25,16 +23,15 @@ class FirebaseStorageProvider implements StorageProvider {
       devtools.log('Compressing image...');
       final compressedImage = await FlutterImageCompress.compressWithFile(
         image.path,
-        minWidth: 500,
-        minHeight: 500,
-        quality: 80,
+        minWidth: 200,
+        minHeight: 200,
       );
-
       // check if the image is compressed
       if (compressedImage == null) {
         devtools.log('Failed to compress image...');
         throw CouldNotUploadImageStorageException();
       }
+      // create a temporary file
       final tempDir = await getTemporaryDirectory();
       final tempFile = File('${tempDir.path}/temp_image');
       await tempFile.writeAsBytes(compressedImage);
@@ -43,8 +40,7 @@ class FirebaseStorageProvider implements StorageProvider {
       await FirebaseStorage.instance
           .ref('user/$userId')
           .child('profile_image')
-          .putFile(tempFile)
-          .onError((error, stackTrace) => throw GenericStorageException());
+          .putFile(tempFile);
       // delete the temporary file
       await tempFile.delete();
       // save the image to the cache directory
@@ -53,9 +49,18 @@ class FirebaseStorageProvider implements StorageProvider {
       final cacheFile = File('${cacheDir.path}/$userId/profile_image');
       cacheFile.createSync(recursive: true);
       cacheFile.writeAsBytesSync(compressedImage);
+    } on FirebaseException catch (e) {
+      switch (e.code) {
+        case 'object-not-found':
+          throw ImageNotFoundStorageException();
+        case 'network-request-failed':
+          throw CouldNotUploadImageStorageException();
+        default:
+          throw GenericStorageException();
+      }
     } on Exception catch (e) {
       devtools.log(e.toString() + e.hashCode.toString());
-      rethrow;
+      throw GenericStorageException();
     }
   }
 

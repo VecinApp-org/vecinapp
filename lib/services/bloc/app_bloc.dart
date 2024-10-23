@@ -513,7 +513,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
     });
 
-    on<AppEventUpdateUserPhoto>((event, emit) async {
+    on<AppEventUpdateProfilePhoto>((event, emit) async {
       //check if user is logged in
       final user = _authProvider.currentUser;
       if (user == null) {

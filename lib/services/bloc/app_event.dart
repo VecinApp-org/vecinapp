@@ -69,9 +69,9 @@ class AppEventUpdateUserDisplayName extends AppEvent {
   const AppEventUpdateUserDisplayName({required this.displayName});
 }
 
-class AppEventUpdateUserPhoto extends AppEvent {
+class AppEventUpdateProfilePhoto extends AppEvent {
   final String imagePath;
-  const AppEventUpdateUserPhoto({required this.imagePath});
+  const AppEventUpdateProfilePhoto({required this.imagePath});
 }
 
 // MAIN APP ROUTING EVENTS
