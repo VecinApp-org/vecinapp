@@ -35,16 +35,22 @@ class FirebaseStorageProvider implements StorageProvider {
         devtools.log('Failed to compress image...');
         throw CouldNotUploadImageStorageException();
       }
-      devtools.log('Compressed image...');
-      final cacheDir = await getApplicationDocumentsDirectory();
-      final cacheFile = File('${cacheDir.path}/$userId/profile_image');
+      final tempDir = await getTemporaryDirectory();
+      final tempFile = File('${tempDir.path}/temp_image');
+      await tempFile.writeAsBytes(compressedImage);
       // upload the image to Firebase Storage
+      devtools.log('Uploading image...');
       await FirebaseStorage.instance
           .ref('user/$userId')
           .child('profile_image')
-          .putFile(cacheFile)
+          .putFile(tempFile)
           .onError((error, stackTrace) => throw GenericStorageException());
+      // delete the temporary file
+      await tempFile.delete();
       // save the image to the cache directory
+      devtools.log('Saving image to cache directory...');
+      final cacheDir = await getApplicationDocumentsDirectory();
+      final cacheFile = File('${cacheDir.path}/$userId/profile_image');
       cacheFile.createSync(recursive: true);
       cacheFile.writeAsBytesSync(compressedImage);
     } on Exception catch (e) {
@@ -73,7 +79,7 @@ class FirebaseStorageProvider implements StorageProvider {
           .then((value) => value as Uint8List)
           .onError((error, stackTrace) {
         if (error is FirebaseException) {
-          if (error.code == 'storage/object-not-found') {
+          if (error.code == 'object-not-found') {
             throw ImageNotFoundStorageException();
           }
           devtools.log('Firebase Storage Error: ${error.toString()}');
