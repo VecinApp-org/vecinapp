@@ -5,8 +5,6 @@ import 'package:vecinapp/services/cloud/cloud_constants.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
 
 class FirebaseCloudProvider implements CloudProvider {
-  Future<void> initialize() async {}
-
   final rulebooks = FirebaseFirestore.instance.collection('docs');
 
   @override
