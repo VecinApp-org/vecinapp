@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_user.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
@@ -13,7 +14,6 @@ class FirebaseCloudProvider implements CloudProvider {
       FirebaseFirestore.instance.collection(neighborhoodsCollectionName);
   final home = FirebaseFirestore.instance.collection(homesCollectionName);
   final users = FirebaseFirestore.instance.collection(usersCollectionName);
-  late final CloudUser? _cachedCloudUser;
 
   @override
   Future<void> deleteRulebook({
@@ -78,45 +78,25 @@ class FirebaseCloudProvider implements CloudProvider {
     );
   }
 
-  void _ensureInitialized() {
-    if (_cachedCloudUser == null) {
-      throw CloudProviderNotInitializedException();
-    }
-  }
-
   @override
   Future<void> initialize({required String? userId}) async {
-    devtools.log('Initializing Firebase Cloud Provider... $userId');
-    if (userId == null) {
-      _cachedCloudUser = null;
-      return;
-    }
-
-    try {
-      // check if the user exists
-      final userDoc = await users.doc(userId).get();
-      if (!userDoc.exists) {
-        _cachedCloudUser = null;
-        return;
-      }
-      // get the cloud user
-      _cachedCloudUser = await users.doc(userId).get().then((value) {
-        devtools.log('Cloud user: $value');
-        return CloudUser.fromFirebase(value);
-      }).onError((error, stackTrace) {
-        devtools.log(error.toString());
-        throw CouldNotInitializeCloudProviderException();
-      });
-    } catch (_) {
-      _cachedCloudUser = null;
-    }
+    await users.doc(userId).get();
   }
 
   @override
-  CloudUser? get currentUser {
-    return _cachedCloudUser;
+  Future<CloudUser?> get currentCloudUser async {
+    final authUser = FirebaseAuth.instance.currentUser;
+    if (authUser == null) {
+      return null;
+    }
+    final cloudUserDoc = users.doc(authUser.uid);
+
+    return await cloudUserDoc.get().then((value) {
+      return CloudUser.fromFirebase(value);
+    });
   }
 
+  @override
   Future<CloudUser> createCloudUser({
     required String userId,
     required String displayName,
@@ -125,17 +105,22 @@ class FirebaseCloudProvider implements CloudProvider {
     if (displayName.isEmpty) {
       throw ChannelErrorRulebookException();
     }
-    final cloudUser = users.doc(userId);
 
-    await cloudUser.set({
-      userDisplayNameFieldName: displayName,
-    }).onError((error, stackTrace) => throw CouldNotCreateCloudUserException());
-
-    final fetchedUser = await cloudUser.get();
-
-    _cachedCloudUser = CloudUser.fromFirebase(fetchedUser);
-
-    return currentUser!;
+    try {
+      await users.doc(userId).set({
+        userDisplayNameFieldName: displayName,
+      });
+    } on CloudException catch (e) {
+      devtools.log(
+          'Could not create cloud user ${e.runtimeType}/${e.hashCode}/${e.toString()}');
+      throw CouldNotCreateCloudUserException();
+    } catch (e) {
+      devtools.log(
+          'Could not create cloud user ${e.runtimeType}/${e.hashCode}/${e.toString()}');
+      throw CouldNotCreateCloudUserException();
+    }
+    final cloudUser = await currentCloudUser;
+    return cloudUser!;
   }
 
   Future<void> updateUserDisplayName({

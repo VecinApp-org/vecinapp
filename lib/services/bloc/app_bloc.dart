@@ -46,9 +46,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
 
-      final cloudUser = _cloudProvider.currentUser;
+      final cloudUser = await _cloudProvider.currentCloudUser;
 
-      if (cloudUser == null) {
+      if (cloudUser == null || cloudUser.displayName == null) {
         emit(const AppStateCreatingCloudUser(
           isLoading: false,
           exception: null,
@@ -425,7 +425,33 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         exception: null,
       ));
     });
+
     //Cloud Events
+    on<AppEventCreateCloudUser>((event, emit) async {
+      final user = _authProvider.currentUser!;
+      //enable loading indicator
+      emit(AppStateCreatingCloudUser(
+        isLoading: true,
+        exception: null,
+      ));
+      try {
+        await _cloudProvider.createCloudUser(
+          userId: user.uid!,
+          displayName: event.displayName,
+        );
+      } catch (e) {
+        emit(AppStateCreatingCloudUser(
+          isLoading: false,
+          exception: e,
+        ));
+        return;
+      }
+      emit(const AppStateSelectingHomeAddress(
+        isLoading: false,
+        exception: null,
+      ));
+    });
+
     on<AppEventCreateOrUpdateRulebook>((event, emit) async {
       //check if user is logged in
       final user = _authProvider.currentUser;

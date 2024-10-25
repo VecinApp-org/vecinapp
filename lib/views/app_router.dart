@@ -23,6 +23,8 @@ import 'package:vecinapp/views/rulebooks/rulebooks_view.dart';
 import 'package:vecinapp/views/settings_view.dart';
 import 'dart:developer' as devtools show log;
 
+import 'package:vecinapp/views/splash_view.dart';
+
 class AppBlocRouter extends StatelessWidget {
   const AppBlocRouter({super.key});
 
@@ -104,7 +106,9 @@ class AppBlocRouter extends StatelessWidget {
       },
       builder: (context, state) {
         devtools.log(state.toString());
-        if (state is AppStateRegistering) {
+        if (state is AppStateUnInitalized) {
+          return const SplashView();
+        } else if (state is AppStateRegistering) {
           return const RegisterView();
         } else if (state is AppStateLoggingIn) {
           return const LoginView();

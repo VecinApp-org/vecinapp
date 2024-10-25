@@ -7,7 +7,13 @@ abstract class CloudProvider {
   Future<void> initialize({
     required String? userId,
   });
-  CloudUser? get currentUser;
+  Future<CloudUser?> get currentCloudUser;
+
+  Future<CloudUser> createCloudUser({
+    required String userId,
+    required String displayName,
+  });
+
   Stream<Iterable<Rulebook>> allRulebooks({
     required String ownerUserId,
   });

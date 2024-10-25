@@ -71,10 +71,8 @@ class AppEventUpdateUserDisplayName extends AppEvent {
 
 // CLOUD REGISTRATION EVENTS
 class AppEventCreateCloudUser extends AppEvent {
-  final String userId;
   final String displayName;
   const AppEventCreateCloudUser({
-    required this.userId,
     required this.displayName,
   });
 }
