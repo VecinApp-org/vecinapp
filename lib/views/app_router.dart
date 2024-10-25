@@ -7,6 +7,9 @@ import 'package:vecinapp/utilities/dialogs/show_error_dialog.dart';
 import 'package:vecinapp/utilities/loading/loading_screen.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
+import 'package:vecinapp/views/cloud_login/find_address_view.dart';
+import 'package:vecinapp/views/cloud_login/no_neighborhood_view.dart';
+import 'package:vecinapp/views/cloud_login/register_cloud_user_view.dart';
 import 'package:vecinapp/views/delete_account_view.dart';
 import 'package:vecinapp/views/home_view.dart';
 import 'package:vecinapp/views/login/forgot_password_view.dart';
@@ -100,6 +103,7 @@ class AppBlocRouter extends StatelessWidget {
         }
       },
       builder: (context, state) {
+        devtools.log(state.toString());
         if (state is AppStateRegistering) {
           return const RegisterView();
         } else if (state is AppStateLoggingIn) {
@@ -122,6 +126,12 @@ class AppBlocRouter extends StatelessWidget {
           return RulebookDetailsView(rulebook: state.rulebook);
         } else if (state is AppStateDeletingAccount) {
           return const DeleteAccountView();
+        } else if (state is AppStateCreatingCloudUser) {
+          return const RegisterCloudUserView();
+        } else if (state is AppStateSelectingHomeAddress) {
+          return const FindAddressView();
+        } else if (state is AppStateNoNeighborhood) {
+          return const NoNeighborhoodView();
         } else {
           return Container(); // This should never happen
         }

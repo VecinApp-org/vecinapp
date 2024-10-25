@@ -17,9 +17,9 @@ class Rulebook {
 
   Rulebook.fromSnapshot(QueryDocumentSnapshot<Map<String, dynamic>> snapshot)
       : id = snapshot.id,
-        ownerUserId = snapshot.data()[ownerUserIdFieldName],
-        title = snapshot.data()[titleFieldName] as String,
-        text = snapshot.data()[textFieldName] as String;
+        ownerUserId = snapshot.data()[rulebookOwnerUserIdFieldName],
+        title = snapshot.data()[rulebookTitleFieldName] as String,
+        text = snapshot.data()[rulebookTextFieldName] as String;
 
   @override
   String toString() =>

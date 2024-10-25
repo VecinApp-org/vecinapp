@@ -41,13 +41,11 @@ class AppStateRegistering extends AppState with EquatableMixin {
 
 class AppStateNeedsVerification extends AppState with EquatableMixin {
   const AppStateNeedsVerification({
-    required user,
     required bool isLoading,
     required exception,
   }) : super(
           isLoading: isLoading,
           exception: exception,
-          user: user,
         );
 
   @override
@@ -80,6 +78,32 @@ class AppStateResettingPassword extends AppState {
           isLoading: isLoading,
           exception: exception,
         );
+}
+
+//CLOUD REGISTRATION STATES
+class AppStateCreatingCloudUser extends AppState with EquatableMixin {
+  const AppStateCreatingCloudUser({
+    required bool isLoading,
+    required exception,
+  }) : super(isLoading: isLoading, exception: exception);
+
+  @override
+  List<Object?> get props => [exception, isLoading];
+}
+
+class AppStateSelectingHomeAddress extends AppState with EquatableMixin {
+  const AppStateSelectingHomeAddress({
+    required bool isLoading,
+    required exception,
+  }) : super(isLoading: isLoading, exception: exception);
+
+  @override
+  List<Object?> get props => [exception, isLoading];
+}
+
+class AppStateNoNeighborhood extends AppState {
+  const AppStateNoNeighborhood({required bool isLoading, required exception})
+      : super(isLoading: isLoading, exception: exception);
 }
 
 //MAIN APP STATES

@@ -69,6 +69,32 @@ class AppEventUpdateUserDisplayName extends AppEvent {
   const AppEventUpdateUserDisplayName({required this.displayName});
 }
 
+// CLOUD REGISTRATION EVENTS
+class AppEventCreateCloudUser extends AppEvent {
+  final String userId;
+  final String displayName;
+  const AppEventCreateCloudUser({
+    required this.userId,
+    required this.displayName,
+  });
+}
+
+class AppEventEnterHomeAddress extends AppEvent {
+  final String country;
+  final String state;
+  final String municipality;
+  final String postalCode;
+  final String street;
+  final String number;
+  const AppEventEnterHomeAddress(
+      {required this.country,
+      required this.state,
+      required this.municipality,
+      required this.postalCode,
+      required this.street,
+      required this.number});
+}
+
 // MAIN APP ROUTING EVENTS
 class AppEventGoToHomeView extends AppEvent {
   const AppEventGoToHomeView();

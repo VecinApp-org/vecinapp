@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
-import 'package:vecinapp/services/auth/auth_user.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
 import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
@@ -41,17 +40,41 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       if (!user.isEmailVerified) {
         emit(AppStateNeedsVerification(
-          user: user,
           exception: null,
           isLoading: false,
         ));
         return;
-      } else {
-        emit(const AppStateViewingHome(
-          exception: null,
-          isLoading: false,
-        ));
       }
+
+      final cloudUser = _cloudProvider.currentUser;
+
+      if (cloudUser == null) {
+        emit(const AppStateCreatingCloudUser(
+          isLoading: false,
+          exception: null,
+        ));
+        return;
+      }
+
+      if (cloudUser.homeId == null) {
+        emit(const AppStateSelectingHomeAddress(
+          isLoading: false,
+          exception: null,
+        ));
+        return;
+      }
+
+      if (cloudUser.neighborhoodId == null) {
+        emit(const AppStateNoNeighborhood(
+          isLoading: false,
+          exception: null,
+        ));
+        return;
+      }
+      emit(const AppStateViewingHome(
+        exception: null,
+        isLoading: false,
+      ));
     });
 
     //Authentication Routing Events
@@ -84,13 +107,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final email = event.email;
       final password = event.password;
       final passwordConfirmation = event.passwordConfirmation;
-      late final AuthUser user;
       try {
         emit(const AppStateRegistering(
           exception: null,
           isLoading: true,
         ));
-        user = await _authProvider.createUser(
+        await _authProvider.createUser(
           email: email,
           password: password,
           passwordConfirmation: passwordConfirmation,
@@ -104,7 +126,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       emit(AppStateNeedsVerification(
-        user: user,
         exception: null,
         isLoading: false,
       ));
@@ -118,16 +139,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppEventConfirmUserIsVerified>((event, emit) async {
       try {
         await _authProvider.confirmUserIsVerified();
-        emit(const AppStateViewingHome(
+        emit(const AppStateCreatingCloudUser(
           exception: null,
           isLoading: false,
         ));
       } on AuthException catch (e) {
-        final user = _authProvider.currentUser!;
         if (e is UserNotVerifiedAuthException) {
           emit(
             AppStateNeedsVerification(
-              user: user,
               isLoading: false,
               exception: e,
             ),
@@ -135,7 +154,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         } else if (e is NetworkRequestFailedAuthException) {
           emit(
             AppStateNeedsVerification(
-              user: user,
               isLoading: false,
               exception: e,
             ),
@@ -143,7 +161,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         } else if (e is GenericAuthException) {
           emit(
             AppStateNeedsVerification(
-              user: user,
               isLoading: false,
               exception: e,
             ),
@@ -182,7 +199,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         //check if email is verified
         if (!user.isEmailVerified) {
           emit(AppStateNeedsVerification(
-            user: user,
             exception: null,
             isLoading: false,
           ));
@@ -291,7 +307,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
 
-      final AuthUser updatedUser = _authProvider.currentUser!;
+      final updatedUser = _authProvider.currentUser!;
       emit(AppStateViewingProfile(
         user: updatedUser,
         exception: null,
