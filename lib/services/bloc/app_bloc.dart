@@ -282,59 +282,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
     });
 
-    on<AppEventUpdateUserDisplayName>((event, emit) async {
-      //check if user is logged in
-      final user = _authProvider.currentUser;
-      if (user == null) {
-        emit(const AppStateLoggingIn(
-          exception: null,
-          isLoading: false,
-        ));
-        return;
-      }
-      //check if user is logged in to cloud
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      if (cloudUser == null) {
-        emit(const AppStateCreatingCloudUser(
-          exception: null,
-          isLoading: false,
-        ));
-        return;
-      }
-      //start loading
-      emit(AppStateViewingProfile(
-        cloudUser: cloudUser,
-        user: user,
-        exception: null,
-        isLoading: true,
-      ));
-
-      //update display name
-      try {
-        await _cloudProvider.updateUserDisplayName(
-          displayName: event.displayName,
-        );
-      } catch (e) {
-        //notify user of error
-        emit(AppStateViewingProfile(
-          cloudUser: cloudUser,
-          user: user,
-          exception: e,
-          isLoading: false,
-        ));
-        return;
-      }
-      //notify user of success
-      final updatedUser = await _cloudProvider.currentCloudUser;
-
-      emit(AppStateViewingProfile(
-        cloudUser: updatedUser!,
-        user: user,
-        exception: null,
-        isLoading: false,
-      ));
-    });
-
     //Neighborhood Routing
     on<AppEventGoToNeighborhoodView>((event, emit) async {
       final user = _authProvider.currentUser;
@@ -575,6 +522,59 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(AppStateViewingNeighborhood(
         isLoading: false,
         exception: null,
+      ));
+    });
+
+    on<AppEventUpdateUserDisplayName>((event, emit) async {
+      //check if user is logged in
+      final user = _authProvider.currentUser;
+      if (user == null) {
+        emit(const AppStateLoggingIn(
+          exception: null,
+          isLoading: false,
+        ));
+        return;
+      }
+      //check if user is logged in to cloud
+      final cloudUser = await _cloudProvider.cachedCloudUser;
+      if (cloudUser == null) {
+        emit(const AppStateCreatingCloudUser(
+          exception: null,
+          isLoading: false,
+        ));
+        return;
+      }
+      //start loading
+      emit(AppStateViewingProfile(
+        cloudUser: cloudUser,
+        user: user,
+        exception: null,
+        isLoading: true,
+      ));
+
+      //update display name
+      try {
+        await _cloudProvider.updateUserDisplayName(
+          displayName: event.displayName,
+        );
+      } catch (e) {
+        //notify user of error
+        emit(AppStateViewingProfile(
+          cloudUser: cloudUser,
+          user: user,
+          exception: e,
+          isLoading: false,
+        ));
+        return;
+      }
+      //notify user of success
+      final updatedUser = await _cloudProvider.currentCloudUser;
+
+      emit(AppStateViewingProfile(
+        cloudUser: updatedUser!,
+        user: user,
+        exception: null,
+        isLoading: false,
       ));
     });
 

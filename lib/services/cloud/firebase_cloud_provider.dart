@@ -85,24 +85,41 @@ class FirebaseCloudProvider implements CloudProvider {
   }
 
   @override
-  Future<CloudUser> get currentCloudUser async {
-    final userId = FirebaseAuth.instance.currentUser!.uid;
+  Future<CloudUser?> get currentCloudUser async {
+    final user = FirebaseAuth.instance.currentUser;
 
-    final cloudUser = await users.doc(userId).get();
+    if (user == null) return null;
+
+    if (user.uid.isEmpty) return null;
+
+    final cloudUser = await users.doc(user.uid).get();
+
+    if (!cloudUser.exists) return null;
+
+    if (cloudUser.data() == null) return null;
+
+    if (cloudUser.data()![userUsernameFieldName] == null) {
+      return null;
+    }
+
     return CloudUser.fromFirebase(doc: cloudUser);
   }
 
   @override
-  Future<CloudUser> get cachedCloudUser async {
-    final userId = FirebaseAuth.instance.currentUser!.uid;
-    final cachedUser = await users
-        .doc(userId)
-        .get(
+  Future<CloudUser?> get cachedCloudUser async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return null;
+    if (user.uid.isEmpty) return null;
+    final cachedDoc = await users.doc(user.uid).get(
           (GetOptions(source: Source.cache)),
-        )
-        .then((value) => CloudUser.fromFirebase(doc: value));
+        );
+    if (!cachedDoc.exists) return null;
+    if (cachedDoc.data() == null) return null;
 
-    return cachedUser;
+    if (cachedDoc.data()![userUsernameFieldName] == null) {
+      return null;
+    }
+    return CloudUser.fromFirebase(doc: cachedDoc);
   }
 
   @override
@@ -118,7 +135,8 @@ class FirebaseCloudProvider implements CloudProvider {
 
     // check if user already exists
     final cloudUser = await currentCloudUser;
-    if (cloudUser.username != null) {
+
+    if (cloudUser != null) {
       throw UserAlreadyExistsException();
     }
 
@@ -187,9 +205,11 @@ class FirebaseCloudProvider implements CloudProvider {
 
   @override
   Future<void> assignNeighborhood() async {
-    final cloudUser = await currentCloudUser;
     final authUser = FirebaseAuth.instance.currentUser!;
-
+    final cloudUser = await currentCloudUser;
+    if (cloudUser == null) {
+      throw UserDoesNotExistException();
+    }
     if (cloudUser.householdId == null) {
       throw UserRequiresHouseholdException();
     }
@@ -223,6 +243,10 @@ class FirebaseCloudProvider implements CloudProvider {
       throw ChannelErrorRulebookException();
     }
     final cachedUser = await cachedCloudUser;
+
+    if (cachedUser == null) {
+      throw UserDoesNotExistException();
+    }
 
     if (displayName == cachedUser.displayName) {
       return;
