@@ -4,26 +4,26 @@ import 'package:vecinapp/services/cloud/cloud_constants.dart';
 
 @immutable
 class CloudUser {
+  final String? username;
   final String? displayName;
   final String? householdId;
   final String? neighborhoodId;
   final String? profilePhotoUrl;
 
   const CloudUser({
+    required this.username,
     required this.displayName,
     required this.householdId,
     required this.neighborhoodId,
     required this.profilePhotoUrl,
   });
 
-  factory CloudUser.fromFirebase(DocumentSnapshot<Map<String, dynamic>> data) {
-    late final String? displayName;
-    late final String? householdId;
-    late final String? neighborhoodId;
-    late final String? profilePhotoUrl;
+  factory CloudUser.fromFirebase({required DocumentSnapshot doc}) {
+    final docData = doc.data() as Map<String, dynamic>;
 
-    if (!data.exists || data.data() == null) {
+    if (docData[userUsernameFieldName] == null) {
       return const CloudUser(
+        username: null,
         displayName: null,
         householdId: null,
         neighborhoodId: null,
@@ -31,35 +31,12 @@ class CloudUser {
       );
     }
 
-    try {
-      displayName = data.get(userDisplayNameFieldName);
-    } catch (e) {
-      displayName = null;
-    }
-
-    try {
-      householdId = data.get(userHouseholdIdFieldName);
-    } catch (e) {
-      householdId = null;
-    }
-
-    try {
-      neighborhoodId = data.get(userNeighborhoodIdFieldName);
-    } catch (e) {
-      neighborhoodId = null;
-    }
-
-    try {
-      profilePhotoUrl = data.get(userProfilePhotoUrlFieldName);
-    } catch (e) {
-      profilePhotoUrl = null;
-    }
-
     return CloudUser(
-      displayName: displayName,
-      householdId: householdId,
-      neighborhoodId: neighborhoodId,
-      profilePhotoUrl: profilePhotoUrl,
+      username: docData[userUsernameFieldName],
+      displayName: docData[userDisplayNameFieldName],
+      householdId: docData[userHouseholdIdFieldName],
+      neighborhoodId: docData[userNeighborhoodIdFieldName],
+      profilePhotoUrl: docData[userProfilePhotoUrlFieldName],
     );
   }
 

@@ -93,7 +93,7 @@ class FirebaseCloudProvider implements CloudProvider {
     final cloudUserDoc = users.doc(authUser.uid);
 
     return await cloudUserDoc.get().then((value) {
-      return CloudUser.fromFirebase(value);
+      return CloudUser.fromFirebase(doc: value);
     });
   }
 
