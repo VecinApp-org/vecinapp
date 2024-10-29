@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
+import 'package:vecinapp/services/auth/auth_user.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
 import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
@@ -48,7 +49,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       final cloudUser = await _cloudProvider.currentCloudUser;
 
-      if (cloudUser == null || cloudUser.displayName == null) {
+      if (cloudUser == null || cloudUser.username == null) {
         emit(const AppStateCreatingCloudUser(
           isLoading: false,
           exception: null,
@@ -282,6 +283,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     on<AppEventUpdateUserDisplayName>((event, emit) async {
+      //check if user is logged in
       final user = _authProvider.currentUser;
       if (user == null) {
         emit(const AppStateLoggingIn(
@@ -290,33 +292,51 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
         return;
       }
+      //check if user is logged in to cloud
+      final cloudUser = await _cloudProvider.cachedCloudUser;
+      if (cloudUser == null) {
+        emit(const AppStateCreatingCloudUser(
+          exception: null,
+          isLoading: false,
+        ));
+        return;
+      }
+      //start loading
       emit(AppStateViewingProfile(
+        cloudUser: cloudUser,
         user: user,
         exception: null,
         isLoading: true,
       ));
 
+      //update display name
       try {
-        await _authProvider.updateUserDisplayName(event.displayName);
-      } on AuthException catch (e) {
+        await _cloudProvider.updateUserDisplayName(
+          displayName: event.displayName,
+        );
+      } catch (e) {
+        //notify user of error
         emit(AppStateViewingProfile(
+          cloudUser: cloudUser,
           user: user,
           exception: e,
           isLoading: false,
         ));
         return;
       }
+      //notify user of success
+      final updatedUser = await _cloudProvider.currentCloudUser;
 
-      final updatedUser = _authProvider.currentUser!;
       emit(AppStateViewingProfile(
-        user: updatedUser,
+        cloudUser: updatedUser!,
+        user: user,
         exception: null,
         isLoading: false,
       ));
     });
 
-    //Main App Routing
-    on<AppEventGoToHomeView>((event, emit) async {
+    //Neighborhood Routing
+    on<AppEventGoToNeighborhoodView>((event, emit) async {
       final user = _authProvider.currentUser;
       if (user == null) {
         emit(const AppStateLoggingIn(
@@ -340,7 +360,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
         return;
       }
+      final cloudUser = await _cloudProvider.cachedCloudUser;
       emit(AppStateViewingProfile(
+        cloudUser: cloudUser!,
         user: user,
         isLoading: false,
         exception: null,
@@ -659,6 +681,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
     });
 
+    //Storage events
     on<AppEventUpdateProfilePhoto>((event, emit) async {
       //check if user is logged in
       final user = _authProvider.currentUser;
@@ -669,15 +692,25 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
         return;
       }
-
+      //check if user has a cloud user
+      final cloudUser = await _cloudProvider.cachedCloudUser;
+      if (cloudUser == null) {
+        emit(const AppStateCreatingCloudUser(
+          isLoading: false,
+          exception: null,
+        ));
+        return;
+      }
       //start loading
       emit(AppStateViewingProfile(
+        cloudUser: cloudUser,
         user: user,
         exception: null,
         isLoading: true,
         loadingText: 'Subiendo imagen...',
       ));
 
+      //upload image
       try {
         final File image = File(event.imagePath);
         await _storageProvider.uploadProfileImage(
@@ -686,6 +719,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
       } catch (e) {
         emit(AppStateViewingProfile(
+          cloudUser: cloudUser,
           user: user,
           exception: e,
           isLoading: false,
@@ -693,6 +727,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       emit(AppStateViewingProfile(
+        cloudUser: cloudUser,
         user: user,
         exception: null,
         isLoading: false,
@@ -710,9 +745,18 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           ));
           return;
         }
-
+        //check if user has a cloud user
+        final cloudUser = await _cloudProvider.cachedCloudUser;
+        if (cloudUser == null) {
+          emit(const AppStateCreatingCloudUser(
+            isLoading: false,
+            exception: null,
+          ));
+          return;
+        }
         //start loading
         emit(AppStateViewingProfile(
+          cloudUser: cloudUser,
           user: user,
           exception: null,
           isLoading: true,
@@ -723,6 +767,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           await _storageProvider.deleteProfileImage(userId: user.uid!);
         } catch (e) {
           emit(AppStateViewingProfile(
+            cloudUser: cloudUser,
             user: user,
             exception: e,
             isLoading: false,
@@ -730,6 +775,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         }
 
         emit(AppStateViewingProfile(
+          cloudUser: cloudUser,
           user: user,
           exception: null,
           isLoading: false,
@@ -749,4 +795,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       return null;
     }
   }
+
+  Stream<AuthUser> get userStream => _authProvider.userChanges();
 }

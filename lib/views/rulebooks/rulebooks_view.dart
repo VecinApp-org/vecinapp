@@ -22,7 +22,7 @@ class _RulebooksViewState extends State<RulebooksView> {
         leading: BackButton(
           onPressed: () {
             context.read<AppBloc>().add(
-                  const AppEventGoToHomeView(),
+                  const AppEventGoToNeighborhoodView(),
                 );
           },
         ),

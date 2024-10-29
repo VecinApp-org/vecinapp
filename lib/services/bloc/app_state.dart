@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:vecinapp/services/auth/auth_user.dart';
+import 'package:vecinapp/services/cloud/cloud_user.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
 
 @immutable
@@ -9,11 +10,13 @@ abstract class AppState {
   final Exception? exception;
   final String? loadingText;
   final AuthUser? user;
+  final CloudUser? cloudUser;
   const AppState({
     required this.isLoading,
     required this.exception,
     this.user,
     this.loadingText,
+    this.cloudUser,
   });
 }
 
@@ -130,16 +133,18 @@ class AppStateViewingProfile extends AppState with EquatableMixin {
     required bool isLoading,
     required exception,
     required AuthUser user,
+    required CloudUser cloudUser,
     String? loadingText,
   }) : super(
           isLoading: isLoading,
           exception: exception,
           user: user,
           loadingText: loadingText,
+          cloudUser: cloudUser,
         );
 
   @override
-  List<Object?> get props => [user, exception, isLoading];
+  List<Object?> get props => [user, exception, isLoading, cloudUser];
   @override
   String toString() {
     return 'AppStateViewingProfile{user: $user, isLoading: $isLoading, exception: $exception}';

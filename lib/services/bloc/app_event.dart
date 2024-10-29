@@ -107,8 +107,8 @@ class AppEventLookForNeighborhood extends AppEvent {
 }
 
 // MAIN APP ROUTING EVENTS
-class AppEventGoToHomeView extends AppEvent {
-  const AppEventGoToHomeView();
+class AppEventGoToNeighborhoodView extends AppEvent {
+  const AppEventGoToNeighborhoodView();
 }
 
 class AppEventGoToProfileView extends AppEvent {

@@ -17,7 +17,7 @@ class ProfileView extends StatelessWidget {
       appBar: AppBar(
         leading: BackButton(
           onPressed: () {
-            context.read<AppBloc>().add(const AppEventGoToHomeView());
+            context.read<AppBloc>().add(const AppEventGoToNeighborhoodView());
           },
         ),
         actions: [
@@ -35,7 +35,7 @@ class ProfileView extends StatelessWidget {
           if (phoneNumber == null || phoneNumber.isEmpty) {
             phoneNumber = 'Sin Teléfono';
           }
-          String? displayName = state.user!.displayName;
+          String? displayName = state.cloudUser!.displayName;
           if (displayName == null || displayName.isEmpty) {
             displayName = 'Sin Nombre';
           }
@@ -82,7 +82,7 @@ class ProfileView extends StatelessWidget {
                     onPressed: () async {
                       final newUserDisplayName = await showTextInputDialog(
                         context: context,
-                        initialValue: state.user!.displayName,
+                        initialValue: state.cloudUser!.displayName,
                         title: 'Cambiar nombre',
                         hintText: 'Nombre',
                       );

@@ -85,16 +85,24 @@ class FirebaseCloudProvider implements CloudProvider {
   }
 
   @override
-  Future<CloudUser?> get currentCloudUser async {
-    final authUser = FirebaseAuth.instance.currentUser;
-    if (authUser == null) {
-      return null;
-    }
-    final cloudUserDoc = users.doc(authUser.uid);
+  Future<CloudUser> get currentCloudUser async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
 
-    return await cloudUserDoc.get().then((value) {
-      return CloudUser.fromFirebase(doc: value);
-    });
+    final cloudUser = await users.doc(userId).get();
+    return CloudUser.fromFirebase(doc: cloudUser);
+  }
+
+  @override
+  Future<CloudUser> get cachedCloudUser async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final cachedUser = await users
+        .doc(userId)
+        .get(
+          (GetOptions(source: Source.cache)),
+        )
+        .then((value) => CloudUser.fromFirebase(doc: value));
+
+    return cachedUser;
   }
 
   @override
@@ -110,7 +118,7 @@ class FirebaseCloudProvider implements CloudProvider {
 
     // check if user already exists
     final cloudUser = await currentCloudUser;
-    if (cloudUser == null) {
+    if (cloudUser.username != null) {
       throw UserAlreadyExistsException();
     }
 
@@ -181,9 +189,7 @@ class FirebaseCloudProvider implements CloudProvider {
   Future<void> assignNeighborhood() async {
     final cloudUser = await currentCloudUser;
     final authUser = FirebaseAuth.instance.currentUser!;
-    if (cloudUser == null) {
-      throw UserDoesNotExistException();
-    }
+
     if (cloudUser.householdId == null) {
       throw UserRequiresHouseholdException();
     }
@@ -207,44 +213,26 @@ class FirebaseCloudProvider implements CloudProvider {
     }
   }
 
+  @override
   Future<void> updateUserDisplayName({
     required String displayName,
-    required String userId,
   }) async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
     // check if displayName is empty
     if (displayName.isEmpty) {
       throw ChannelErrorRulebookException();
     }
-    final cloudUser = users.doc(userId);
-    await cloudUser.update({
-      userDisplayNameFieldName: displayName,
-    }).onError((error, stackTrace) => throw CouldNotUpdateUserException());
-  }
+    final cachedUser = await cachedCloudUser;
 
-  Future<void> updateUserPhotoUrl({
-    required String photoUrl,
-    required String userId,
-  }) async {
-    // check if photoUrl is valid
-    if (photoUrl.isEmpty) {
-      throw ChannelErrorRulebookException();
+    if (displayName == cachedUser.displayName) {
+      return;
     }
-    // update the user photo url
-    final cloudUser = users.doc(userId);
-    await cloudUser.update({
-      userProfilePhotoUrlFieldName: photoUrl,
-    }).onError((error, stackTrace) => throw CouldNotUpdateUserException());
-  }
 
-  Future<void> updateUserHouseholdId({
-    required String householdId,
-    required String userId,
-  }) async {
-    final cloudUser = users.doc(userId);
     try {
-      await cloudUser.update({
-        userHouseholdIdFieldName: householdId,
-      }).onError((error, stackTrace) => throw CouldNotUpdateUserException());
+      // update the user display name
+      await users.doc(userId).update({
+        userDisplayNameFieldName: displayName,
+      });
     } catch (e) {
       throw CouldNotUpdateUserException();
     }

@@ -9,6 +9,7 @@ abstract class CloudProvider {
   });
 
   Future<CloudUser?> get currentCloudUser;
+  Future<CloudUser?> get cachedCloudUser;
 
   Future<void> createCloudUser({
     required String userId,
@@ -27,6 +28,9 @@ abstract class CloudProvider {
 
   Future<void> assignNeighborhood();
 
+  Future<void> updateUserDisplayName({
+    required String displayName,
+  });
   Stream<Iterable<Rulebook>> allRulebooks({
     required String ownerUserId,
   });

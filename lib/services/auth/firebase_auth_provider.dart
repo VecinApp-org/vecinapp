@@ -206,36 +206,6 @@ class FirebaseAuthProvider implements AuthProvider {
   }
 
   @override
-  Future<void> updateUserDisplayName(String displayName) async {
-    final user = currentUser;
-    if (user == null) {
-      throw UserNotLoggedInAuthException();
-    }
-
-    if (displayName.isEmpty) {
-      throw ChannelErrorAuthException();
-    }
-
-    if (displayName == user.displayName) {
-      return;
-    }
-
-    try {
-      await FirebaseAuth.instance.currentUser!.updateDisplayName(displayName);
-      await FirebaseAuth.instance.currentUser!.reload();
-    } on FirebaseAuthException catch (e) {
-      devtools.log(e.code.toString());
-      if (e.code == 'network-request-failed') {
-        throw NetworkRequestFailedAuthException();
-      } else {
-        throw GenericAuthException();
-      }
-    } catch (_) {
-      throw GenericAuthException();
-    }
-  }
-
-  @override
   Future<void> updateUserPhotoUrl({required String photoUrl}) async {
     final user = currentUser;
     if (user == null) {
