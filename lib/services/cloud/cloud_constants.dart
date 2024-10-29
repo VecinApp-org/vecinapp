@@ -6,15 +6,20 @@ const rulebookTextFieldName = 'text';
 
 // users
 const usersCollectionName = 'users';
+const userUsernameFieldName = 'username';
 const userDisplayNameFieldName = 'display_name';
-const userHomeIdFieldName = 'home_id';
+const userHouseholdIdFieldName = 'household_id';
 const userNeighborhoodIdFieldName = 'neighborhood_id';
 const userProfilePhotoUrlFieldName = 'photo_url';
 
-// homes
-const homesCollectionName = 'homes';
-const homeNameFieldName = 'name';
-const homeNeighborhoodIdFieldName = 'neighborhood_id';
+// households
+const householdsCollectionName = 'households';
+const householdFullAddressFieldName = 'full_address';
+const householdNeighborhoodIdFieldName = 'neighborhood_id';
+const householdAddressLine1FieldName = 'address_line_1';
+const householdGroupNameFieldName = 'group_name';
+const householdInteriorFieldName = 'interior';
+const householdLocationFieldName = 'location';
 
 // neighborhoods
 const neighborhoodsCollectionName = 'neighborhoods';

@@ -19,3 +19,13 @@ class CouldNotUpdateUserException extends CloudException {}
 class CloudProviderNotInitializedException extends CloudException {}
 
 class CouldNotInitializeCloudProviderException extends CloudException {}
+
+class UserAlreadyExistsException extends CloudException {}
+
+class CouldNotUpdateHouseholdException extends CloudException {}
+
+class UserDoesNotExistException extends CloudException {}
+
+class UserRequiresHouseholdException extends CloudException {}
+
+class CouldNotAssignNeighborhoodException extends CloudException {}

@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 
-class NoNeighborhoodView extends StatelessWidget {
-  const NoNeighborhoodView({super.key});
+class SelectAddressView extends StatelessWidget {
+  const SelectAddressView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,17 +15,26 @@ class NoNeighborhoodView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Sin Vecindad',
+              Text('Selecciona tu dirección',
                   style: Theme.of(context).textTheme.headlineLarge),
-              const SizedBox(height: 55),
               TextButton(
                 onPressed: () {
                   context.read<AppBloc>().add(
-                        const AppEventLookForNeighborhood(),
+                        const AppEventUpdateHomeAddress(
+                          country: 'Mexico',
+                          state: 'Nuevo León',
+                          municipality: 'Monterrey',
+                          postalCode: '60000',
+                          street: 'Calle 1',
+                          number: '123',
+                          interior: '1',
+                          latitude: 20.0,
+                          longitude: 20.0,
+                        ),
                       );
                 },
                 child: const Text('Set address'),
-              )
+              ),
             ],
           ),
         ),

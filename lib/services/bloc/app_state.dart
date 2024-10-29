@@ -106,9 +106,14 @@ class AppStateNoNeighborhood extends AppState {
       : super(isLoading: isLoading, exception: exception);
 }
 
+class AppStateWelcomeToNeighborhood extends AppState {
+  const AppStateWelcomeToNeighborhood({required bool isLoading})
+      : super(isLoading: isLoading, exception: null);
+}
+
 //MAIN APP STATES
-class AppStateViewingHome extends AppState with EquatableMixin {
-  const AppStateViewingHome({
+class AppStateViewingNeighborhood extends AppState with EquatableMixin {
+  const AppStateViewingNeighborhood({
     required exception,
     required bool isLoading,
   }) : super(

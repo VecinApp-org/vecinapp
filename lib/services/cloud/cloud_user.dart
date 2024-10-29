@@ -1,26 +1,35 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' show DocumentSnapshot;
 import 'package:flutter/foundation.dart';
 import 'package:vecinapp/services/cloud/cloud_constants.dart';
 
 @immutable
 class CloudUser {
   final String? displayName;
-  final String? homeId;
+  final String? householdId;
   final String? neighborhoodId;
   final String? profilePhotoUrl;
 
   const CloudUser({
     required this.displayName,
-    required this.homeId,
+    required this.householdId,
     required this.neighborhoodId,
     required this.profilePhotoUrl,
   });
 
   factory CloudUser.fromFirebase(DocumentSnapshot<Map<String, dynamic>> data) {
     late final String? displayName;
-    late final String? homeId;
+    late final String? householdId;
     late final String? neighborhoodId;
     late final String? profilePhotoUrl;
+
+    if (!data.exists || data.data() == null) {
+      return const CloudUser(
+        displayName: null,
+        householdId: null,
+        neighborhoodId: null,
+        profilePhotoUrl: null,
+      );
+    }
 
     try {
       displayName = data.get(userDisplayNameFieldName);
@@ -29,9 +38,9 @@ class CloudUser {
     }
 
     try {
-      homeId = data.get(userHomeIdFieldName);
+      householdId = data.get(userHouseholdIdFieldName);
     } catch (e) {
-      homeId = null;
+      householdId = null;
     }
 
     try {
@@ -48,7 +57,7 @@ class CloudUser {
 
     return CloudUser(
       displayName: displayName,
-      homeId: homeId,
+      householdId: householdId,
       neighborhoodId: neighborhoodId,
       profilePhotoUrl: profilePhotoUrl,
     );
@@ -56,6 +65,6 @@ class CloudUser {
 
   @override
   String toString() {
-    return 'CloudUser(displayName: $displayName, homeId: $homeId, neighborhoodId: $neighborhoodId, profilePhotoUrl: $profilePhotoUrl)';
+    return 'CloudUser(displayName: $displayName, homeId: $householdId, neighborhoodId: $neighborhoodId, profilePhotoUrl: $profilePhotoUrl)';
   }
 }

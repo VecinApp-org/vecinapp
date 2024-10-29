@@ -56,7 +56,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
 
-      if (cloudUser.homeId == null) {
+      if (cloudUser.householdId == null) {
         emit(const AppStateSelectingHomeAddress(
           isLoading: false,
           exception: null,
@@ -71,7 +71,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
         return;
       }
-      emit(const AppStateViewingHome(
+      emit(const AppStateViewingNeighborhood(
         exception: null,
         isLoading: false,
       ));
@@ -203,7 +203,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             isLoading: false,
           ));
         } else {
-          emit(const AppStateViewingHome(
+          emit(const AppStateViewingNeighborhood(
             exception: null,
             isLoading: false,
           ));
@@ -324,7 +324,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           isLoading: false,
         ));
       } else {
-        emit(const AppStateViewingHome(
+        emit(const AppStateViewingNeighborhood(
           isLoading: false,
           exception: null,
         ));
@@ -428,25 +428,129 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     //Cloud Events
     on<AppEventCreateCloudUser>((event, emit) async {
-      final user = _authProvider.currentUser!;
+      //check if user is logged in
+      final user = _authProvider.currentUser;
+      if (user == null) {
+        emit(const AppStateLoggingIn(
+          exception: null,
+          isLoading: false,
+        ));
+        return;
+      }
       //enable loading indicator
       emit(AppStateCreatingCloudUser(
         isLoading: true,
         exception: null,
       ));
+      //create new cloud user
       try {
         await _cloudProvider.createCloudUser(
           userId: user.uid!,
+          username: event.username,
           displayName: event.displayName,
         );
       } catch (e) {
+        //inform user of error
         emit(AppStateCreatingCloudUser(
           isLoading: false,
           exception: e,
         ));
         return;
       }
+      //send to selecting home address
       emit(const AppStateSelectingHomeAddress(
+        isLoading: false,
+        exception: null,
+      ));
+    });
+
+    on<AppEventUpdateHomeAddress>(
+      (event, emit) async {
+        //check if user is logged in
+        final user = _authProvider.currentUser;
+        if (user == null) {
+          emit(const AppStateLoggingIn(
+            exception: null,
+            isLoading: false,
+          ));
+          return;
+        }
+        //enable loading indicator
+        emit(AppStateSelectingHomeAddress(
+          isLoading: true,
+          exception: null,
+        ));
+        //todo: check if address is valid and get full address from geocoding
+        final String fullAddress =
+            '${event.street} #${event.number}. ${event.municipality}, ${event.state}, ${event.country}';
+        final String addressLine1 = '${event.street} #${event.number}';
+        final String groupname = event.street;
+        final String? interior = event.interior;
+        final double latitude = event.latitude;
+        final double longitude = event.longitude;
+        //change the user's household
+        try {
+          await _cloudProvider.changeHousehold(
+            fullAddress: fullAddress,
+            addressLine1: addressLine1,
+            groupname: groupname,
+            interior: interior,
+            latitude: latitude,
+            longitude: longitude,
+          );
+        } catch (e) {
+          //inform user of error
+          emit(AppStateSelectingHomeAddress(
+            isLoading: false,
+            exception: e,
+          ));
+          return;
+        }
+        final updatedCloudUser = await _cloudProvider.currentCloudUser;
+        //if the user has a neighborhood, send to viewing neighborhood
+        if (updatedCloudUser!.neighborhoodId != null) {
+          emit(AppStateViewingNeighborhood(
+            isLoading: false,
+            exception: null,
+          ));
+        } else {
+          //Send No Neighborhood (this view should try to find a neighborhood for the user's home)
+          emit(const AppStateNoNeighborhood(
+            isLoading: false,
+            exception: null,
+          ));
+        }
+      },
+    );
+
+    on<AppEventLookForNeighborhood>((event, emit) async {
+      //check if user is logged in
+      final user = _authProvider.currentUser;
+      if (user == null) {
+        emit(const AppStateLoggingIn(
+          exception: null,
+          isLoading: false,
+        ));
+        return;
+      }
+      //enable loading indicator
+      emit(AppStateNoNeighborhood(
+        isLoading: true,
+        exception: null,
+      ));
+      //change the user's neighborhood
+      try {
+        await _cloudProvider.assignNeighborhood();
+      } catch (_) {
+        //inform user of error
+        emit(AppStateNoNeighborhood(
+          isLoading: false,
+          exception: null,
+        ));
+        return;
+      }
+      //send to viewing neighborhood
+      emit(AppStateViewingNeighborhood(
         isLoading: false,
         exception: null,
       ));
@@ -634,16 +738,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     );
   }
 
-  Stream<Uint8List?> profilePicture() async* {
+  Future<Uint8List?> profilePicture() async {
     final user = _authProvider.currentUser;
     if (user == null) {
-      yield null;
-      return;
+      return null;
     }
     try {
-      yield await _storageProvider.getProfileImage(userId: user.uid!);
+      return await _storageProvider.getProfileImage(userId: user.uid!);
     } catch (e) {
-      yield null;
+      return null;
     }
   }
 }

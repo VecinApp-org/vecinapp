@@ -11,8 +11,8 @@ class ProfilePicture extends StatelessWidget {
   Widget build(BuildContext context) {
     const Icon icon = Icon(Icons.person);
     final profilePicture = context.watch<AppBloc>().profilePicture();
-    return StreamBuilder(
-        stream: profilePicture,
+    return FutureBuilder(
+        future: profilePicture,
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:

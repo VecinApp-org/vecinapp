@@ -11,17 +11,20 @@ class RegisterCloudUserView extends StatefulWidget {
 }
 
 class _RegisterCloudUserViewState extends State<RegisterCloudUserView> {
+  late final TextEditingController _usernameController;
   late final TextEditingController _displayNameController;
 
   @override
   void initState() {
     _displayNameController = TextEditingController();
+    _usernameController = TextEditingController();
     super.initState();
   }
 
   @override
   void dispose() {
     _displayNameController.dispose();
+    _usernameController.dispose();
     super.dispose();
   }
 
@@ -49,13 +52,29 @@ class _RegisterCloudUserViewState extends State<RegisterCloudUserView> {
                 icon: Icon(Icons.person),
               ),
             ),
+            TextField(
+              autofocus: true,
+              controller: _usernameController,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                constraints: BoxConstraints(maxWidth: 377),
+                hintText: 'Nombre de ususario único',
+                icon: Icon(Icons.person),
+              ),
+            ),
             const SizedBox(height: 55),
             //Register button
             FilledButton(
               onPressed: () async {
                 final name = _displayNameController.text;
+                final username = _usernameController.text;
                 context.read<AppBloc>().add(
-                      AppEventCreateCloudUser(displayName: name),
+                      AppEventCreateCloudUser(
+                        displayName: name,
+                        username: username,
+                      ),
                     );
               },
               child: const Text('Crear cuenta'),

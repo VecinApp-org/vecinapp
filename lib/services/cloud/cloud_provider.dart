@@ -7,12 +7,25 @@ abstract class CloudProvider {
   Future<void> initialize({
     required String? userId,
   });
+
   Future<CloudUser?> get currentCloudUser;
 
-  Future<CloudUser> createCloudUser({
+  Future<void> createCloudUser({
     required String userId,
+    required String username,
     required String displayName,
   });
+
+  Future<void> changeHousehold({
+    required String fullAddress,
+    required String addressLine1,
+    required String groupname,
+    required String? interior,
+    required double latitude,
+    required double longitude,
+  });
+
+  Future<void> assignNeighborhood();
 
   Stream<Iterable<Rulebook>> allRulebooks({
     required String ownerUserId,
