@@ -47,11 +47,21 @@ class FirebaseCloudProvider implements CloudProvider {
   }
 
   @override
-  Stream<Iterable<Rulebook>> allRulebooks({required String ownerUserId}) {
-    final allRulebooks = rulebooks
-        .where(rulebookOwnerUserIdFieldName, isEqualTo: ownerUserId)
+  Stream<Iterable<Rulebook>> allRulebooks({
+    required String ownerUserId,
+    required String neighborhoodId,
+  }) {
+    final allRulebooks = FirebaseFirestore.instance
+        .collection(neighborhoodsCollectionName)
+        .doc(neighborhoodId)
+        .collection('rulebooks')
         .snapshots()
-        .map((event) => event.docs.map((doc) => Rulebook.fromSnapshot(doc)));
+        .map((event) {
+      return event.docs.map((doc) {
+        devtools.log(doc.data().toString());
+        return Rulebook.fromSnapshot(doc);
+      });
+    });
     return allRulebooks;
   }
 
@@ -73,7 +83,6 @@ class FirebaseCloudProvider implements CloudProvider {
 
     return Rulebook(
       id: fetchedRulebook.id,
-      ownerUserId: ownerUserId,
       title: title,
       text: text,
     );

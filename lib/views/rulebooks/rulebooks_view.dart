@@ -7,16 +7,23 @@ import 'package:vecinapp/services/cloud/rulebook.dart';
 import 'package:vecinapp/views/rulebooks/rulebook_list_view.dart';
 
 class RulebooksView extends StatefulWidget {
-  final Stream<Iterable<Rulebook>> rulebooks;
-  const RulebooksView({super.key, required this.rulebooks});
+  const RulebooksView({super.key});
 
   @override
   State<RulebooksView> createState() => _RulebooksViewState();
 }
 
 class _RulebooksViewState extends State<RulebooksView> {
+  late final Stream<Iterable<Rulebook>> rulebooks;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    rulebooks = context.watch<AppBloc>().rulebooks;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final rulebooks = context.watch<AppBloc>().rulebooks;
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
@@ -37,7 +44,7 @@ class _RulebooksViewState extends State<RulebooksView> {
         child: const Icon(Icons.add),
       ),
       body: StreamBuilder(
-        stream: widget.rulebooks,
+        stream: rulebooks,
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.active:

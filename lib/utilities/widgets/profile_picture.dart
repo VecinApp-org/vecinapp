@@ -11,10 +11,11 @@ class ProfilePicture extends StatelessWidget {
   Widget build(BuildContext context) {
     const Icon icon = Icon(Icons.person);
     final profilePicture = context.watch<AppBloc>().profilePicture();
-    return FutureBuilder(
-        future: profilePicture,
+    return StreamBuilder(
+        stream: profilePicture,
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
+            case ConnectionState.active:
             case ConnectionState.done:
               if (snapshot.hasData) {
                 return CircleAvatar(

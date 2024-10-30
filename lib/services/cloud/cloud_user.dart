@@ -4,6 +4,7 @@ import 'package:vecinapp/services/cloud/cloud_constants.dart';
 
 @immutable
 class CloudUser {
+  final String id;
   final String? username;
   final String? displayName;
   final String? householdId;
@@ -11,6 +12,7 @@ class CloudUser {
   final String? profilePhotoUrl;
 
   const CloudUser({
+    required this.id,
     required this.username,
     required this.displayName,
     required this.householdId,
@@ -21,17 +23,8 @@ class CloudUser {
   factory CloudUser.fromFirebase({required DocumentSnapshot doc}) {
     final docData = doc.data() as Map<String, dynamic>;
 
-    if (docData[userUsernameFieldName] == null) {
-      return const CloudUser(
-        username: null,
-        displayName: null,
-        householdId: null,
-        neighborhoodId: null,
-        profilePhotoUrl: null,
-      );
-    }
-
     return CloudUser(
+      id: doc.id,
       username: docData[userUsernameFieldName],
       displayName: docData[userDisplayNameFieldName],
       householdId: docData[userHouseholdIdFieldName],

@@ -340,9 +340,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
         return;
       }
-      final rulebooks = _cloudProvider.allRulebooks(ownerUserId: user.uid!);
       emit(AppStateViewingRulebooks(
-        rulebooks: rulebooks,
         isLoading: false,
         exception: null,
       ));
@@ -675,7 +673,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
       //Send user to rulebooks view
       emit(AppStateViewingRulebooks(
-        rulebooks: _cloudProvider.allRulebooks(ownerUserId: user.uid!),
         isLoading: false,
         exception: null,
       ));
@@ -784,17 +781,35 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     );
   }
 
-  Future<Uint8List?> profilePicture() async {
+  Stream<Uint8List?> profilePicture() async* {
     final user = _authProvider.currentUser;
     if (user == null) {
-      return null;
+      yield null;
     }
     try {
-      return await _storageProvider.getProfileImage(userId: user.uid!);
+      yield await _storageProvider.getProfileImage(userId: user!.uid!);
     } catch (e) {
-      return null;
+      yield null;
     }
   }
 
   Stream<AuthUser> get userStream => _authProvider.userChanges();
+
+  Stream<Iterable<Rulebook>> get rulebooks async* {
+    final user = _authProvider.currentUser;
+    if (user == null) {
+      yield const Iterable<Rulebook>.empty();
+    }
+    final cloudUSer = await _cloudProvider.cachedCloudUser;
+    if (cloudUSer == null ||
+        cloudUSer.householdId == null ||
+        cloudUSer.neighborhoodId == null) {
+      yield const Iterable<Rulebook>.empty();
+      return;
+    }
+    yield* _cloudProvider.allRulebooks(
+      ownerUserId: user!.uid!,
+      neighborhoodId: cloudUSer.neighborhoodId!,
+    );
+  }
 }

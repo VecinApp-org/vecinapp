@@ -123,7 +123,7 @@ class AppBlocRouter extends StatelessWidget {
         } else if (state is AppStateViewingSettings) {
           return SettingsView();
         } else if (state is AppStateViewingRulebooks) {
-          return RulebooksView(rulebooks: state.rulebooks);
+          return RulebooksView();
         } else if (state is AppStateEditingRulebook) {
           return EditRulebookView(rulebook: state.rulebook);
         } else if (state is AppStateViewingRulebookDetails) {

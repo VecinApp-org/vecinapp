@@ -159,9 +159,7 @@ class AppStateViewingSettings extends AppState {
 }
 
 class AppStateViewingRulebooks extends AppState {
-  final Stream<Iterable<Rulebook>> rulebooks;
   const AppStateViewingRulebooks({
-    required this.rulebooks,
     required bool isLoading,
     required exception,
   }) : super(isLoading: isLoading, exception: exception);

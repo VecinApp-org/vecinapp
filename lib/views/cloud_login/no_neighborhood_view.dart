@@ -8,6 +8,9 @@ class NoNeighborhoodView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.read<AppBloc>().add(
+          const AppEventLookForNeighborhood(),
+        );
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -24,7 +27,7 @@ class NoNeighborhoodView extends StatelessWidget {
                         const AppEventLookForNeighborhood(),
                       );
                 },
-                child: const Text('Set address'),
+                child: const Text('Reintentar'),
               )
             ],
           ),

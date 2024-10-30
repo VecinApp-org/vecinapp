@@ -5,25 +5,21 @@ import 'package:flutter/foundation.dart';
 @immutable
 class Rulebook {
   final String id;
-  final String ownerUserId;
   final String title;
   final String text;
   const Rulebook({
     required this.id,
-    required this.ownerUserId,
     required this.title,
     required this.text,
   });
 
   Rulebook.fromSnapshot(QueryDocumentSnapshot<Map<String, dynamic>> snapshot)
       : id = snapshot.id,
-        ownerUserId = snapshot.data()[rulebookOwnerUserIdFieldName],
         title = snapshot.data()[rulebookTitleFieldName] as String,
         text = snapshot.data()[rulebookTextFieldName] as String;
 
   @override
-  String toString() =>
-      'Rulebook (ownerUserId: $ownerUserId, title: $title, text: $text)';
+  String toString() => 'Rulebook (title: $title, text: $text)';
 
   String get shareRulebook => 'Reglamento en VecinApp:\n\n$title\n\n$text';
 
@@ -33,7 +29,6 @@ class Rulebook {
   }) {
     return Rulebook(
       id: id,
-      ownerUserId: ownerUserId,
       title: newTitle,
       text: newText,
     );

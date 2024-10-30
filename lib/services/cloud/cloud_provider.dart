@@ -33,6 +33,7 @@ abstract class CloudProvider {
   });
   Stream<Iterable<Rulebook>> allRulebooks({
     required String ownerUserId,
+    required String neighborhoodId,
   });
 
   Future<Rulebook> createNewRulebook({
