@@ -184,6 +184,15 @@ class FirebaseCloudProvider implements CloudProvider {
   }
 
   @override
+  Future<void> deleteCloudUser({required String userId}) async {
+    try {
+      await _users.doc(userId).delete();
+    } catch (e) {
+      throw CouldNotDeleteCloudUserException();
+    }
+  }
+
+  @override
   Future<void> changeHousehold({
     required String fullAddress,
     required String addressLine1,

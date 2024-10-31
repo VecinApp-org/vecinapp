@@ -231,23 +231,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(const AppStateDeletingAccount(
         isLoading: true,
         exception: null,
+        loadingText: 'Eliminando cuenta...',
       ));
       try {
         await _authProvider.logInWithEmailAndPassword(
           email: user.email!,
           password: event.password,
         );
+        await _storageProvider.deleteProfileImage(userId: user.uid!);
+        await _cloudProvider.deleteCloudUser(userId: user.uid!);
         await _authProvider.deleteAccount();
-      } on AuthException catch (e) {
+      } catch (e) {
         emit(AppStateDeletingAccount(
           isLoading: false,
           exception: e,
-        ));
-        return;
-      } catch (_) {
-        emit(AppStateDeletingAccount(
-          isLoading: false,
-          exception: GenericAuthException(),
         ));
         return;
       }

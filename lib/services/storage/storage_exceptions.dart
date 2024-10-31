@@ -9,3 +9,5 @@ class CouldNotUploadImageStorageException implements StorageException {}
 class ImageNotFoundStorageException implements StorageException {}
 
 class ImageTooLargeStorageException implements StorageException {}
+
+class CouldNotDeleteImageStorageException implements StorageException {}

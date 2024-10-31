@@ -17,6 +17,10 @@ abstract class CloudProvider {
     required String displayName,
   });
 
+  Future<void> deleteCloudUser({
+    required String userId,
+  });
+
   Future<void> changeHousehold({
     required String fullAddress,
     required String addressLine1,

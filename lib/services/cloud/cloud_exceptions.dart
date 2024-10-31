@@ -33,3 +33,5 @@ class CouldNotAssignNeighborhoodException extends CloudException {}
 class CouldNotCreateRulebookException extends CloudException {}
 
 class CouldNotGetRulebookException extends CloudException {}
+
+class CouldNotDeleteCloudUserException extends CloudException {}

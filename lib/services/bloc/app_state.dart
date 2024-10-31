@@ -187,7 +187,11 @@ class AppStateDeletingAccount extends AppState {
   const AppStateDeletingAccount({
     required bool isLoading,
     required exception,
-  }) : super(isLoading: isLoading, exception: exception);
+    loadingText,
+  }) : super(
+            isLoading: isLoading,
+            exception: exception,
+            loadingText: loadingText);
 }
 
 //EXTENSIONS

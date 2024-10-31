@@ -75,48 +75,50 @@ class FirebaseStorageProvider implements StorageProvider {
       // return the cached image
       return cacheFile.readAsBytes();
     }
+    //download the image
     try {
-      // try to download the image from Firebase Storage
       final Uint8List imageBytes = await FirebaseStorage.instance
           .ref('user/$userId')
           .child('profile_image')
           .getData()
-          .then((value) => value as Uint8List)
-          .onError((error, stackTrace) {
-        if (error is FirebaseException) {
-          if (error.code == 'object-not-found') {
-            throw ImageNotFoundStorageException();
-          }
-          devtools.log('Firebase Storage Error: ${error.toString()}');
-          throw GenericStorageException();
-        } else {
-          devtools.log('Error: ${error.toString()}');
-          throw GenericStorageException();
-        }
-      });
-
+          .then((value) => value as Uint8List);
       // save the image to the cache directory
       cacheFile.createSync(recursive: true);
       cacheFile.writeAsBytesSync(imageBytes);
       return imageBytes;
     } catch (e) {
-      rethrow;
+      // throw an exception if the image couldn't be downloaded
+      throw ImageNotFoundStorageException();
     }
   }
 
   @override
   Future<void> deleteProfileImage({required String userId}) async {
     // delete the image from Firebase Storage
-    await FirebaseStorage.instance
-        .ref('user/$userId')
-        .child('profile_image')
-        .delete()
-        .then((value) => devtools.log('Profile image deleted'))
-        .onError((error, stackTrace) => devtools.log(error.toString()));
-
+    try {
+      await FirebaseStorage.instance
+          .ref('user/$userId')
+          .child('profile_image')
+          .delete()
+          .then((value) => devtools.log('Profile image deleted'))
+          .onError((error, stackTrace) => devtools.log(error.toString()));
+    } on FirebaseException catch (e) {
+      switch (e.code) {
+        case 'object-not-found':
+          return;
+        default:
+          throw CouldNotDeleteImageStorageException();
+      }
+    } catch (e) {
+      throw GenericStorageException();
+    }
     // delete the image from the cache directory
-    final cacheDir = await getApplicationDocumentsDirectory();
-    final cacheFile = File('${cacheDir.path}/$userId/profile_image');
-    cacheFile.deleteSync();
+    try {
+      final cacheDir = await getApplicationDocumentsDirectory();
+      final cacheFile = File('${cacheDir.path}/$userId/profile_image');
+      cacheFile.deleteSync();
+    } catch (_) {
+      // ignore
+    }
   }
 }
