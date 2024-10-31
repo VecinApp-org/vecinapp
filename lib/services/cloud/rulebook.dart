@@ -18,6 +18,11 @@ class Rulebook {
         title = snapshot.data()[rulebookTitleFieldName] as String,
         text = snapshot.data()[rulebookTextFieldName] as String;
 
+  Rulebook.fromDocument(DocumentSnapshot<Map<String, dynamic>> doc)
+      : id = doc.id,
+        title = doc[rulebookTitleFieldName] as String,
+        text = doc[rulebookTextFieldName] as String;
+
   @override
   String toString() => 'Rulebook (title: $title, text: $text)';
 

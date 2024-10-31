@@ -29,3 +29,7 @@ class UserDoesNotExistException extends CloudException {}
 class UserRequiresHouseholdException extends CloudException {}
 
 class CouldNotAssignNeighborhoodException extends CloudException {}
+
+class CouldNotCreateRulebookException extends CloudException {}
+
+class CouldNotGetRulebookException extends CloudException {}

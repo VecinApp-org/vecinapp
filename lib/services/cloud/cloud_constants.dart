@@ -24,3 +24,4 @@ const householdLocationFieldName = 'location';
 // neighborhoods
 const neighborhoodsCollectionName = 'neighborhoods';
 const neighborhoodNameFieldName = 'name';
+const neighborhoodRulebooksCollectionName = 'rulebooks';

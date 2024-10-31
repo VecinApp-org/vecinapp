@@ -31,13 +31,11 @@ abstract class CloudProvider {
   Future<void> updateUserDisplayName({
     required String displayName,
   });
-  Stream<Iterable<Rulebook>> allRulebooks({
-    required String ownerUserId,
+  Stream<Iterable<Rulebook>> neighborhoodRulebooks({
     required String neighborhoodId,
   });
 
   Future<Rulebook> createNewRulebook({
-    required String ownerUserId,
     required String title,
     required String text,
   });

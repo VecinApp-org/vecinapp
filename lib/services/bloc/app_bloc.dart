@@ -592,41 +592,41 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         isLoading: true,
         exception: null,
       ));
-      late final Rulebook newRulebook;
-      try {
-        if (state.rulebook != null) {
-          //update rulebook if provided
+      //check if rulebook is provided
+      late Rulebook newRulebook;
+      if (state.rulebook != null) {
+        try {
+          //update existing rulebook
           await _cloudProvider.updateRulebook(
             rulebookId: state.rulebook!.id,
             title: event.title,
             text: event.text,
           );
-          newRulebook = state.rulebook!.copyWith(
-            newTitle: event.title,
-            newText: event.text,
-          );
-        } else {
-          //create new rulebook if not provided
+        } catch (e) {
+          //inform user of error
+          emit(AppStateEditingRulebook(
+            rulebook: state.rulebook,
+            isLoading: false,
+            exception: e,
+          ));
+          return;
+        }
+      } else {
+        //create new rulebook
+        try {
           newRulebook = await _cloudProvider.createNewRulebook(
-            ownerUserId: user.uid!,
             title: event.title,
             text: event.text,
           );
+        } catch (e) {
+          //inform user of error
+          emit(AppStateEditingRulebook(
+            rulebook: null,
+            isLoading: false,
+            exception: e,
+          ));
+          return;
         }
-      } on CloudException catch (e) {
-        emit(AppStateEditingRulebook(
-          rulebook: state.rulebook,
-          isLoading: false,
-          exception: e,
-        ));
-        return;
-      } on Exception catch (e) {
-        emit(AppStateEditingRulebook(
-          rulebook: state.rulebook,
-          isLoading: false,
-          exception: e,
-        ));
-        return;
       }
       //Send user to rulebook details view
       emit(AppStateViewingRulebookDetails(
@@ -796,20 +796,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   Stream<AuthUser> get userStream => _authProvider.userChanges();
 
   Stream<Iterable<Rulebook>> get rulebooks async* {
-    final user = _authProvider.currentUser;
-    if (user == null) {
-      yield const Iterable<Rulebook>.empty();
-    }
     final cloudUSer = await _cloudProvider.cachedCloudUser;
-    if (cloudUSer == null ||
-        cloudUSer.householdId == null ||
-        cloudUSer.neighborhoodId == null) {
-      yield const Iterable<Rulebook>.empty();
-      return;
-    }
-    yield* _cloudProvider.allRulebooks(
-      ownerUserId: user!.uid!,
-      neighborhoodId: cloudUSer.neighborhoodId!,
+    yield* _cloudProvider.neighborhoodRulebooks(
+      neighborhoodId: cloudUSer!.neighborhoodId!,
     );
   }
 }

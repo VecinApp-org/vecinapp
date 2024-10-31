@@ -51,10 +51,6 @@ class AppEventDeleteAccount extends AppEvent {
   const AppEventDeleteAccount({required this.password});
 }
 
-class AppEventUserChanges extends AppEvent {
-  const AppEventUserChanges();
-}
-
 class AppEventConfirmUserIsVerified extends AppEvent {
   const AppEventConfirmUserIsVerified();
 }
@@ -64,12 +60,7 @@ class AppEventSendPasswordResetEmail extends AppEvent {
   const AppEventSendPasswordResetEmail(this.email);
 }
 
-class AppEventUpdateUserDisplayName extends AppEvent {
-  final String displayName;
-  const AppEventUpdateUserDisplayName({required this.displayName});
-}
-
-// CLOUD REGISTRATION EVENTS
+//NEIGHBORHOOD REGISTRATION EVENTS
 class AppEventCreateCloudUser extends AppEvent {
   final String displayName;
   final String username;
@@ -106,7 +97,12 @@ class AppEventLookForNeighborhood extends AppEvent {
   const AppEventLookForNeighborhood();
 }
 
-// MAIN APP ROUTING EVENTS
+class AppEventUpdateUserDisplayName extends AppEvent {
+  final String displayName;
+  const AppEventUpdateUserDisplayName({required this.displayName});
+}
+
+//NEIGHBORHOOD ROUTING EVENTS
 class AppEventGoToNeighborhoodView extends AppEvent {
   const AppEventGoToNeighborhoodView();
 }
@@ -137,7 +133,7 @@ class AppEventGoToDeleteAccountView extends AppEvent {
   const AppEventGoToDeleteAccountView();
 }
 
-// CLOUD EVENTS
+// RULEBOOK EVENTS
 class AppEventCreateOrUpdateRulebook extends AppEvent {
   final String title;
   final String text;

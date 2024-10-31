@@ -8,20 +8,40 @@ import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
 import 'dart:developer' as devtools show log;
 
 class FirebaseCloudProvider implements CloudProvider {
-  final rulebooks =
-      FirebaseFirestore.instance.collection(rulebooksCollectionName);
-  final neighborhood =
+  final _neighborhoods =
       FirebaseFirestore.instance.collection(neighborhoodsCollectionName);
   final households =
       FirebaseFirestore.instance.collection(householdsCollectionName);
-  final users = FirebaseFirestore.instance.collection(usersCollectionName);
+  final _users = FirebaseFirestore.instance.collection(usersCollectionName);
+
+  DocumentReference<Map<String, dynamic>> _neighborhood(
+      {required String neighborhoodId}) {
+    return _neighborhoods.doc(neighborhoodId);
+  }
+
+  CollectionReference<Map<String, dynamic>> _rulebooks(
+      {required String neighborhoodId}) {
+    return _neighborhood(neighborhoodId: neighborhoodId)
+        .collection(neighborhoodRulebooksCollectionName);
+  }
+
+  DocumentReference<Map<String, dynamic>> _rulebook({
+    required String neighborhoodId,
+    required String rulebookId,
+  }) {
+    return _rulebooks(neighborhoodId: neighborhoodId).doc(rulebookId);
+  }
 
   @override
   Future<void> deleteRulebook({
     required String rulebookId,
   }) async {
     try {
-      await rulebooks.doc(rulebookId).delete();
+      final user = await cachedCloudUser;
+      await _rulebook(
+        neighborhoodId: user!.neighborhoodId!,
+        rulebookId: rulebookId,
+      ).delete();
     } catch (e) {
       throw CouldNotDeleteRulebookException();
     }
@@ -37,7 +57,11 @@ class FirebaseCloudProvider implements CloudProvider {
       throw ChannelErrorRulebookException();
     }
     try {
-      await rulebooks.doc(rulebookId).update({
+      final user = await cachedCloudUser;
+      return await _rulebook(
+        neighborhoodId: user!.neighborhoodId!,
+        rulebookId: rulebookId,
+      ).update({
         rulebookTitleFieldName: title,
         rulebookTextFieldName: text,
       });
@@ -47,18 +71,12 @@ class FirebaseCloudProvider implements CloudProvider {
   }
 
   @override
-  Stream<Iterable<Rulebook>> allRulebooks({
-    required String ownerUserId,
+  Stream<Iterable<Rulebook>> neighborhoodRulebooks({
     required String neighborhoodId,
   }) {
-    final allRulebooks = FirebaseFirestore.instance
-        .collection(neighborhoodsCollectionName)
-        .doc(neighborhoodId)
-        .collection('rulebooks')
-        .snapshots()
-        .map((event) {
+    final allRulebooks =
+        _rulebooks(neighborhoodId: neighborhoodId).snapshots().map((event) {
       return event.docs.map((doc) {
-        devtools.log(doc.data().toString());
         return Rulebook.fromSnapshot(doc);
       });
     });
@@ -67,30 +85,29 @@ class FirebaseCloudProvider implements CloudProvider {
 
   @override
   Future<Rulebook> createNewRulebook({
-    required String ownerUserId,
     required String title,
     required String text,
   }) async {
     if (title.isEmpty || text.isEmpty) {
       throw ChannelErrorRulebookException();
     }
-    final rulebook = await rulebooks.add({
-      rulebookOwnerUserIdFieldName: ownerUserId,
-      rulebookTitleFieldName: title,
-      rulebookTextFieldName: text,
-    });
-    final fetchedRulebook = await rulebook.get();
-
-    return Rulebook(
-      id: fetchedRulebook.id,
-      title: title,
-      text: text,
-    );
+    try {
+      final user = await cachedCloudUser;
+      final doc = await _rulebooks(
+        neighborhoodId: user!.neighborhoodId!,
+      ).add({
+        rulebookTitleFieldName: title,
+        rulebookTextFieldName: text,
+      }).then((doc) => doc.get().then((doc) => Rulebook.fromDocument(doc)));
+      return doc;
+    } catch (e) {
+      throw CouldNotCreateRulebookException();
+    }
   }
 
   @override
   Future<void> initialize({required String? userId}) async {
-    await users.doc(userId).get();
+    await _users.doc(userId).get();
   }
 
   @override
@@ -101,7 +118,7 @@ class FirebaseCloudProvider implements CloudProvider {
 
     if (user.uid.isEmpty) return null;
 
-    final cloudUser = await users.doc(user.uid).get();
+    final cloudUser = await _users.doc(user.uid).get();
 
     if (!cloudUser.exists) return null;
 
@@ -119,7 +136,7 @@ class FirebaseCloudProvider implements CloudProvider {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return null;
     if (user.uid.isEmpty) return null;
-    final cachedDoc = await users.doc(user.uid).get(
+    final cachedDoc = await _users.doc(user.uid).get(
           (GetOptions(source: Source.cache)),
         );
     if (!cachedDoc.exists) return null;
@@ -151,7 +168,7 @@ class FirebaseCloudProvider implements CloudProvider {
 
     // create the cloud user
     try {
-      await users.doc(userId).set({
+      await _users.doc(userId).set({
         userDisplayNameFieldName: displayName,
         userUsernameFieldName: username,
       });
@@ -197,12 +214,12 @@ class FirebaseCloudProvider implements CloudProvider {
         // update the user's household id and neighborhood id if applicable
         final data = snapshot.data() as Map<String, dynamic>;
         if (data[householdNeighborhoodIdFieldName] != null) {
-          await users.doc(userId).update({
+          await _users.doc(userId).update({
             userHouseholdIdFieldName: snapshot.id,
             userNeighborhoodIdFieldName: data[householdNeighborhoodIdFieldName],
           });
         } else {
-          await users.doc(userId).update({
+          await _users.doc(userId).update({
             userHouseholdIdFieldName: snapshot.id,
           });
         }
@@ -229,7 +246,7 @@ class FirebaseCloudProvider implements CloudProvider {
         final data = value.data() as Map<String, dynamic>;
         if (data.containsKey(householdNeighborhoodIdFieldName)) {
           // update the user's neighborhood id
-          await users.doc(authUser.uid).update({
+          await _users.doc(authUser.uid).update({
             userNeighborhoodIdFieldName: data[householdNeighborhoodIdFieldName],
           });
         } else {
@@ -263,7 +280,7 @@ class FirebaseCloudProvider implements CloudProvider {
 
     try {
       // update the user display name
-      await users.doc(userId).update({
+      await _users.doc(userId).update({
         userDisplayNameFieldName: displayName,
       });
     } catch (e) {
