@@ -602,6 +602,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             title: event.title,
             text: event.text,
           );
+          newRulebook = state.rulebook!.copyWith(
+            newTitle: event.title,
+            newText: event.text,
+          );
         } catch (e) {
           //inform user of error
           emit(AppStateEditingRulebook(
