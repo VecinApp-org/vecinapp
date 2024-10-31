@@ -4,7 +4,7 @@ import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/dialogs/show_confirmation_dialog.dart';
 
-import '../services/settings/settings_controller.dart';
+import 'package:vecinapp/services/settings/settings_controller.dart';
 
 class SettingsView extends StatelessWidget {
   SettingsView({super.key});

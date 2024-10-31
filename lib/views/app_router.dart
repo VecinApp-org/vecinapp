@@ -123,7 +123,7 @@ class AppBlocRouter extends StatelessWidget {
         } else if (state is AppStateViewingSettings) {
           return SettingsView();
         } else if (state is AppStateViewingRulebooks) {
-          return RulebooksView();
+          return const RulebooksView();
         } else if (state is AppStateEditingRulebook) {
           return EditRulebookView(rulebook: state.rulebook);
         } else if (state is AppStateViewingRulebookDetails) {
@@ -137,9 +137,22 @@ class AppBlocRouter extends StatelessWidget {
         } else if (state is AppStateNoNeighborhood) {
           return const NoNeighborhoodView();
         } else {
-          return Container(); // This should never happen
+          return const BadState(); // This should never happen
         }
       },
+    );
+  }
+}
+
+class BadState extends StatelessWidget {
+  const BadState({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: Text('BadState'),
+      ),
     );
   }
 }
