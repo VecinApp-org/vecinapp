@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_user.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
@@ -8,6 +8,7 @@ import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
 import 'dart:developer' as devtools show log;
 
 class FirebaseCloudProvider implements CloudProvider {
+  late final AuthProvider _authProvider;
   final _neighborhoods =
       FirebaseFirestore.instance.collection(neighborhoodsCollectionName);
   final households =
@@ -106,17 +107,17 @@ class FirebaseCloudProvider implements CloudProvider {
   }
 
   @override
-  Future<void> initialize({required String? userId}) async {
-    await _users.doc(userId).get();
+  Future<void> initialize({required authProvider}) async {
+    _authProvider = authProvider;
   }
 
   @override
   Future<CloudUser?> get currentCloudUser async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _authProvider.currentUser;
 
     if (user == null) return null;
 
-    if (user.uid.isEmpty) return null;
+    if (user.uid!.isEmpty) return null;
 
     final cloudUser = await _users.doc(user.uid).get();
 
@@ -133,9 +134,9 @@ class FirebaseCloudProvider implements CloudProvider {
 
   @override
   Future<CloudUser?> get cachedCloudUser async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _authProvider.currentUser;
     if (user == null) return null;
-    if (user.uid.isEmpty) return null;
+    if (user.uid!.isEmpty) return null;
     final cachedDoc = await _users.doc(user.uid).get(
           (GetOptions(source: Source.cache)),
         );
@@ -150,7 +151,6 @@ class FirebaseCloudProvider implements CloudProvider {
 
   @override
   Future<void> createCloudUser({
-    required String userId,
     required String username,
     required String displayName,
   }) async {
@@ -168,6 +168,7 @@ class FirebaseCloudProvider implements CloudProvider {
 
     // create the cloud user
     try {
+      final userId = _authProvider.currentUser!.uid;
       await _users.doc(userId).set({
         userDisplayNameFieldName: displayName,
         userUsernameFieldName: username,
@@ -184,8 +185,9 @@ class FirebaseCloudProvider implements CloudProvider {
   }
 
   @override
-  Future<void> deleteCloudUser({required String userId}) async {
+  Future<void> deleteCloudUser() async {
     try {
+      final userId = _authProvider.currentUser!.uid;
       await _users.doc(userId).delete();
     } catch (e) {
       throw CouldNotDeleteCloudUserException();
@@ -202,7 +204,7 @@ class FirebaseCloudProvider implements CloudProvider {
     required double longitude,
   }) async {
     try {
-      final userId = FirebaseAuth.instance.currentUser!.uid;
+      final userId = _authProvider.currentUser!.uid;
       await households
           .where(householdFullAddressFieldName, isEqualTo: fullAddress)
           .get()
@@ -240,7 +242,7 @@ class FirebaseCloudProvider implements CloudProvider {
 
   @override
   Future<void> assignNeighborhood() async {
-    final authUser = FirebaseAuth.instance.currentUser!;
+    final authUser = _authProvider.currentUser!;
     final cloudUser = await currentCloudUser;
     if (cloudUser == null) {
       throw UserDoesNotExistException();
@@ -272,7 +274,7 @@ class FirebaseCloudProvider implements CloudProvider {
   Future<void> updateUserDisplayName({
     required String displayName,
   }) async {
-    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final userId = _authProvider.currentUser!.uid;
     // check if displayName is empty
     if (displayName.isEmpty) {
       throw ChannelErrorRulebookException();

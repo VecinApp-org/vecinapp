@@ -18,7 +18,7 @@ void main() async {
 
   // Initialize Cloud database
   final cloudProvider = FirebaseCloudProvider();
-  await cloudProvider.initialize(userId: authProvider.currentUser?.uid);
+  await cloudProvider.initialize(authProvider: authProvider);
 
   // Initialize Storage
   final storageProvider = FirebaseStorageProvider();

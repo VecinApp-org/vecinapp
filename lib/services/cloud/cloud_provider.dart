@@ -4,22 +4,17 @@ import 'package:vecinapp/services/cloud/rulebook.dart';
 
 @immutable
 abstract class CloudProvider {
-  Future<void> initialize({
-    required String? userId,
-  });
+  Future<void> initialize({required authProvider});
 
   Future<CloudUser?> get currentCloudUser;
   Future<CloudUser?> get cachedCloudUser;
 
   Future<void> createCloudUser({
-    required String userId,
     required String username,
     required String displayName,
   });
 
-  Future<void> deleteCloudUser({
-    required String userId,
-  });
+  Future<void> deleteCloudUser();
 
   Future<void> changeHousehold({
     required String fullAddress,

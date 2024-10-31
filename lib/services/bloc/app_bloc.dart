@@ -239,7 +239,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           password: event.password,
         );
         await _storageProvider.deleteProfileImage(userId: user.uid!);
-        await _cloudProvider.deleteCloudUser(userId: user.uid!);
+        await _cloudProvider.deleteCloudUser();
         await _authProvider.deleteAccount();
       } catch (e) {
         emit(AppStateDeletingAccount(
@@ -409,7 +409,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       //create new cloud user
       try {
         await _cloudProvider.createCloudUser(
-          userId: user.uid!,
           username: event.username,
           displayName: event.displayName,
         );
