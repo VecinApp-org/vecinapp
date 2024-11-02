@@ -2,26 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 
-import 'package:flutter_hooks/flutter_hooks.dart';
-
-class ProfilePicture extends HookWidget {
+class ProfilePicture extends StatelessWidget {
   const ProfilePicture({super.key, required this.radius});
 
   final double radius;
 
   @override
   Widget build(BuildContext context) {
-    final future = useMemoized(() => context.watch<AppBloc>().profilePicture());
-    final profilePicture = useStream(future, preserveState: false);
-    if (profilePicture.data != null) {
-      return CircleAvatar(
-        backgroundImage: MemoryImage(profilePicture.data!),
-        radius: radius,
-      );
-    } else {
-      return CircleAvatar(
-        radius: radius,
-      );
-    }
+    final profilePicture = context.watch<AppBloc>().profilePicture();
+    return StreamBuilder(
+      stream: profilePicture,
+      builder: (context, snapshot) {
+        if (snapshot.data != null &&
+            snapshot.connectionState == ConnectionState.done) {
+          return CircleAvatar(
+            radius: radius,
+            backgroundImage: Image.memory(snapshot.data!).image,
+          );
+        } else {
+          return CircleAvatar(
+            radius: radius,
+          );
+        }
+      },
+    );
   }
 }

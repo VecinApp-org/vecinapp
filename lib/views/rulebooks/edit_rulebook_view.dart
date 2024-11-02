@@ -8,13 +8,18 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 class EditRulebookView extends HookWidget {
   const EditRulebookView({super.key, this.rulebook});
   final Rulebook? rulebook;
+
   @override
   Widget build(BuildContext context) {
     final textController = useTextEditingController();
     final titleController = useTextEditingController();
-    (rulebook != null)
-        ? textController.text = rulebook!.text
-        : titleController.text = rulebook!.title;
+    //populate the fields with the rulebook data
+    if (rulebook != null) {
+      if (rulebook!.text.isNotEmpty && rulebook!.title.isNotEmpty) {
+        textController.text = rulebook!.text;
+        titleController.text = rulebook!.title;
+      }
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Editar Reglamento'),
