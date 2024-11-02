@@ -75,15 +75,15 @@ class AppBlocRouter extends StatelessWidget {
             }
           } else if (exception is CloudException) {
             if (exception is CouldNotCreateRulebooksException) {
-              message = 'No se pudo crear el documento';
+              message = 'No se pudo crear, intenta de nuevo';
             } else if (exception is CouldNotDeleteRulebookException) {
-              message = 'No se pudo borrar el documento';
+              message = 'No se pudo borrar. Intenta de nuevo';
             } else if (exception is CouldNotUpdateRulebooksException) {
-              message = 'No se pudo actualizar el documento';
+              message = 'No se pudo actualizar';
             } else if (exception is CouldNotGetRulebooksException) {
-              message = 'No se pudieron obtener los reglamentos';
+              message = 'No se pudo obtener la información';
             } else if (exception is ChannelErrorRulebookException) {
-              message = 'Los reglamentos deben tener título y contenido';
+              message = 'Dejaste algo vacío';
             } else {
               message = 'Error de base de datos desconocido';
             }

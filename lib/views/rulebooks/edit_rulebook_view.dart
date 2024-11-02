@@ -3,88 +3,54 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
-class EditRulebookView extends StatefulWidget {
+class EditRulebookView extends HookWidget {
   const EditRulebookView({super.key, this.rulebook});
-
   final Rulebook? rulebook;
-
-  @override
-  State<EditRulebookView> createState() => _EditRulebookViewState();
-}
-
-class _EditRulebookViewState extends State<EditRulebookView> {
-  late final TextEditingController _textController;
-  late final TextEditingController _titleController;
-
-  @override
-  void initState() {
-    _textController = TextEditingController();
-    _titleController = TextEditingController();
-    _setupEditRulebookIfProvided();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _textController.dispose();
-    _titleController.dispose();
-    super.dispose();
-  }
-
-  void _setupEditRulebookIfProvided() {
-    if (widget.rulebook != null) {
-      _textController.text = widget.rulebook!.text;
-      _titleController.text = widget.rulebook!.title;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final textController = useTextEditingController();
+    final titleController = useTextEditingController();
+    (rulebook != null)
+        ? textController.text = rulebook!.text
+        : titleController.text = rulebook!.title;
     return Scaffold(
-        appBar: AppBar(
-          leading: BackButton(
-            onPressed: () {
-              context.read<AppBloc>().add(const AppEventGoToRulebooksView());
-            },
+      appBar: AppBar(
+        title: const Text('Editar Reglamento'),
+        leading: BackButton(
+            onPressed: () =>
+                context.read<AppBloc>().add(const AppEventGoToRulebooksView())),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(33),
+        children: [
+          TextField(
+            controller: titleController,
+            autofocus: true,
+            keyboardType: TextInputType.multiline,
+            maxLines: 1,
+            decoration: const InputDecoration(labelText: 'Título'),
           ),
-          title: const Text('Editar Reglamento'),
-        ),
-        body: ListView(
-          padding: const EdgeInsets.all(16.0),
-          children: [
-            TextField(
-              autofocus: true,
-              keyboardType: TextInputType.multiline,
-              maxLines: 1,
-              decoration: const InputDecoration(
-                labelText: 'Título',
-                //hintText: 'Título...',
-              ),
-              controller: _titleController,
-            ),
-            const SizedBox(height: 8.0),
-            TextField(
-              keyboardType: TextInputType.multiline,
-              maxLines: null,
-              decoration: const InputDecoration(
-                labelText: 'Contenido',
-              ),
-              controller: _textController,
-            ),
-            const SizedBox(height: 32.0),
-            FilledButton(
-              onPressed: () async {
-                final text = _textController.text;
-                final title = _titleController.text;
-                context.read<AppBloc>().add(AppEventCreateOrUpdateRulebook(
-                      title: title,
-                      text: text,
-                    ));
-              },
-              child: const Text('Guardar'),
-            )
-          ],
-        ));
+          const SizedBox(height: 8.0),
+          TextField(
+            controller: textController,
+            keyboardType: TextInputType.multiline,
+            maxLines: null,
+            decoration: const InputDecoration(labelText: 'Contenido'),
+          ),
+          const SizedBox(height: 32.0),
+          FilledButton(
+            onPressed: () async {
+              context.read<AppBloc>().add(AppEventCreateOrUpdateRulebook(
+                    title: titleController.text,
+                    text: textController.text,
+                  ));
+            },
+            child: const Text('Guardar'),
+          )
+        ],
+      ),
+    );
   }
 }

@@ -78,22 +78,17 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
-        title: const Text('Las Brisas'),
-        actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: InkWell(
-              onTap: () {
-                context.read<AppBloc>().add(
-                      const AppEventGoToProfileView(),
-                    );
-              },
-              child: const ProfilePicture(radius: 20),
-            ),
-          ),
-        ],
-      ),
+          centerTitle: true,
+          title: const Text('Las Brisas'),
+          actions: <Widget>[
+            Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GestureDetector(
+                    onTap: () => context
+                        .read<AppBloc>()
+                        .add(const AppEventGoToProfileView()),
+                    child: const ProfilePicture(radius: 24)))
+          ]),
       body: GridView.builder(
         padding: EdgeInsets.all(spacing),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

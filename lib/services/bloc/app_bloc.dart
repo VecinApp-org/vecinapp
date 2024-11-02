@@ -443,11 +443,25 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           isLoading: true,
           exception: null,
         ));
+        //check if fields are empty
+        if (event.streetLine1.isEmpty ||
+            event.municipality.isEmpty ||
+            event.state.isEmpty ||
+            event.country.isEmpty ||
+            event.postalCode.isEmpty) {
+          emit(AppStateSelectingHomeAddress(
+            isLoading: false,
+            exception: ChannelErrorRulebookException(),
+          ));
+          return;
+        }
         //todo: check if address is valid and get full address from geocoding
+        final String addressLine1 =
+            '${event.streetLine1} ${event.interior}'.trim();
         final String fullAddress =
-            '${event.street} #${event.number}. ${event.municipality}, ${event.state}, ${event.country}';
-        final String addressLine1 = '${event.street} #${event.number}';
-        final String groupname = event.street;
+            '$addressLine1. ${event.municipality}, ${event.state}, ${event.country}';
+
+        final String groupname = event.streetLine1;
         final String? interior = event.interior;
         final double latitude = event.latitude;
         final double longitude = event.longitude;

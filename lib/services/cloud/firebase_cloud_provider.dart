@@ -203,6 +203,9 @@ class FirebaseCloudProvider implements CloudProvider {
     required double latitude,
     required double longitude,
   }) async {
+    if (fullAddress.isEmpty || addressLine1.isEmpty || groupname.isEmpty) {
+      throw ChannelErrorRulebookException();
+    }
     try {
       final userId = _authProvider.currentUser!.uid;
       await households

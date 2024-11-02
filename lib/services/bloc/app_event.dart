@@ -75,8 +75,7 @@ class AppEventUpdateHomeAddress extends AppEvent {
   final String state;
   final String municipality;
   final String postalCode;
-  final String street;
-  final String number;
+  final String streetLine1;
   final String? interior;
   final double latitude;
   final double longitude;
@@ -85,8 +84,7 @@ class AppEventUpdateHomeAddress extends AppEvent {
     required this.state,
     required this.municipality,
     required this.postalCode,
-    required this.street,
-    required this.number,
+    required this.streetLine1,
     required this.interior,
     required this.latitude,
     required this.longitude,

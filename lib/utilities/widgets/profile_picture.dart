@@ -2,41 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 
-class ProfilePicture extends StatelessWidget {
+import 'package:flutter_hooks/flutter_hooks.dart';
+
+class ProfilePicture extends HookWidget {
   const ProfilePicture({super.key, required this.radius});
 
   final double radius;
 
   @override
   Widget build(BuildContext context) {
-    const Icon icon = Icon(Icons.person);
-    final profilePicture = context.watch<AppBloc>().profilePicture();
-    return StreamBuilder(
-        stream: profilePicture,
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.active:
-            case ConnectionState.done:
-              if (snapshot.hasData) {
-                return CircleAvatar(
-                  backgroundImage: Image.memory(snapshot.data!).image,
-                  radius: radius,
-                );
-              } else {
-                return CircleAvatar(
-                  radius: radius,
-                  child: icon,
-                );
-              }
-            default:
-              return CircleAvatar(
-                radius: radius,
-                child: const CircularProgressIndicator(
-                  strokeWidth: 2.0,
-                  strokeAlign: BorderSide.strokeAlignInside,
-                ),
-              );
-          }
-        });
+    final future = useMemoized(() => context.watch<AppBloc>().profilePicture());
+    final profilePicture = useStream(future, preserveState: false);
+    if (profilePicture.data != null) {
+      return CircleAvatar(
+        backgroundImage: MemoryImage(profilePicture.data!),
+        radius: radius,
+      );
+    } else {
+      return CircleAvatar(
+        radius: radius,
+      );
+    }
   }
 }

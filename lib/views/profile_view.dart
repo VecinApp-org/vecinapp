@@ -48,7 +48,7 @@ class ProfileView extends StatelessWidget {
             children: [
               const SizedBox(height: 32),
               Center(
-                child: InkWell(
+                child: GestureDetector(
                   onTap: () async {
                     final image = await picker.pickImage(
                       source: ImageSource.gallery,
