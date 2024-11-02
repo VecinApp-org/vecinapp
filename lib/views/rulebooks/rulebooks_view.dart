@@ -9,8 +9,8 @@ class RulebooksView extends HookWidget {
   const RulebooksView({super.key});
   @override
   Widget build(BuildContext context) {
-    final rulebooks = useStream(context.watch<AppBloc>().rulebooks);
-
+    final stream = useMemoized(() => context.watch<AppBloc>().rulebooks);
+    final rulebooks = useStream(stream);
     return Scaffold(
         appBar: AppBar(
             leading: BackButton(
