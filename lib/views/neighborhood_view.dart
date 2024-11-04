@@ -69,8 +69,8 @@ Widget cardBuilder(
   );
 }
 
-class HomeView extends StatelessWidget {
-  const HomeView({super.key});
+class NeighborhoodView extends StatelessWidget {
+  const NeighborhoodView({super.key});
 
   final double spacing = 16;
 

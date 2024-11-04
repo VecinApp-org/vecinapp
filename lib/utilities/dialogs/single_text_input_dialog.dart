@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 Future<String?> showTextInputDialog({
   required BuildContext context,
   required String title,
-  required String hintText,
+  required String labelText,
   required String? initialValue,
 }) {
   final controller = TextEditingController(text: initialValue);
@@ -17,7 +17,7 @@ Future<String?> showTextInputDialog({
           autofocus: true,
           controller: controller,
           decoration: InputDecoration(
-            hintText: hintText,
+            labelText: labelText,
           ),
         ),
         actions: [

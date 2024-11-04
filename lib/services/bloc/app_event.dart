@@ -109,6 +109,13 @@ class AppEventGoToProfileView extends AppEvent {
   const AppEventGoToProfileView();
 }
 
+class AppEventGoToHouseholdView extends AppEvent {
+  final String householdId;
+  const AppEventGoToHouseholdView({
+    required this.householdId,
+  });
+}
+
 class AppEventGoToSettingsView extends AppEvent {
   const AppEventGoToSettingsView();
 }

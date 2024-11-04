@@ -10,7 +10,7 @@ abstract class StorageProvider {
     required String userId,
   });
 
-  Future<Uint8List> getProfileImage({required String userId});
+  Future<Uint8List?> getProfileImage({required String userId});
 
   Future<void> deleteProfileImage({required String userId});
 }

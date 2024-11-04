@@ -30,6 +30,11 @@ abstract class CloudProvider {
   Future<void> updateUserDisplayName({
     required String displayName,
   });
+
+  Stream<Iterable<CloudUser>> householdNeighbors({
+    required String householdId,
+  });
+
   Stream<Iterable<Rulebook>> neighborhoodRulebooks({
     required String neighborhoodId,
   });

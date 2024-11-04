@@ -84,7 +84,7 @@ class ProfileView extends StatelessWidget {
                         context: context,
                         initialValue: state.cloudUser!.displayName,
                         title: 'Cambiar nombre',
-                        hintText: 'Nombre',
+                        labelText: 'Nombre',
                       );
                       if (newUserDisplayName != null && context.mounted) {
                         context.read<AppBloc>().add(
@@ -105,12 +105,17 @@ class ProfileView extends StatelessWidget {
                 leading: const Icon(Icons.phone),
                 title: Text(phoneNumber),
               ),
-              const ListTile(
-                leading: Icon(Icons.home),
-                title: Text('Sin Dirección'),
-              ),
+              ListTile(
+                  leading: Icon(Icons.home),
+                  title: Text('Mi Casa'),
+                  trailing: Icon(Icons.arrow_right),
+                  onTap: () {
+                    context.read<AppBloc>().add(AppEventGoToHouseholdView(
+                        householdId: state.cloudUser!.householdId!));
+                  }),
               const Divider(),
               ListTile(
+                  leading: const Icon(Icons.settings),
                   title: const Text('Configuración'),
                   trailing: const Icon(Icons.arrow_right),
                   onTap: () {

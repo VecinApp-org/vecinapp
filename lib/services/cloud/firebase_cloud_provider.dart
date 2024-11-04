@@ -76,11 +76,13 @@ class FirebaseCloudProvider implements CloudProvider {
     required String neighborhoodId,
   }) {
     final allRulebooks =
-        _rulebooks(neighborhoodId: neighborhoodId).snapshots().map((event) {
-      return event.docs.map((doc) {
-        return Rulebook.fromSnapshot(doc);
-      });
-    });
+        _rulebooks(neighborhoodId: neighborhoodId).snapshots().map(
+      (event) {
+        return event.docs.map((doc) {
+          return Rulebook.fromSnapshot(doc);
+        });
+      },
+    );
     return allRulebooks;
   }
 
@@ -300,5 +302,21 @@ class FirebaseCloudProvider implements CloudProvider {
     } catch (e) {
       throw CouldNotUpdateUserException();
     }
+  }
+
+  @override
+  Stream<Iterable<CloudUser>> householdNeighbors({
+    required String householdId,
+  }) {
+    final query = _users
+        .where(userHouseholdIdFieldName, isEqualTo: householdId)
+        .snapshots()
+        .map((event) {
+      devtools.log('event: $event');
+      return event.docs.map((doc) {
+        return CloudUser.fromSnapshot(doc);
+      });
+    });
+    return query;
   }
 }

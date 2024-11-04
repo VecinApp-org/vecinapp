@@ -65,7 +65,7 @@ class FirebaseStorageProvider implements StorageProvider {
   }
 
   @override
-  Future<Uint8List> getProfileImage({required String userId}) async {
+  Future<Uint8List?> getProfileImage({required String userId}) async {
     // create a cache directory
     final cacheDir = await getApplicationDocumentsDirectory();
     final cacheFile = File('${cacheDir.path}/$userId/profile_image');
@@ -76,20 +76,22 @@ class FirebaseStorageProvider implements StorageProvider {
       return cacheFile.readAsBytes();
     }
     //download the image
+    late final Uint8List? imageBytes;
     try {
-      final Uint8List imageBytes = await FirebaseStorage.instance
+      imageBytes = await FirebaseStorage.instance
           .ref('user/$userId')
           .child('profile_image')
-          .getData()
-          .then((value) => value as Uint8List);
-      // save the image to the cache directory
-      cacheFile.createSync(recursive: true);
-      cacheFile.writeAsBytesSync(imageBytes);
-      return imageBytes;
+          .getData();
     } catch (e) {
-      // throw an exception if the image couldn't be downloaded
-      throw ImageNotFoundStorageException();
+      return null;
     }
+    if (imageBytes == null) {
+      return null;
+    }
+    // save the image to the cache directory
+    cacheFile.createSync(recursive: true);
+    cacheFile.writeAsBytesSync(imageBytes);
+    return imageBytes;
   }
 
   @override
@@ -99,9 +101,7 @@ class FirebaseStorageProvider implements StorageProvider {
       await FirebaseStorage.instance
           .ref('user/$userId')
           .child('profile_image')
-          .delete()
-          .then((value) => devtools.log('Profile image deleted'))
-          .onError((error, stackTrace) => devtools.log(error.toString()));
+          .delete();
     } on FirebaseException catch (e) {
       switch (e.code) {
         case 'object-not-found':
@@ -116,9 +116,12 @@ class FirebaseStorageProvider implements StorageProvider {
     try {
       final cacheDir = await getApplicationDocumentsDirectory();
       final cacheFile = File('${cacheDir.path}/$userId/profile_image');
-      cacheFile.deleteSync();
+      if (cacheFile.existsSync()) {
+        await cacheFile.delete();
+      }
     } catch (_) {
       // ignore
     }
+    devtools.log('Profile image deleted');
   }
 }

@@ -151,6 +151,18 @@ class AppStateViewingProfile extends AppState with EquatableMixin {
   }
 }
 
+class AppStateViewingHousehold extends AppState {
+  final String householdId;
+  const AppStateViewingHousehold({
+    required bool isLoading,
+    required exception,
+    required this.householdId,
+  }) : super(
+          isLoading: isLoading,
+          exception: exception,
+        );
+}
+
 class AppStateViewingSettings extends AppState {
   const AppStateViewingSettings({
     required bool isLoading,
@@ -202,6 +214,15 @@ extension GetRulebook on AppState {
     }
     if (this is AppStateViewingRulebookDetails) {
       return (this as AppStateViewingRulebookDetails).rulebook;
+    }
+    return null;
+  }
+}
+
+extension GetHouseholdId on AppState {
+  String? get householdId {
+    if (this is AppStateViewingHousehold) {
+      return (this as AppStateViewingHousehold).householdId;
     }
     return null;
   }

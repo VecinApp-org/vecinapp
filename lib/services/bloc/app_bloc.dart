@@ -9,6 +9,7 @@ import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
+import 'package:vecinapp/services/cloud/cloud_user.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
 import 'package:vecinapp/services/storage/storage_provider.dart';
 
@@ -308,6 +309,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(AppStateViewingProfile(
         cloudUser: cloudUser!,
         user: user,
+        isLoading: false,
+        exception: null,
+      ));
+    });
+
+    on<AppEventGoToHouseholdView>((event, emit) async {
+      emit(AppStateViewingHousehold(
+        householdId: event.householdId,
         isLoading: false,
         exception: null,
       ));
@@ -795,19 +804,29 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     );
   }
 
-  Stream<Uint8List?> profilePicture() async* {
+  Future<Uint8List?> profilePicture() async {
     final user = _authProvider.currentUser;
     if (user == null) {
-      yield null;
+      return null;
     }
     try {
-      yield await _storageProvider.getProfileImage(userId: user!.uid!);
+      return await _storageProvider.getProfileImage(userId: user.uid!);
     } catch (e) {
-      yield null;
+      return null;
     }
   }
 
   Stream<AuthUser> get userStream => _authProvider.userChanges();
+
+  Future<CloudUser?> get currentCloudUser async =>
+      await _cloudProvider.cachedCloudUser;
+
+  Stream<Iterable<CloudUser>> householdNeighbors(
+      {required String householdId}) async* {
+    yield* _cloudProvider.householdNeighbors(
+      householdId: householdId,
+    );
+  }
 
   Stream<Iterable<Rulebook>> get rulebooks async* {
     final cloudUSer = await _cloudProvider.cachedCloudUser;

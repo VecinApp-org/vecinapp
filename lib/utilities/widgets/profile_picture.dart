@@ -10,8 +10,8 @@ class ProfilePicture extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final profilePicture = context.watch<AppBloc>().profilePicture();
-    return StreamBuilder(
-      stream: profilePicture,
+    return FutureBuilder(
+      future: profilePicture,
       builder: (context, snapshot) {
         if (snapshot.data != null &&
             snapshot.connectionState == ConnectionState.done) {

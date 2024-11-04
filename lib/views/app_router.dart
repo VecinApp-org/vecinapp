@@ -11,7 +11,8 @@ import 'package:vecinapp/views/cloud_login/select_address_view.dart';
 import 'package:vecinapp/views/cloud_login/no_neighborhood_view.dart';
 import 'package:vecinapp/views/cloud_login/register_cloud_user_view.dart';
 import 'package:vecinapp/views/delete_account_view.dart';
-import 'package:vecinapp/views/home_view.dart';
+import 'package:vecinapp/views/household_view.dart';
+import 'package:vecinapp/views/neighborhood_view.dart';
 import 'package:vecinapp/views/login/forgot_password_view.dart';
 import 'package:vecinapp/views/login/login_view.dart';
 import 'package:vecinapp/views/login/register_view.dart';
@@ -117,9 +118,11 @@ class AppBlocRouter extends StatelessWidget {
         } else if (state is AppStateNeedsVerification) {
           return const VerifyEmailView();
         } else if (state is AppStateViewingNeighborhood) {
-          return const HomeView();
+          return const NeighborhoodView();
         } else if (state is AppStateViewingProfile) {
           return const ProfileView();
+        } else if (state is AppStateViewingHousehold) {
+          return HouseholdView(householdId: state.householdId);
         } else if (state is AppStateViewingSettings) {
           return SettingsView();
         } else if (state is AppStateViewingRulebooks) {
