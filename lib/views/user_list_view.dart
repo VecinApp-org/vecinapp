@@ -16,7 +16,7 @@ class UserListView extends StatelessWidget {
             ListTile(
               onTap: () {},
               title: Text(
-                user.displayName!,
+                user.displayName,
                 maxLines: 1,
                 softWrap: true,
                 overflow: TextOverflow.ellipsis,

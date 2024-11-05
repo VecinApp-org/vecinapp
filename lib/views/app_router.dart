@@ -7,6 +7,7 @@ import 'package:vecinapp/utilities/dialogs/show_error_dialog.dart';
 import 'package:vecinapp/utilities/loading/loading_screen.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
+import 'package:vecinapp/views/change_address_view.dart';
 import 'package:vecinapp/views/cloud_login/select_address_view.dart';
 import 'package:vecinapp/views/cloud_login/no_neighborhood_view.dart';
 import 'package:vecinapp/views/cloud_login/register_cloud_user_view.dart';
@@ -123,6 +124,8 @@ class AppBlocRouter extends StatelessWidget {
           return const ProfileView();
         } else if (state is AppStateViewingHousehold) {
           return HouseholdView(householdId: state.householdId);
+        } else if (state is AppStateChangingAddress) {
+          return const ChangeAddressView();
         } else if (state is AppStateViewingSettings) {
           return SettingsView();
         } else if (state is AppStateViewingRulebooks) {

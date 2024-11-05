@@ -163,6 +163,16 @@ class AppStateViewingHousehold extends AppState {
         );
 }
 
+class AppStateChangingAddress extends AppState {
+  const AppStateChangingAddress({
+    required bool isLoading,
+    required exception,
+  }) : super(
+          isLoading: isLoading,
+          exception: exception,
+        );
+}
+
 class AppStateViewingSettings extends AppState {
   const AppStateViewingSettings({
     required bool isLoading,

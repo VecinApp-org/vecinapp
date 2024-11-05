@@ -14,6 +14,7 @@ class SelectAddressView extends HookWidget {
     final municipalityController = useTextEditingController();
     final postalCodeController = useTextEditingController();
     final streetController = useTextEditingController();
+    final numberController = useTextEditingController();
     final interiorController = useTextEditingController();
     return CenteredView(children: [
       Text('Selecciona tu dirección',
@@ -33,9 +34,21 @@ class SelectAddressView extends HookWidget {
       TextField(
           controller: municipalityController,
           decoration: InputDecoration(labelText: 'Municipio')),
-      TextField(
-          controller: streetController,
-          decoration: InputDecoration(labelText: 'Calle y Número')),
+      Row(
+        children: [
+          Expanded(
+            child: TextField(
+                controller: streetController,
+                decoration: InputDecoration(labelText: 'Calle')),
+          ),
+          SizedBox(width: 13),
+          Expanded(
+            child: TextField(
+                controller: numberController,
+                decoration: InputDecoration(labelText: 'Número')),
+          ),
+        ],
+      ),
       Row(children: [
         Expanded(
             child: TextField(
@@ -55,7 +68,8 @@ class SelectAddressView extends HookWidget {
                   state: stateController.text.trim(),
                   municipality: municipalityController.text.trim(),
                   postalCode: postalCodeController.text.trim(),
-                  streetLine1: streetController.text.trim(),
+                  street: streetController.text.trim(),
+                  houseNumber: numberController.text.trim(),
                   interior: interiorController.text.trim(),
                   latitude: 25.671802609711552,
                   longitude: -100.30939284155167)),
@@ -67,8 +81,9 @@ class SelectAddressView extends HookWidget {
                   state: 'Nuevo León',
                   municipality: 'Monterrey',
                   postalCode: '64000',
-                  streetLine1: 'Ignacio Zaragoza',
-                  interior: '',
+                  street: 'Ignacio Zaragoza',
+                  houseNumber: '123',
+                  interior: 'A',
                   latitude: 25.671802609711552,
                   longitude: -100.30939284155167)),
           child: const Text('Set default address'))

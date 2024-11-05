@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 @immutable
 abstract class StorageProvider {
-  Future<void> uploadProfileImage({
+  Future<String> uploadProfileImage({
     required File image,
     required String userId,
   });

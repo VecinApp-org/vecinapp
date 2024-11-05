@@ -50,7 +50,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       final cloudUser = await _cloudProvider.currentCloudUser;
 
-      if (cloudUser == null || cloudUser.username == null) {
+      if (cloudUser == null) {
         emit(const AppStateCreatingCloudUser(
           isLoading: false,
           exception: null,
@@ -322,6 +322,21 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
     });
 
+    on<AppEventGoToChangeAddressView>((event, emit) async {
+      final user = _authProvider.currentUser;
+      if (user == null) {
+        emit(const AppStateLoggingIn(
+          exception: null,
+          isLoading: false,
+        ));
+        return;
+      }
+      emit(AppStateChangingAddress(
+        isLoading: false,
+        exception: null,
+      ));
+    });
+
     on<AppEventGoToSettingsView>((event, emit) async {
       final user = _authProvider.currentUser;
       if (user == null) {
@@ -453,11 +468,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           exception: null,
         ));
         //check if fields are empty
-        if (event.streetLine1.isEmpty ||
-            event.municipality.isEmpty ||
-            event.state.isEmpty ||
-            event.country.isEmpty ||
-            event.postalCode.isEmpty) {
+        if (event.street.trim().isEmpty ||
+            event.municipality.trim().isEmpty ||
+            event.state.trim().isEmpty ||
+            event.country.trim().isEmpty ||
+            event.postalCode.trim().isEmpty) {
           emit(AppStateSelectingHomeAddress(
             isLoading: false,
             exception: ChannelErrorRulebookException(),
@@ -466,11 +481,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         }
         //todo: check if address is valid and get full address from geocoding
         final String addressLine1 =
-            '${event.streetLine1} ${event.interior}'.trim();
+            '${event.street.trim()} ${event.houseNumber.trim()}'.trim();
         final String fullAddress =
-            '$addressLine1. ${event.municipality}, ${event.state}, ${event.country}';
-
-        final String groupname = event.streetLine1;
+            '$addressLine1. ${event.municipality.trim()}, ${event.state.trim()}, ${event.country.trim()}';
+        final String groupname = event.street;
         final String? interior = event.interior;
         final double latitude = event.latitude;
         final double longitude = event.longitude;
@@ -731,11 +745,26 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
 
       //upload image
+      late final String url;
       try {
         final File image = File(event.imagePath);
-        await _storageProvider.uploadProfileImage(
+        url = await _storageProvider.uploadProfileImage(
           image: image,
           userId: user.uid!,
+        );
+      } catch (e) {
+        emit(AppStateViewingProfile(
+          cloudUser: cloudUser,
+          user: user,
+          exception: e,
+          isLoading: false,
+        ));
+        return;
+      }
+      // update cloud user's profile photo url
+      try {
+        await _cloudProvider.updateUserPhotoUrl(
+          photoUrl: url,
         );
       } catch (e) {
         emit(AppStateViewingProfile(

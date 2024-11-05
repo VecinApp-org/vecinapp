@@ -9,7 +9,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class FirebaseStorageProvider implements StorageProvider {
   @override
-  Future<void> uploadProfileImage({
+  Future<String> uploadProfileImage({
     required File image,
     required String userId,
   }) async {
@@ -37,10 +37,11 @@ class FirebaseStorageProvider implements StorageProvider {
       await tempFile.writeAsBytes(compressedImage);
       // upload the image to Firebase Storage
       devtools.log('Uploading image...');
-      await FirebaseStorage.instance
+      final downloadUrl = await FirebaseStorage.instance
           .ref('user/$userId')
           .child('profile_image')
-          .putFile(tempFile);
+          .putFile(tempFile)
+          .then((value) => value.ref.getDownloadURL());
       // delete the temporary file
       await tempFile.delete();
       // save the image to the cache directory
@@ -49,6 +50,8 @@ class FirebaseStorageProvider implements StorageProvider {
       final cacheFile = File('${cacheDir.path}/$userId/profile_image');
       cacheFile.createSync(recursive: true);
       cacheFile.writeAsBytesSync(compressedImage);
+      // return the download URL
+      return downloadUrl;
     } on FirebaseException catch (e) {
       switch (e.code) {
         case 'object-not-found':

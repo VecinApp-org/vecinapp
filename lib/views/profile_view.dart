@@ -35,10 +35,7 @@ class ProfileView extends StatelessWidget {
           if (phoneNumber == null || phoneNumber.isEmpty) {
             phoneNumber = 'Sin Teléfono';
           }
-          String? displayName = state.cloudUser!.displayName;
-          if (displayName == null || displayName.isEmpty) {
-            displayName = 'Sin Nombre';
-          }
+          String displayName = state.cloudUser!.displayName;
           String? email = state.user!.email;
           if (email == null || email.isEmpty) {
             email = 'Sin Email';

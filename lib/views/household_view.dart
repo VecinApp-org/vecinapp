@@ -21,10 +21,31 @@ class HouseholdView extends HookWidget {
           onPressed: () =>
               context.read<AppBloc>().add(const AppEventGoToProfileView()),
         ),
+        actions: [
+          PopupMenuButton<AddressActions>(
+            onSelected: (value) {
+              switch (value) {
+                case AddressActions.changeAddress:
+                  context.read<AppBloc>().add(AppEventGoToChangeAddressView());
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: AddressActions.changeAddress,
+                child: Text('Cambiar Dirección'),
+              )
+            ],
+          )
+        ],
       ),
       body: UserListView(
         users: neighbors.data ?? [],
       ),
     );
   }
+}
+
+enum AddressActions {
+  changeAddress,
 }

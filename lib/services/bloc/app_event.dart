@@ -75,7 +75,8 @@ class AppEventUpdateHomeAddress extends AppEvent {
   final String state;
   final String municipality;
   final String postalCode;
-  final String streetLine1;
+  final String street;
+  final String houseNumber;
   final String? interior;
   final double latitude;
   final double longitude;
@@ -84,7 +85,8 @@ class AppEventUpdateHomeAddress extends AppEvent {
     required this.state,
     required this.municipality,
     required this.postalCode,
-    required this.streetLine1,
+    required this.street,
+    required this.houseNumber,
     required this.interior,
     required this.latitude,
     required this.longitude,
@@ -114,6 +116,10 @@ class AppEventGoToHouseholdView extends AppEvent {
   const AppEventGoToHouseholdView({
     required this.householdId,
   });
+}
+
+class AppEventGoToChangeAddressView extends AppEvent {
+  const AppEventGoToChangeAddressView();
 }
 
 class AppEventGoToSettingsView extends AppEvent {

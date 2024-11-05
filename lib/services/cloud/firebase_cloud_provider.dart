@@ -228,17 +228,11 @@ class FirebaseCloudProvider implements CloudProvider {
           snapshot = value.docs.first;
         }
         // update the user's household id and neighborhood id if applicable
-        final data = snapshot.data() as Map<String, dynamic>;
-        if (data[householdNeighborhoodIdFieldName] != null) {
-          await _users.doc(userId).update({
-            userHouseholdIdFieldName: snapshot.id,
-            userNeighborhoodIdFieldName: data[householdNeighborhoodIdFieldName],
-          });
-        } else {
-          await _users.doc(userId).update({
-            userHouseholdIdFieldName: snapshot.id,
-          });
-        }
+        final data = snapshot.data() as Map<String?, dynamic>;
+        await _users.doc(userId).update({
+          userHouseholdIdFieldName: snapshot.id,
+          userNeighborhoodIdFieldName: data[householdNeighborhoodIdFieldName],
+        });
       });
     } catch (e) {
       throw CouldNotUpdateHouseholdException();
@@ -305,6 +299,19 @@ class FirebaseCloudProvider implements CloudProvider {
   }
 
   @override
+  Future<void> updateUserPhotoUrl({required String photoUrl}) async {
+    final userId = _authProvider.currentUser!.uid;
+    try {
+      // update the user photo url
+      await _users.doc(userId).update({
+        userProfilePhotoUrlFieldName: photoUrl,
+      });
+    } catch (e) {
+      throw CouldNotUpdateUserException();
+    }
+  }
+
+  @override
   Stream<Iterable<CloudUser>> householdNeighbors({
     required String householdId,
   }) {
@@ -312,9 +319,8 @@ class FirebaseCloudProvider implements CloudProvider {
         .where(userHouseholdIdFieldName, isEqualTo: householdId)
         .snapshots()
         .map((event) {
-      devtools.log('event: $event');
       return event.docs.map((doc) {
-        return CloudUser.fromSnapshot(doc);
+        return CloudUser.fromSnapshot(snapshot: doc);
       });
     });
     return query;

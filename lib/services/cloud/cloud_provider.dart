@@ -31,6 +31,10 @@ abstract class CloudProvider {
     required String displayName,
   });
 
+  Future<void> updateUserPhotoUrl({
+    required String photoUrl,
+  });
+
   Stream<Iterable<CloudUser>> householdNeighbors({
     required String householdId,
   });
