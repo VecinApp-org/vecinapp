@@ -9,13 +9,15 @@ class SelectAddressView extends HookWidget {
   const SelectAddressView({super.key});
   @override
   Widget build(BuildContext context) {
-    final countryController = useTextEditingController();
-    final stateController = useTextEditingController();
-    final municipalityController = useTextEditingController();
-    final postalCodeController = useTextEditingController();
-    final streetController = useTextEditingController();
-    final numberController = useTextEditingController();
-    final interiorController = useTextEditingController();
+    final countryController = useTextEditingController(text: 'México');
+    final stateController = useTextEditingController(text: 'Nuevo León');
+    final municipalityController = useTextEditingController(text: 'Monterrey');
+    final postalCodeController = useTextEditingController(text: '64000');
+    final streetController = useTextEditingController(text: 'Ignacio Zaragoza');
+    final numberController = useTextEditingController(text: '123');
+    final interiorController = useTextEditingController(text: 'A');
+    final latitudeController = useValueNotifier<double>(25.671802609711552);
+    final longitudeController = useValueNotifier<double>(-100.30939284155167);
     return CenteredView(children: [
       Text('Selecciona tu dirección',
           style: Theme.of(context).textTheme.headlineMedium),
@@ -42,14 +44,15 @@ class SelectAddressView extends HookWidget {
                 decoration: InputDecoration(labelText: 'Calle')),
           ),
           SizedBox(width: 13),
-          Expanded(
-            child: TextField(
-                controller: numberController,
-                decoration: InputDecoration(labelText: 'Número')),
-          ),
         ],
       ),
       Row(children: [
+        Expanded(
+          child: TextField(
+              controller: numberController,
+              decoration: InputDecoration(labelText: 'Número')),
+        ),
+        SizedBox(width: 13),
         Expanded(
             child: TextField(
                 controller: interiorController,
@@ -61,7 +64,7 @@ class SelectAddressView extends HookWidget {
                 decoration: InputDecoration(labelText: 'Código Postal')))
       ]),
       SizedBox(height: 55),
-      TextButton(
+      FilledButton(
           onPressed: () => context.read<AppBloc>().add(
               AppEventUpdateHomeAddress(
                   country: countryController.text.trim(),
@@ -71,22 +74,9 @@ class SelectAddressView extends HookWidget {
                   street: streetController.text.trim(),
                   houseNumber: numberController.text.trim(),
                   interior: interiorController.text.trim(),
-                  latitude: 25.671802609711552,
-                  longitude: -100.30939284155167)),
+                  latitude: latitudeController.value,
+                  longitude: longitudeController.value)),
           child: const Text('Continuar')),
-      TextButton(
-          onPressed: () => context.read<AppBloc>().add(
-              AppEventUpdateHomeAddress(
-                  country: 'México',
-                  state: 'Nuevo León',
-                  municipality: 'Monterrey',
-                  postalCode: '64000',
-                  street: 'Ignacio Zaragoza',
-                  houseNumber: '123',
-                  interior: 'A',
-                  latitude: 25.671802609711552,
-                  longitude: -100.30939284155167)),
-          child: const Text('Set default address'))
     ]);
   }
 }

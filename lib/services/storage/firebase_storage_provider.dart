@@ -78,13 +78,16 @@ class FirebaseStorageProvider implements StorageProvider {
       // return the cached image
       return cacheFile.readAsBytes();
     }
-    //download the image
     late final Uint8List? imageBytes;
     try {
-      imageBytes = await FirebaseStorage.instance
-          .ref('user/$userId')
-          .child('profile_image')
-          .getData();
+      final filePath = 'user/$userId/profile_image';
+      //check if the image exists in Firebase Storage
+      if (await checkFileExists(filePath)) {
+        // return the image from Firebase Storage
+        imageBytes = await FirebaseStorage.instance.ref(filePath).getData();
+      } else {
+        return null;
+      }
     } catch (e) {
       return null;
     }
@@ -101,10 +104,8 @@ class FirebaseStorageProvider implements StorageProvider {
   Future<void> deleteProfileImage({required String userId}) async {
     // delete the image from Firebase Storage
     try {
-      await FirebaseStorage.instance
-          .ref('user/$userId')
-          .child('profile_image')
-          .delete();
+      final filePath = 'user/$userId/profile_image';
+      await FirebaseStorage.instance.ref(filePath).delete();
     } on FirebaseException catch (e) {
       switch (e.code) {
         case 'object-not-found':
@@ -126,5 +127,17 @@ class FirebaseStorageProvider implements StorageProvider {
       // ignore
     }
     devtools.log('Profile image deleted');
+  }
+}
+
+Future<bool> checkFileExists(String filePath) async {
+  final storageRef = FirebaseStorage.instance.ref(filePath);
+  try {
+    final listResult = await storageRef.list();
+    return listResult.items.isNotEmpty;
+  } catch (e) {
+    // Handle errors, such as file not found
+    devtools.log('Error checking file existence: $e');
+    return false;
   }
 }
