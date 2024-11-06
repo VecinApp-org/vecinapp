@@ -299,7 +299,7 @@ class FirebaseCloudProvider implements CloudProvider {
   }
 
   @override
-  Future<void> updateUserPhotoUrl({required String photoUrl}) async {
+  Future<void> updateUserPhotoUrl({required String? photoUrl}) async {
     final userId = _authProvider.currentUser!.uid;
     try {
       // update the user photo url

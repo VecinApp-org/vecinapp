@@ -61,7 +61,8 @@ class ProfileView extends StatelessWidget {
                           );
                     }
                   },
-                  child: const ProfilePicture(
+                  child: ProfilePicture(
+                    id: state.cloudUser!.id,
                     radius: 60.0,
                   ),
                 ),

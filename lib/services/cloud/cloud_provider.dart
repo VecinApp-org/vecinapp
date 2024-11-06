@@ -32,7 +32,7 @@ abstract class CloudProvider {
   });
 
   Future<void> updateUserPhotoUrl({
-    required String photoUrl,
+    required String? photoUrl,
   });
 
   Stream<Iterable<CloudUser>> householdNeighbors({

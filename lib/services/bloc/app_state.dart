@@ -119,9 +119,11 @@ class AppStateViewingNeighborhood extends AppState with EquatableMixin {
   const AppStateViewingNeighborhood({
     required exception,
     required bool isLoading,
+    required CloudUser cloudUser,
   }) : super(
           isLoading: isLoading,
           exception: exception,
+          cloudUser: cloudUser,
         );
 
   @override

@@ -51,18 +51,15 @@ Widget cardBuilder(
       },
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: icon,
-            ),
-            const SizedBox(width: 16),
-            Text(
-              title,
-            ),
-          ],
+        child: Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              icon,
+              const SizedBox(width: 8),
+              Text(title),
+            ],
+          ),
         ),
       ),
     ),
@@ -76,6 +73,7 @@ class NeighborhoodView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cloudUser = context.read<AppBloc>().state.cloudUser!;
     return Scaffold(
       appBar: AppBar(
           centerTitle: true,
@@ -87,7 +85,10 @@ class NeighborhoodView extends StatelessWidget {
                     onTap: () => context
                         .read<AppBloc>()
                         .add(const AppEventGoToProfileView()),
-                    child: const ProfilePicture(radius: 24)))
+                    child: ProfilePicture(
+                      radius: 24,
+                      id: cloudUser.id,
+                    )))
           ]),
       body: GridView.builder(
         padding: EdgeInsets.all(spacing),
