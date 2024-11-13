@@ -7,6 +7,8 @@ import 'package:vecinapp/services/cloud/cloud_constants.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
 import 'dart:developer' as devtools show log;
 
+import 'package:vecinapp/services/geocoding/address.dart';
+
 class FirebaseCloudProvider implements CloudProvider {
   late final AuthProvider _authProvider;
   final _neighborhoods =
@@ -55,7 +57,7 @@ class FirebaseCloudProvider implements CloudProvider {
     required String text,
   }) async {
     if (title.isEmpty || text.isEmpty) {
-      throw ChannelErrorRulebookException();
+      throw ChannelErrorCloudException();
     }
     try {
       final user = await cachedCloudUser;
@@ -92,7 +94,7 @@ class FirebaseCloudProvider implements CloudProvider {
     required String text,
   }) async {
     if (title.isEmpty || text.isEmpty) {
-      throw ChannelErrorRulebookException();
+      throw ChannelErrorCloudException();
     }
     try {
       final user = await cachedCloudUser;
@@ -158,7 +160,7 @@ class FirebaseCloudProvider implements CloudProvider {
   }) async {
     // check if input is empty
     if (displayName.isEmpty || username.isEmpty) {
-      throw ChannelErrorRulebookException();
+      throw ChannelErrorCloudException();
     }
 
     // check if user already exists
@@ -198,31 +200,55 @@ class FirebaseCloudProvider implements CloudProvider {
 
   @override
   Future<void> changeHousehold({
-    required String fullAddress,
-    required String addressLine1,
-    required String groupname,
-    required String? interior,
-    required double latitude,
-    required double longitude,
+    required Address address,
   }) async {
-    if (fullAddress.isEmpty || addressLine1.isEmpty || groupname.isEmpty) {
-      throw ChannelErrorRulebookException();
+    // check if input is empty
+    if (address.fullAddress.isEmpty ||
+        address.street.isEmpty ||
+        address.houseNumber.isEmpty ||
+        address.postalCode.isEmpty ||
+        address.municipality.isEmpty ||
+        address.state.isEmpty ||
+        address.country.isEmpty) {
+      throw ChannelErrorCloudException();
     }
+    //check if interior is not empty and has spaces or special characters
+    var interior = address.interior;
+    if (address.interior != null) {
+      if (address.interior!.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]')) ||
+          address.interior!.contains(' ')) {
+        throw ChannelErrorCloudException();
+      }
+      if (address.interior!.isEmpty) {
+        interior = null;
+      }
+    }
+
+    //update the household
     try {
       final userId = _authProvider.currentUser!.uid;
       await households
-          .where(householdFullAddressFieldName, isEqualTo: fullAddress)
+          .where(householdFullAddressFieldName, isEqualTo: address.fullAddress)
+          .where(householdInteriorFieldName, isEqualTo: interior)
           .get()
           .then((value) async {
         late DocumentSnapshot snapshot;
         //get or create household
         if (value.docs.isEmpty) {
           snapshot = await households.add({
-            householdFullAddressFieldName: fullAddress,
-            householdAddressLine1FieldName: addressLine1,
-            householdGroupNameFieldName: groupname,
+            householdFullAddressFieldName: address.fullAddress,
+            householdStreetFieldName: address.street,
+            householdNeighborhoodFieldName: address.neighborhood,
+            householdHouseNumberFieldName: address.houseNumber,
+            householdPostalCodeFieldName: address.postalCode,
             householdInteriorFieldName: interior,
-            householdLocationFieldName: GeoPoint(latitude, longitude),
+            householdMunicipalityFieldName: address.municipality,
+            householdCountryFieldName: address.country,
+            householdStateFieldName: address.state,
+            householdLocationFieldName: GeoPoint(
+              address.latitude,
+              address.longitude,
+            ),
           }).then((value) => value.get());
         } else {
           snapshot = value.docs.first;
@@ -236,6 +262,19 @@ class FirebaseCloudProvider implements CloudProvider {
       });
     } catch (e) {
       throw CouldNotUpdateHouseholdException();
+    }
+  }
+
+  @override
+  Future<void> exitHousehold() async {
+    try {
+      final userId = _authProvider.currentUser!.uid;
+      await _users.doc(userId).update({
+        userHouseholdIdFieldName: null,
+        userNeighborhoodIdFieldName: null,
+      });
+    } catch (e) {
+      throw CouldNotExitHouseholdException();
     }
   }
 
@@ -276,7 +315,7 @@ class FirebaseCloudProvider implements CloudProvider {
     final userId = _authProvider.currentUser!.uid;
     // check if displayName is empty
     if (displayName.isEmpty) {
-      throw ChannelErrorRulebookException();
+      throw ChannelErrorCloudException();
     }
     final cachedUser = await cachedCloudUser;
 

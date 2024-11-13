@@ -20,10 +20,12 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.6
+  flutter_dotenv: ^5.2.1
   flutter_hooks: ^0.20.5
   flutter_image_compress: ^2.3.0
   flutter_localizations:
     sdk: flutter
+  http: ^1.2.2
   image_picker: ^1.0.0
   path_provider: ^2.1.4
   share_plus: ^10.0.0
@@ -43,3 +45,4 @@ flutter:
   assets:
     # Add assets from the images directory to the application.
     - assets/images/
+    - .env

@@ -15,10 +15,15 @@ const userProfilePhotoUrlFieldName = 'photo_url';
 // households
 const householdsCollectionName = 'households';
 const householdFullAddressFieldName = 'full_address';
+const householdNeighborhoodFieldName = 'neighborhood';
 const householdNeighborhoodIdFieldName = 'neighborhood_id';
-const householdAddressLine1FieldName = 'address_line_1';
-const householdGroupNameFieldName = 'group_name';
+const householdStreetFieldName = 'street';
 const householdInteriorFieldName = 'interior';
+const householdHouseNumberFieldName = 'house_number';
+const householdPostalCodeFieldName = 'postal_code';
+const householdMunicipalityFieldName = 'municipality';
+const householdStateFieldName = 'state';
+const householdCountryFieldName = 'country';
 const householdLocationFieldName = 'location';
 
 // neighborhoods

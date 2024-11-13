@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show immutable;
 import 'package:vecinapp/services/auth/auth_user.dart';
 import 'package:vecinapp/services/cloud/cloud_user.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
+import 'package:vecinapp/services/geocoding/address.dart';
 
 @immutable
 abstract class AppState {
@@ -104,9 +105,21 @@ class AppStateSelectingHomeAddress extends AppState with EquatableMixin {
   List<Object?> get props => [exception, isLoading];
 }
 
-class AppStateNoNeighborhood extends AppState {
+class AppStateConfirmingHomeAddress extends AppState {
+  final List<Address> addresses;
+  const AppStateConfirmingHomeAddress({
+    required bool isLoading,
+    required exception,
+    required this.addresses,
+  }) : super(isLoading: isLoading, exception: exception);
+}
+
+class AppStateNoNeighborhood extends AppState with EquatableMixin {
   const AppStateNoNeighborhood({required bool isLoading, required exception})
       : super(isLoading: isLoading, exception: exception);
+
+  @override
+  List<Object?> get props => [exception, isLoading];
 }
 
 class AppStateWelcomeToNeighborhood extends AppState {
@@ -159,16 +172,6 @@ class AppStateViewingHousehold extends AppState {
     required bool isLoading,
     required exception,
     required this.householdId,
-  }) : super(
-          isLoading: isLoading,
-          exception: exception,
-        );
-}
-
-class AppStateChangingAddress extends AppState {
-  const AppStateChangingAddress({
-    required bool isLoading,
-    required exception,
   }) : super(
           isLoading: isLoading,
           exception: exception,
@@ -235,6 +238,15 @@ extension GetHouseholdId on AppState {
   String? get householdId {
     if (this is AppStateViewingHousehold) {
       return (this as AppStateViewingHousehold).householdId;
+    }
+    return null;
+  }
+}
+
+extension GetAddresses on AppState {
+  List<Address>? get addresses {
+    if (this is AppStateConfirmingHomeAddress) {
+      return (this as AppStateConfirmingHomeAddress).addresses;
     }
     return null;
   }

@@ -6,8 +6,7 @@ import 'package:vecinapp/services/cloud/cloud_constants.dart';
 class Household {
   final String id;
   final String fullAddress;
-  final String addressLine1;
-  final String groupname;
+  final String street;
   final String? interior;
   final double latitude;
   final double longitude;
@@ -15,8 +14,7 @@ class Household {
   const Household({
     required this.id,
     required this.fullAddress,
-    required this.addressLine1,
-    required this.groupname,
+    required this.street,
     required this.interior,
     required this.latitude,
     required this.longitude,
@@ -27,8 +25,7 @@ class Household {
     return Household(
       id: snapshot.id,
       fullAddress: data[householdFullAddressFieldName] as String,
-      addressLine1: data[householdAddressLine1FieldName] as String,
-      groupname: data[householdGroupNameFieldName] as String,
+      street: data[householdStreetFieldName] as String,
       interior: data[householdInteriorFieldName] as String?,
       latitude: data[householdLocationFieldName].latitude as double,
       longitude: data[householdLocationFieldName].longitude as double,

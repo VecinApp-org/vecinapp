@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:vecinapp/services/auth/firebase_auth_provider.dart';
+import 'package:vecinapp/services/geocoding/opencage_geocoding_provider.dart';
 import 'package:vecinapp/views/vecinapp.dart';
 import 'services/settings/settings_controller.dart';
 import 'package:vecinapp/services/cloud/firebase_cloud_provider.dart';
 import 'package:vecinapp/services/storage/firebase_storage_provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await dotenv.load(fileName: ".env");
 
   // Load user settings
   final settingsController = SettingsController();
@@ -23,11 +27,15 @@ void main() async {
   // Initialize Storage
   final storageProvider = FirebaseStorageProvider();
 
+  // Initialize Geocoding
+  final geocodingProvider = OpenCageGeocodingProvider();
+
   // Run app
   runApp(VecinApp(
     settingsController: settingsController,
     authProvider: authProvider,
     cloudProvider: cloudProvider,
     storageProvider: storageProvider,
+    geocodingProvider: geocodingProvider,
   ));
 }

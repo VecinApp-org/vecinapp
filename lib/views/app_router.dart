@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
+import 'package:vecinapp/services/geocoding/geocoding_exceptions.dart';
 import 'package:vecinapp/services/storage/storage_exceptions.dart';
 import 'package:vecinapp/utilities/dialogs/show_error_dialog.dart';
 import 'package:vecinapp/utilities/loading/loading_screen.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
-import 'package:vecinapp/views/change_address_view.dart';
+import 'package:vecinapp/views/cloud_login/confirm_address_view.dart';
 import 'package:vecinapp/views/cloud_login/select_address_view.dart';
 import 'package:vecinapp/views/cloud_login/no_neighborhood_view.dart';
 import 'package:vecinapp/views/cloud_login/register_cloud_user_view.dart';
@@ -84,18 +85,36 @@ class AppBlocRouter extends StatelessWidget {
               message = 'No se pudo actualizar';
             } else if (exception is CouldNotGetRulebooksException) {
               message = 'No se pudo obtener la información';
-            } else if (exception is ChannelErrorRulebookException) {
+            } else if (exception is ChannelErrorCloudException) {
               message = 'Dejaste algo vacío';
             } else {
-              message = 'Error de base de datos desconocido';
+              message = 'Error de base de datos';
             }
           } else if (exception is StorageException) {
             if (exception is ImageTooLargeStorageException) {
               message = 'La imagen es demasiado grande';
             } else if (exception is CouldNotUploadImageStorageException) {
               message = 'No se pudo cargar la imagen';
+            } else if (exception is GenericStorageException) {
+              message = 'Error de almacenamiento';
+            } else if (exception is ImageNotFoundStorageException) {
+              message = 'No se pudo cargar la imagen';
+            } else if (exception is ImageTooLargeStorageException) {
+              message = 'Esa imagen es demasiado grande';
+            } else if (exception is CouldNotDeleteImageStorageException) {
+              message = 'No se pudo borrar la imagen';
             } else {
               message = 'Error de almacenamiento desconocido';
+            }
+          } else if (exception is GeocodingException) {
+            if (exception is ChannelErrorGeocodingException) {
+              message = 'Dejaste algo vacío';
+            } else if (exception is NoValidAddressFoundGeocodingException) {
+              message = 'No se encontraron resultados';
+            } else if (exception is GenericGeocodingException) {
+              message = 'Error de geocodificación';
+            } else {
+              message = 'Error de geocodificación desconocido';
             }
           } else {
             message = 'Error mitológico';
@@ -124,8 +143,6 @@ class AppBlocRouter extends StatelessWidget {
           return const ProfileView();
         } else if (state is AppStateViewingHousehold) {
           return HouseholdView(householdId: state.householdId);
-        } else if (state is AppStateChangingAddress) {
-          return const ChangeAddressView();
         } else if (state is AppStateViewingSettings) {
           return SettingsView();
         } else if (state is AppStateViewingRulebooks) {
@@ -142,6 +159,8 @@ class AppBlocRouter extends StatelessWidget {
           return const SelectAddressView();
         } else if (state is AppStateNoNeighborhood) {
           return const NoNeighborhoodView();
+        } else if (state is AppStateConfirmingHomeAddress) {
+          return ConfirmAddressView(addresses: state.addresses);
         } else {
           return const BadState(); // This should never happen
         }

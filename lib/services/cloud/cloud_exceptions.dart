@@ -10,7 +10,7 @@ class CouldNotUpdateRulebooksException extends CloudException {}
 
 class CouldNotDeleteRulebookException extends CloudException {}
 
-class ChannelErrorRulebookException extends CloudException {}
+class ChannelErrorCloudException extends CloudException {}
 
 class CouldNotCreateCloudUserException extends CloudException {}
 
@@ -35,3 +35,5 @@ class CouldNotCreateRulebookException extends CloudException {}
 class CouldNotGetRulebookException extends CloudException {}
 
 class CouldNotDeleteCloudUserException extends CloudException {}
+
+class CouldNotExitHouseholdException extends CloudException {}

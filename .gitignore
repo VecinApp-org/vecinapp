@@ -47,6 +47,7 @@ app.*.map.json
 
 #user
 pubspec.lock
+*.env
 
 # TODO: find out correct way to manage keys
 firebase.json

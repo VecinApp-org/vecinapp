@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
+import 'package:vecinapp/services/geocoding/geocoding_provider.dart';
 import 'package:vecinapp/services/settings/settings_controller.dart';
 import 'package:vecinapp/services/storage/storage_provider.dart';
 import 'package:vecinapp/views/app_router.dart';
@@ -18,11 +19,13 @@ class VecinApp extends StatelessWidget {
     required this.authProvider,
     required this.cloudProvider,
     required this.storageProvider,
+    required this.geocodingProvider,
   });
   final SettingsController settingsController;
   final AuthProvider authProvider;
   final CloudProvider cloudProvider;
   final StorageProvider storageProvider;
+  final GeocodingProvider geocodingProvider;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +34,7 @@ class VecinApp extends StatelessWidget {
         authProvider: authProvider,
         cloudProvider: cloudProvider,
         storageProvider: storageProvider,
+        geocodingProvider: geocodingProvider,
       )..add(const AppEventInitialize()),
       child: ListenableBuilder(
           listenable: settingsController,

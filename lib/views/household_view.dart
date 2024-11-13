@@ -26,14 +26,14 @@ class HouseholdView extends HookWidget {
             onSelected: (value) {
               switch (value) {
                 case AddressActions.changeAddress:
-                  context.read<AppBloc>().add(AppEventGoToChangeAddressView());
+                  context.read<AppBloc>().add(AppEventExitHousehold());
                   break;
               }
             },
             itemBuilder: (context) => [
               const PopupMenuItem(
                 value: AddressActions.changeAddress,
-                child: Text('Cambiar Dirección'),
+                child: Text('Salir de la casa'),
               )
             ],
           )

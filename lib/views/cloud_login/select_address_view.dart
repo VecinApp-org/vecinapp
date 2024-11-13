@@ -12,10 +12,11 @@ class SelectAddressView extends HookWidget {
     final countryController = useTextEditingController(text: 'México');
     final stateController = useTextEditingController(text: 'Nuevo León');
     final municipalityController = useTextEditingController(text: 'Monterrey');
-    final postalCodeController = useTextEditingController(text: '64000');
-    final streetController = useTextEditingController(text: 'Ignacio Zaragoza');
-    final numberController = useTextEditingController(text: '123');
-    final interiorController = useTextEditingController(text: 'A');
+    final postalCodeController = useTextEditingController(text: '64790');
+    final neighborhoodController = useTextEditingController(text: 'Las Brisas');
+    final streetController = useTextEditingController(text: 'Puerto Soconusco');
+    final numberController = useTextEditingController(text: '5422');
+    final interiorController = useTextEditingController(text: '');
     final latitudeController = useValueNotifier<double>(25.671802609711552);
     final longitudeController = useValueNotifier<double>(-100.30939284155167);
     return CenteredView(children: [
@@ -36,6 +37,9 @@ class SelectAddressView extends HookWidget {
       TextField(
           controller: municipalityController,
           decoration: InputDecoration(labelText: 'Municipio')),
+      TextField(
+          controller: neighborhoodController,
+          decoration: InputDecoration(labelText: 'Colonia')),
       Row(
         children: [
           Expanded(
@@ -70,6 +74,7 @@ class SelectAddressView extends HookWidget {
                   country: countryController.text.trim(),
                   state: stateController.text.trim(),
                   municipality: municipalityController.text.trim(),
+                  neighborhood: neighborhoodController.text.trim(),
                   postalCode: postalCodeController.text.trim(),
                   street: streetController.text.trim(),
                   houseNumber: numberController.text.trim(),

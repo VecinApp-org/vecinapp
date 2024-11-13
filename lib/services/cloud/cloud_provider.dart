@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:vecinapp/services/cloud/cloud_user.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
+import 'package:vecinapp/services/geocoding/address.dart';
 
 @immutable
 abstract class CloudProvider {
@@ -17,13 +18,10 @@ abstract class CloudProvider {
   Future<void> deleteCloudUser();
 
   Future<void> changeHousehold({
-    required String fullAddress,
-    required String addressLine1,
-    required String groupname,
-    required String? interior,
-    required double latitude,
-    required double longitude,
+    required Address address,
   });
+
+  Future<void> exitHousehold();
 
   Future<void> assignNeighborhood();
 

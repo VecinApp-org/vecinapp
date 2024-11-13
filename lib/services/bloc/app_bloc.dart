@@ -11,24 +11,37 @@ import 'package:vecinapp/services/cloud/cloud_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
 import 'package:vecinapp/services/cloud/cloud_user.dart';
 import 'package:vecinapp/services/cloud/rulebook.dart';
+import 'package:vecinapp/services/geocoding/address.dart';
+import 'package:vecinapp/services/geocoding/geocoding_exceptions.dart';
+import 'package:vecinapp/services/geocoding/geocoding_provider.dart';
 import 'package:vecinapp/services/storage/storage_provider.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
   final AuthProvider _authProvider;
   final CloudProvider _cloudProvider;
   final StorageProvider _storageProvider;
+  final GeocodingProvider _geocodingProvider;
   AppBloc({
     required AuthProvider authProvider,
     required CloudProvider cloudProvider,
     required StorageProvider storageProvider,
+    required GeocodingProvider geocodingProvider,
   })  : _authProvider = authProvider,
         _cloudProvider = cloudProvider,
         _storageProvider = storageProvider,
+        _geocodingProvider = geocodingProvider,
         super(const AppStateUnInitalized(
           isLoading: true,
         )) {
     //initialize
     on<AppEventInitialize>((event, emit) async {
+      add(AppEventReset());
+    });
+
+    on<AppEventReset>((event, emit) async {
+      emit(const AppStateUnInitalized(
+        isLoading: true,
+      ));
       final user = _authProvider.currentUser;
       if (user == null) {
         emit(
@@ -349,21 +362,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
     });
 
-    on<AppEventGoToChangeAddressView>((event, emit) async {
-      final user = _authProvider.currentUser;
-      if (user == null) {
-        emit(const AppStateLoggingIn(
-          exception: null,
-          isLoading: false,
-        ));
-        return;
-      }
-      emit(AppStateChangingAddress(
-        isLoading: false,
-        exception: null,
-      ));
-    });
-
     on<AppEventGoToSettingsView>((event, emit) async {
       final user = _authProvider.currentUser;
       if (user == null) {
@@ -494,36 +492,52 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           isLoading: true,
           exception: null,
         ));
-        //check if fields are empty
-        if (event.street.trim().isEmpty ||
-            event.municipality.trim().isEmpty ||
-            event.state.trim().isEmpty ||
-            event.country.trim().isEmpty ||
-            event.postalCode.trim().isEmpty) {
+
+        //check if address is valid and get full address from geocoding
+        late final List<Address> validAddresses;
+        try {
+          validAddresses = await _geocodingProvider.getValidAddress(
+            country: event.country,
+            state: event.state,
+            municipality: event.municipality,
+            neighborhood: event.neighborhood,
+            street: event.street,
+            houseNumber: event.houseNumber,
+            postalCode: event.postalCode,
+            interior: event.interior,
+            latitude: event.latitude,
+            longitude: event.longitude,
+          );
+        } catch (e) {
+          //inform user of error
           emit(AppStateSelectingHomeAddress(
             isLoading: false,
-            exception: ChannelErrorRulebookException(),
+            exception: e,
           ));
           return;
         }
-        //todo: check if address is valid and get full address from geocoding
-        final String addressLine1 =
-            '${event.street.trim()} ${event.houseNumber.trim()}'.trim();
-        final String fullAddress =
-            '$addressLine1. ${event.municipality.trim()}, ${event.state.trim()}, ${event.country.trim()}';
-        final String groupname = event.street;
-        final String? interior = event.interior;
-        final double latitude = event.latitude;
-        final double longitude = event.longitude;
+        //if there is no valid address, inform user
+        if (validAddresses.isEmpty) {
+          emit(AppStateSelectingHomeAddress(
+            isLoading: false,
+            exception: NoValidAddressFoundGeocodingException(),
+          ));
+          return;
+        }
+        //if there is more than one valid address, show them
+        if (validAddresses.length > 1) {
+          emit(AppStateConfirmingHomeAddress(
+            isLoading: false,
+            exception: null,
+            addresses: validAddresses,
+          ));
+          return;
+        }
+        final validAddress = validAddresses.first;
         //change the user's household
         try {
           await _cloudProvider.changeHousehold(
-            fullAddress: fullAddress,
-            addressLine1: addressLine1,
-            groupname: groupname,
-            interior: interior,
-            latitude: latitude,
-            longitude: longitude,
+            address: validAddress,
           );
         } catch (e) {
           //inform user of error
@@ -550,6 +564,43 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         }
       },
     );
+
+    on<AppEventConfirmAddress>((event, emit) async {
+      //start loading indicator
+      emit(AppStateConfirmingHomeAddress(
+        isLoading: true,
+        exception: null,
+        addresses: state.addresses!,
+      ));
+      //change the user's household
+      try {
+        await _cloudProvider.changeHousehold(
+          address: event.address,
+        );
+      } catch (e) {
+        //inform user of error
+        emit(AppStateSelectingHomeAddress(
+          isLoading: false,
+          exception: e,
+        ));
+        return;
+      }
+      final updatedCloudUser = await _cloudProvider.currentCloudUser;
+      //if the user has a neighborhood, send to viewing neighborhood
+      if (updatedCloudUser!.neighborhoodId != null) {
+        emit(AppStateViewingNeighborhood(
+          cloudUser: updatedCloudUser,
+          isLoading: false,
+          exception: null,
+        ));
+      } else {
+        //Send No Neighborhood (this view should try to find a neighborhood for the user's home)
+        emit(const AppStateNoNeighborhood(
+          isLoading: false,
+          exception: null,
+        ));
+      }
+    });
 
     on<AppEventLookForNeighborhood>((event, emit) async {
       //check if user is logged in
@@ -584,6 +635,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         isLoading: false,
         exception: null,
       ));
+    });
+
+    on<AppEventExitHousehold>((event, emit) async {
+      try {
+        _cloudProvider.exitHousehold();
+      } catch (_) {}
+      add(AppEventReset());
     });
 
     on<AppEventUpdateUserDisplayName>((event, emit) async {
