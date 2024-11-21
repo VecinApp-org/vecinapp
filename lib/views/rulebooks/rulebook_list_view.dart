@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
-import 'package:vecinapp/services/cloud/rulebook.dart';
+import 'package:vecinapp/utilities/entities/rulebook.dart';
 
 class RulebookListView extends StatelessWidget {
   final Iterable<Rulebook> rulebooks;

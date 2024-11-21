@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:vecinapp/services/auth/firebase_auth_provider.dart';
 import 'package:vecinapp/services/geocoding/opencage_geocoding_provider.dart';
 import 'package:vecinapp/views/vecinapp.dart';
@@ -11,6 +12,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(fileName: ".env");
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
 
   // Load user settings
   final settingsController = SettingsController();

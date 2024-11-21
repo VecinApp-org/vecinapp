@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart' show immutable;
-import 'package:vecinapp/services/cloud/rulebook.dart';
-import 'package:vecinapp/services/geocoding/address.dart';
+import 'package:vecinapp/utilities/entities/rulebook.dart';
+import 'package:vecinapp/utilities/entities/address.dart';
 
 @immutable
 abstract class AppEvent {
@@ -81,19 +81,17 @@ class AppEventUpdateHomeAddress extends AppEvent {
   final String municipality;
   final String neighborhood;
   final String postalCode;
-  final String street;
-  final String houseNumber;
+  final String streetLine1;
   final String? interior;
-  final double latitude;
-  final double longitude;
+  final double? latitude;
+  final double? longitude;
   const AppEventUpdateHomeAddress({
     required this.country,
     required this.state,
     required this.municipality,
     required this.neighborhood,
     required this.postalCode,
-    required this.street,
-    required this.houseNumber,
+    required this.streetLine1,
     required this.interior,
     required this.latitude,
     required this.longitude,

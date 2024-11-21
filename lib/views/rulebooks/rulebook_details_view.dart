@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
-import 'package:vecinapp/services/cloud/rulebook.dart';
+import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/dialogs/show_confirmation_dialog.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 

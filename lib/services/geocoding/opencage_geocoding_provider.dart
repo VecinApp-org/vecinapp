@@ -1,4 +1,4 @@
-import 'package:vecinapp/services/geocoding/address.dart';
+import 'package:vecinapp/utilities/entities/address.dart';
 import 'package:vecinapp/services/geocoding/geocoding_provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -13,44 +13,59 @@ class OpenCageGeocodingProvider implements GeocodingProvider {
     required String state,
     required String municipality,
     required String neighborhood,
-    required String street,
-    required String houseNumber,
+    required String streetLine1,
     required String postalCode,
     required String? interior,
     required double? latitude,
     required double? longitude,
   }) async {
     //check if fields are empty
-    if (street.trim().isEmpty ||
+    if (streetLine1.trim().isEmpty ||
         municipality.trim().isEmpty ||
         state.trim().isEmpty ||
         country.trim().isEmpty ||
-        postalCode.trim().isEmpty ||
-        houseNumber.trim().isEmpty) {
+        postalCode.trim().isEmpty) {
       throw ChannelErrorGeocodingException();
     }
-    final String addressLine1 = '${street.trim()} ${houseNumber.trim()}'.trim();
+    //build address
     final String fullAddress =
-        '$addressLine1, ${neighborhood.trim()}, ${postalCode.trim()} ${municipality.trim()}, ${state.trim()}, ${country.trim()}';
+        '$streetLine1, ${neighborhood.trim()}, ${postalCode.trim()} ${municipality.trim()}, ${state.trim()}, ${country.trim()}';
+    //build url
+    late final Uri url;
+    if (longitude == null || latitude == null) {
+      url = Uri.https('api.opencagedata.com', '/geocode/v1/json', {
+        'q': fullAddress,
+        'key': dotenv.get('GEOCODER_APIKEY'),
+        'address_only': '1',
+        'abbrv': '1',
+        'countrycode:': 'mx',
+        'no_annotations': '1',
+        'pretty': '1',
+      });
+    } else {
+      url = Uri.https('api.opencagedata.com', '/geocode/v1/json', {
+        'q': fullAddress,
+        'key': dotenv.get('GEOCODER_APIKEY'),
+        'address_only': '1',
+        'abbrv': '1',
+        'countrycode:': 'mx',
+        'no_annotations': '1',
+        'pretty': '1',
+        'proximity': '$latitude,$longitude',
+      });
+    }
     //request geocoding results
-    final url = Uri.https('api.opencagedata.com', '/geocode/v1/json', {
-      'q': fullAddress,
-      'key': dotenv.get('GEOCODER_APIKEY'),
-      'address_only': '1',
-      'abbrv': '1',
-      'countrycode:': 'mx',
-      'no_annotations': '1',
-      'pretty': '1',
-    });
     final response = await http.get(url);
     //check if the request was successful
     if (response.statusCode != 200) {
+      devtools
+          .log('Response status code: ${response.statusCode} ${response.body}');
       throw GenericGeocodingException();
     }
     //parse the response
     final List<dynamic> results = await jsonDecode(response.body)['results'];
     if (results.isEmpty) {
-      throw GenericGeocodingException();
+      throw NoValidAddressFoundGeocodingException();
     }
     //filter the results
     results

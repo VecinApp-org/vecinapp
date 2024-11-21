@@ -10,7 +10,7 @@ class CenteredView extends StatelessWidget {
         body: Center(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(55.0),
+              padding: const EdgeInsets.all(21.0),
               child: Column(
                 children: children,
               ),

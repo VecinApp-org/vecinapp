@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:vecinapp/services/auth/auth_user.dart';
+import 'package:vecinapp/utilities/entities/auth_user.dart';
 
 @immutable
 abstract class AuthProvider {

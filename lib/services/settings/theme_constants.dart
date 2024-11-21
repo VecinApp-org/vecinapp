@@ -107,7 +107,7 @@ ThemeData darkTheme = ThemeData(
     secondaryFixedDim: s80,
     onSecondaryFixed: s10,
     onSecondaryFixedVariant: s30,
-    //tertiary
+    //tertiary Dark
     tertiary: t80,
     onTertiary: t20,
     tertiaryContainer: t30,

@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart' show immutable;
-import 'package:vecinapp/services/auth/auth_user.dart';
-import 'package:vecinapp/services/cloud/cloud_user.dart';
-import 'package:vecinapp/services/cloud/rulebook.dart';
-import 'package:vecinapp/services/geocoding/address.dart';
+import 'package:vecinapp/utilities/entities/auth_user.dart';
+import 'package:vecinapp/utilities/entities/cloud_user.dart';
+import 'package:vecinapp/utilities/entities/rulebook.dart';
+import 'package:vecinapp/utilities/entities/address.dart';
 
 @immutable
 abstract class AppState {

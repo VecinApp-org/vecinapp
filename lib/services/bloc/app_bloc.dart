@@ -3,15 +3,15 @@ import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
-import 'package:vecinapp/services/auth/auth_user.dart';
+import 'package:vecinapp/utilities/entities/auth_user.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
 import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
-import 'package:vecinapp/services/cloud/cloud_user.dart';
-import 'package:vecinapp/services/cloud/rulebook.dart';
-import 'package:vecinapp/services/geocoding/address.dart';
+import 'package:vecinapp/utilities/entities/cloud_user.dart';
+import 'package:vecinapp/utilities/entities/rulebook.dart';
+import 'package:vecinapp/utilities/entities/address.dart';
 import 'package:vecinapp/services/geocoding/geocoding_exceptions.dart';
 import 'package:vecinapp/services/geocoding/geocoding_provider.dart';
 import 'package:vecinapp/services/storage/storage_provider.dart';
@@ -501,8 +501,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             state: event.state,
             municipality: event.municipality,
             neighborhood: event.neighborhood,
-            street: event.street,
-            houseNumber: event.houseNumber,
+            streetLine1: event.streetLine1,
             postalCode: event.postalCode,
             interior: event.interior,
             latitude: event.latitude,

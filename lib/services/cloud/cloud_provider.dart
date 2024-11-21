@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:vecinapp/services/cloud/cloud_user.dart';
-import 'package:vecinapp/services/cloud/rulebook.dart';
-import 'package:vecinapp/services/geocoding/address.dart';
+import 'package:vecinapp/utilities/entities/cloud_user.dart';
+import 'package:vecinapp/utilities/entities/rulebook.dart';
+import 'package:vecinapp/utilities/entities/address.dart';
 
 @immutable
 abstract class CloudProvider {

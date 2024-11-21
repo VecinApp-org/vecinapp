@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vecinapp/services/cloud/cloud_user.dart';
+import 'package:vecinapp/utilities/entities/cloud_user.dart';
 
 class UserListView extends StatelessWidget {
   final Iterable<CloudUser> users;

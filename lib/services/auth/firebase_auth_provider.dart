@@ -1,4 +1,4 @@
-import 'package:vecinapp/services/auth/auth_user.dart';
+import 'package:vecinapp/utilities/entities/auth_user.dart';
 import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
 

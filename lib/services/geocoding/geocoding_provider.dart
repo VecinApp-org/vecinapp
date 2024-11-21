@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:vecinapp/services/geocoding/address.dart';
+import 'package:vecinapp/utilities/entities/address.dart';
 
 @immutable
 abstract class GeocodingProvider {
@@ -10,8 +10,7 @@ abstract class GeocodingProvider {
     required String state,
     required String municipality,
     required String neighborhood,
-    required String street,
-    required String houseNumber,
+    required String streetLine1,
     required String postalCode,
     required String? interior,
     required double? latitude,

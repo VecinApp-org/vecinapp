@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
-import 'package:vecinapp/services/cloud/cloud_user.dart';
-import 'package:vecinapp/services/cloud/rulebook.dart';
+import 'package:vecinapp/utilities/entities/cloud_user.dart';
+import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/services/cloud/cloud_constants.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
 import 'dart:developer' as devtools show log;
 
-import 'package:vecinapp/services/geocoding/address.dart';
+import 'package:vecinapp/utilities/entities/address.dart';
 
 class FirebaseCloudProvider implements CloudProvider {
   late final AuthProvider _authProvider;
