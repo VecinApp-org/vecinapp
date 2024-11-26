@@ -5,6 +5,7 @@ import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/services/cloud/cloud_constants.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
+import 'package:vecinapp/extensions/geometry/is_point_in_polygon.dart';
 import 'dart:developer' as devtools show log;
 
 import 'package:vecinapp/utilities/entities/address.dart';
@@ -13,7 +14,7 @@ class FirebaseCloudProvider implements CloudProvider {
   late final AuthProvider _authProvider;
   final _neighborhoods =
       FirebaseFirestore.instance.collection(neighborhoodsCollectionName);
-  final households =
+  final _households =
       FirebaseFirestore.instance.collection(householdsCollectionName);
   final _users = FirebaseFirestore.instance.collection(usersCollectionName);
 
@@ -199,7 +200,7 @@ class FirebaseCloudProvider implements CloudProvider {
   }
 
   @override
-  Future<void> changeHousehold({
+  Future<void> updateHousehold({
     required Address address,
   }) async {
     // check if input is empty
@@ -227,7 +228,7 @@ class FirebaseCloudProvider implements CloudProvider {
     //update the household
     try {
       final userId = _authProvider.currentUser!.uid;
-      await households
+      await _households
           .where(householdFullAddressFieldName, isEqualTo: address.fullAddress)
           .where(householdInteriorFieldName, isEqualTo: interior)
           .get()
@@ -235,7 +236,7 @@ class FirebaseCloudProvider implements CloudProvider {
         late DocumentSnapshot snapshot;
         //get or create household
         if (value.docs.isEmpty) {
-          snapshot = await households.add({
+          snapshot = await _households.add({
             householdFullAddressFieldName: address.fullAddress,
             householdStreetFieldName: address.street,
             householdNeighborhoodFieldName: address.neighborhood,
@@ -290,20 +291,78 @@ class FirebaseCloudProvider implements CloudProvider {
     }
     try {
       //get the household doc
-      await households.doc(cloudUser.householdId).get().then((value) async {
+      await _households.doc(cloudUser.householdId).get().then((value) async {
         //check if the household has a neighborhood
-        final data = value.data() as Map<String, dynamic>;
-        if (data.containsKey(householdNeighborhoodIdFieldName)) {
+        final householdData = value.data() as Map<String, dynamic>;
+        if (householdData.containsKey(householdNeighborhoodIdFieldName)) {
           // update the user's neighborhood id
           await _users.doc(authUser.uid).update({
-            userNeighborhoodIdFieldName: data[householdNeighborhoodIdFieldName],
+            userNeighborhoodIdFieldName:
+                householdData[householdNeighborhoodIdFieldName],
           });
+          devtools
+              .log('The household already had a neighborhood and was updated');
         } else {
-          //todo try to assign a neighborhood
-          throw CouldNotAssignNeighborhoodException();
+          //Search for nearby neighborhoods
+          //todo optimize by searching by distance
+          final nearestNeighborhoods = await _neighborhoods
+              .where('country',
+                  isEqualTo: householdData[householdCountryFieldName])
+              .where('state', isEqualTo: householdData[householdStateFieldName])
+              .where('municipality',
+                  isEqualTo: householdData[householdMunicipalityFieldName])
+              .get()
+              .then((value) => value.docs);
+          devtools.log('Found ${nearestNeighborhoods.length} neighborhoods');
+          //check if the point is in a neighborhood
+          if (nearestNeighborhoods.isNotEmpty) {
+            //Iterate through the results and check if the point is inside the polygon
+            bool found = false;
+            for (final neighborhood in nearestNeighborhoods) {
+              devtools.log('Checking neighborhood ${neighborhood.id}');
+              final geoPoint = neighborhood[neighborhoodPolygonFieldName]
+                  as Map<String, dynamic>;
+              devtools.log('GeoPoint: $geoPoint');
+              final List<Point> polygon = [];
+              for (final point in geoPoint.values) {
+                polygon.add(Point(x: point.latitude, y: point.longitude));
+              }
+              if (Poly.isPointInPolygon(
+                Point(
+                  x: householdData[householdLocationFieldName].latitude
+                      as double,
+                  y: householdData[householdLocationFieldName].longitude
+                      as double,
+                ),
+                polygon,
+              )) {
+                devtools.log('The point is in the neighborhood');
+                // update the household's neighborhood id
+                await _households.doc(cloudUser.householdId).update({
+                  householdNeighborhoodIdFieldName: neighborhood.id,
+                });
+                // update the user's neighborhood id
+                await _users.doc(authUser.uid).update({
+                  userNeighborhoodIdFieldName: neighborhood.id,
+                });
+                found = true;
+                break;
+              }
+            }
+            if (!found) {
+              // throw an error if the point is not in a neighborhood
+              devtools.log('The point is not in a neighborhood');
+              throw CouldNotAssignNeighborhoodException();
+            }
+          } else {
+            // throw an error if the point is not in a neighborhood
+            devtools.log('Empty list of neighborhoods');
+            throw CouldNotAssignNeighborhoodException();
+          }
         }
       });
     } catch (e) {
+      devtools.log(e.toString());
       throw CouldNotAssignNeighborhoodException();
     }
   }

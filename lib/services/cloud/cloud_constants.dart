@@ -30,3 +30,4 @@ const householdLocationFieldName = 'location';
 const neighborhoodsCollectionName = 'neighborhoods';
 const neighborhoodNameFieldName = 'name';
 const neighborhoodRulebooksCollectionName = 'rulebooks';
+const neighborhoodPolygonFieldName = 'polygon';

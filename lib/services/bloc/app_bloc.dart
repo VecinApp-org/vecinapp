@@ -535,7 +535,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         final validAddress = validAddresses.first;
         //change the user's household
         try {
-          await _cloudProvider.changeHousehold(
+          await _cloudProvider.updateHousehold(
             address: validAddress,
           );
         } catch (e) {
@@ -573,7 +573,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
       //change the user's household
       try {
-        await _cloudProvider.changeHousehold(
+        await _cloudProvider.updateHousehold(
           address: event.address,
         );
       } catch (e) {

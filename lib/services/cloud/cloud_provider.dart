@@ -17,7 +17,7 @@ abstract class CloudProvider {
 
   Future<void> deleteCloudUser();
 
-  Future<void> changeHousehold({
+  Future<void> updateHousehold({
     required Address address,
   });
 
