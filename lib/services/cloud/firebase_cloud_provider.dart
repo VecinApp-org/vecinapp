@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
+import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/services/cloud/cloud_constants.dart';
@@ -406,6 +407,16 @@ class FirebaseCloudProvider implements CloudProvider {
       });
     } catch (e) {
       throw CouldNotUpdateUserException();
+    }
+  }
+
+  @override
+  Future<Household> household({required String householdId}) async {
+    try {
+      final doc = await _households.doc(householdId).get();
+      return Household.fromSnapshot(doc);
+    } catch (e) {
+      throw CouldNotGetHouseholdException();
     }
   }
 

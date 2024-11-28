@@ -9,6 +9,7 @@ import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
+import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
@@ -356,7 +357,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     on<AppEventGoToHouseholdView>((event, emit) async {
       emit(AppStateViewingHousehold(
-        householdId: event.householdId,
+        household: event.household,
         isLoading: false,
         exception: null,
       ));
@@ -935,6 +936,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   Future<CloudUser?> get currentCloudUser async =>
       await _cloudProvider.cachedCloudUser;
+
+  Future<Household?> currentHousehold(String? householdId) async {
+    if (householdId == null || householdId.isEmpty) {
+      return null;
+    }
+    try {
+      return await _cloudProvider.household(householdId: householdId);
+    } catch (e) {
+      return null;
+    }
+  }
 
   Stream<Iterable<CloudUser>> householdNeighbors(
       {required String householdId}) async* {

@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:vecinapp/utilities/entities/auth_user.dart';
+import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
@@ -12,12 +13,14 @@ abstract class AppState {
   final String? loadingText;
   final AuthUser? user;
   final CloudUser? cloudUser;
+  final Household? household;
   const AppState({
     required this.isLoading,
     required this.exception,
     this.user,
     this.loadingText,
     this.cloudUser,
+    this.household,
   });
 }
 
@@ -167,14 +170,14 @@ class AppStateViewingProfile extends AppState with EquatableMixin {
 }
 
 class AppStateViewingHousehold extends AppState {
-  final String householdId;
   const AppStateViewingHousehold({
     required bool isLoading,
     required exception,
-    required this.householdId,
+    required Household household,
   }) : super(
           isLoading: isLoading,
           exception: exception,
+          household: household,
         );
 }
 
@@ -229,15 +232,6 @@ extension GetRulebook on AppState {
     }
     if (this is AppStateViewingRulebookDetails) {
       return (this as AppStateViewingRulebookDetails).rulebook;
-    }
-    return null;
-  }
-}
-
-extension GetHouseholdId on AppState {
-  String? get householdId {
-    if (this is AppStateViewingHousehold) {
-      return (this as AppStateViewingHousehold).householdId;
     }
     return null;
   }

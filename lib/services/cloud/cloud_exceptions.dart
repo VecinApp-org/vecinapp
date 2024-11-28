@@ -37,3 +37,5 @@ class CouldNotGetRulebookException extends CloudException {}
 class CouldNotDeleteCloudUserException extends CloudException {}
 
 class CouldNotExitHouseholdException extends CloudException {}
+
+class CouldNotGetHouseholdException extends CloudException {}

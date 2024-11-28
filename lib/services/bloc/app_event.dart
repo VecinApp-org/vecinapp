@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart' show immutable;
+import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 
@@ -126,9 +127,9 @@ class AppEventGoToProfileView extends AppEvent {
 }
 
 class AppEventGoToHouseholdView extends AppEvent {
-  final String householdId;
+  final Household household;
   const AppEventGoToHouseholdView({
-    required this.householdId,
+    required this.household,
   });
 }
 

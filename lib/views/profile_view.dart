@@ -3,16 +3,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
-import 'package:vecinapp/services/bloc/app_state.dart';
 import 'package:vecinapp/utilities/dialogs/single_text_input_dialog.dart';
+import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/widgets/profile_picture.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
 class ProfileView extends StatelessWidget {
-  const ProfileView({super.key});
-
+  const ProfileView({super.key, required this.cloudUser});
+  final CloudUser cloudUser;
   @override
   Widget build(BuildContext context) {
-    final picker = ImagePicker();
+    String displayName = cloudUser.displayName;
+    String username = cloudUser.username;
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
@@ -29,102 +31,112 @@ class ProfileView extends StatelessWidget {
           )
         ],
       ),
-      body: BlocBuilder<AppBloc, AppState>(
-        builder: (context, state) {
-          String? phoneNumber = state.user!.phoneNumber;
-          if (phoneNumber == null || phoneNumber.isEmpty) {
-            phoneNumber = 'Sin Teléfono';
-          }
-          String displayName = state.cloudUser!.displayName;
-          String? email = state.user!.email;
-          if (email == null || email.isEmpty) {
-            email = 'Sin Email';
-          }
-          return ListView(
-            padding: const EdgeInsets.all(16.0),
-            children: [
-              const SizedBox(height: 32),
-              Center(
-                child: GestureDetector(
-                  onTap: () async {
-                    final image = await picker.pickImage(
-                      source: ImageSource.gallery,
-                    );
-                    if (image == null) {
-                      return;
-                    }
-                    if (context.mounted) {
-                      context.read<AppBloc>().add(
-                            AppEventUpdateProfilePhoto(
-                              imagePath: image.path,
-                            ),
-                          );
-                    }
-                  },
-                  child: ProfilePicture(
-                    id: state.cloudUser!.id,
-                    radius: 60.0,
-                  ),
-                ),
+      body: ListView(
+        padding: const EdgeInsets.all(3.0),
+        children: [
+          const SizedBox(height: 32),
+          Center(
+            child: GestureDetector(
+              child: ProfilePicture(
+                id: cloudUser.id,
+                radius: 60.0,
               ),
-              const SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const SizedBox(width: 50),
-                  Text(displayName,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headlineSmall),
-                  IconButton(
-                    onPressed: () async {
-                      final newUserDisplayName = await showTextInputDialog(
-                        context: context,
-                        initialValue: state.cloudUser!.displayName,
-                        title: 'Cambiar nombre',
-                        labelText: 'Nombre',
-                      );
-                      if (newUserDisplayName != null && context.mounted) {
-                        context.read<AppBloc>().add(
-                            AppEventUpdateUserDisplayName(
-                                displayName: newUserDisplayName));
-                      }
-                    },
-                    icon: const Icon(Icons.edit),
-                  )
-                ],
-              ),
-              const SizedBox(height: 32),
-              ListTile(
-                leading: const Icon(Icons.alternate_email),
-                title: Text(email),
-              ),
-              ListTile(
-                leading: const Icon(Icons.phone),
-                title: Text(phoneNumber),
-              ),
-              ListTile(
-                  leading: Icon(Icons.home),
-                  title: Text('Mi Casa'),
-                  trailing: Icon(Icons.arrow_right),
-                  onTap: () {
-                    context.read<AppBloc>().add(AppEventGoToHouseholdView(
-                        householdId: state.cloudUser!.householdId!));
-                  }),
-              const Divider(),
-              ListTile(
-                  leading: const Icon(Icons.settings),
-                  title: const Text('Configuración'),
-                  trailing: const Icon(Icons.arrow_right),
-                  onTap: () {
-                    context
-                        .read<AppBloc>()
-                        .add(const AppEventGoToSettingsView());
-                  }),
-            ],
-          );
-        },
+              onTap: () async {
+                await updateProfilePicture(context);
+              },
+            ),
+          ),
+          const SizedBox(height: 34),
+          GestureDetector(
+            child: Text(displayName,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleLarge),
+            onTap: () async {
+              await updateDisplayName(context, displayName);
+            },
+          ),
+          const SizedBox(height: 8),
+          GestureDetector(
+            child: Text(
+              '@$username',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.labelMedium,
+            ),
+          ),
+          const SizedBox(height: 34),
+          AddressListTile(
+            householdId: cloudUser.householdId,
+          ),
+          ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Configuración'),
+              trailing: const Icon(Icons.arrow_right),
+              onTap: () {
+                context.read<AppBloc>().add(const AppEventGoToSettingsView());
+              }),
+        ],
       ),
     );
+  }
+}
+
+Future<void> updateProfilePicture(context) async {
+  final picker = ImagePicker();
+  final image = await picker.pickImage(
+    source: ImageSource.gallery,
+  );
+  if (image == null) {
+    return;
+  }
+  if (context.mounted) {
+    context.read<AppBloc>().add(
+          AppEventUpdateProfilePhoto(
+            imagePath: image.path,
+          ),
+        );
+  }
+}
+
+Future<void> updateDisplayName(context, currentDisplayName) async {
+  final newUserDisplayName = await showTextInputDialog(
+    context: context,
+    initialValue: currentDisplayName,
+    title: 'Cambiar nombre',
+    labelText: 'Nombre y Apellido',
+  );
+  if (newUserDisplayName != null && context.mounted) {
+    context
+        .read<AppBloc>()
+        .add(AppEventUpdateUserDisplayName(displayName: newUserDisplayName));
+  }
+}
+
+class AddressListTile extends HookWidget {
+  const AddressListTile({super.key, required this.householdId});
+  final String? householdId;
+  @override
+  Widget build(BuildContext context) {
+    final householdFuture = useMemoized(
+        () => context.watch<AppBloc>().currentHousehold(householdId));
+    final snapshot = useFuture(householdFuture);
+    final household = snapshot.data;
+    String addressline;
+    if (household == null) {
+      addressline = '';
+    } else {
+      addressline = '${household.street} #${household.number}';
+    }
+    return ListTile(
+        leading: Icon(Icons.home),
+        title: Text(addressline),
+        trailing: Icon(Icons.arrow_right),
+        onTap: () {
+          if (household == null) {
+            return;
+          }
+          context
+              .read<AppBloc>()
+              .add(AppEventGoToHouseholdView(household: household));
+        });
   }
 }

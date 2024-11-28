@@ -3,17 +3,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/views/user_list_view.dart';
 
 class HouseholdView extends HookWidget {
-  const HouseholdView({super.key, required this.householdId});
+  const HouseholdView({super.key, required this.household});
 
-  final String householdId;
+  final Household household;
 
   @override
   Widget build(BuildContext context) {
     final stream = useMemoized(() =>
-        context.watch<AppBloc>().householdNeighbors(householdId: householdId));
+        context.watch<AppBloc>().householdNeighbors(householdId: household.id));
     final neighbors = useStream(stream);
     return Scaffold(
       appBar: AppBar(
