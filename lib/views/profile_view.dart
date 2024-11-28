@@ -42,7 +42,20 @@ class ProfileView extends StatelessWidget {
                 radius: 60.0,
               ),
               onTap: () async {
-                await updateProfilePicture(context);
+                final picker = ImagePicker();
+                final image = await picker.pickImage(
+                  source: ImageSource.gallery,
+                );
+                if (image == null) {
+                  return;
+                }
+                if (context.mounted) {
+                  context.read<AppBloc>().add(
+                        AppEventUpdateProfilePhoto(
+                          imagePath: image.path,
+                        ),
+                      );
+                }
               },
             ),
           ),
@@ -52,7 +65,16 @@ class ProfileView extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.titleLarge),
             onTap: () async {
-              await updateDisplayName(context, displayName);
+              final newUserDisplayName = await showTextInputDialog(
+                context: context,
+                initialValue: displayName,
+                title: 'Cambiar nombre',
+                labelText: 'Nombre y Apellido(s)',
+              );
+              if (newUserDisplayName != null && context.mounted) {
+                context.read<AppBloc>().add(AppEventUpdateUserDisplayName(
+                    displayName: newUserDisplayName));
+              }
             },
           ),
           const SizedBox(height: 8),
@@ -64,7 +86,7 @@ class ProfileView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 34),
-          AddressListTile(
+          HouseholdListTile(
             householdId: cloudUser.householdId,
           ),
           ListTile(
@@ -80,39 +102,8 @@ class ProfileView extends StatelessWidget {
   }
 }
 
-Future<void> updateProfilePicture(context) async {
-  final picker = ImagePicker();
-  final image = await picker.pickImage(
-    source: ImageSource.gallery,
-  );
-  if (image == null) {
-    return;
-  }
-  if (context.mounted) {
-    context.read<AppBloc>().add(
-          AppEventUpdateProfilePhoto(
-            imagePath: image.path,
-          ),
-        );
-  }
-}
-
-Future<void> updateDisplayName(context, currentDisplayName) async {
-  final newUserDisplayName = await showTextInputDialog(
-    context: context,
-    initialValue: currentDisplayName,
-    title: 'Cambiar nombre',
-    labelText: 'Nombre y Apellido',
-  );
-  if (newUserDisplayName != null && context.mounted) {
-    context
-        .read<AppBloc>()
-        .add(AppEventUpdateUserDisplayName(displayName: newUserDisplayName));
-  }
-}
-
-class AddressListTile extends HookWidget {
-  const AddressListTile({super.key, required this.householdId});
+class HouseholdListTile extends HookWidget {
+  const HouseholdListTile({super.key, required this.householdId});
   final String? householdId;
   @override
   Widget build(BuildContext context) {

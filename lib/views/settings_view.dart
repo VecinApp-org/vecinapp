@@ -25,10 +25,6 @@ class SettingsView extends StatelessWidget {
       ),
       body: Column(
         children: [
-          const SizedBox(height: 32),
-          //const Text('Configuración', style: TextStyle(fontSize: 24)),
-          //const SizedBox(height: 32),
-          const Divider(),
           ListTile(
             leading: const Icon(Icons.light_mode_outlined),
             title: const Text('Tema'),
@@ -50,10 +46,7 @@ class SettingsView extends StatelessWidget {
                   )
                 ]),
           ),
-          const Divider(),
-          const Spacer(),
-          const Divider(),
-          const SizedBox(height: 32),
+          Spacer(),
           TextButton(
             onPressed: () async {
               final confirmLogout = await showConfirmationDialog(
@@ -69,7 +62,6 @@ class SettingsView extends StatelessWidget {
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Cerrar sesión'),
           ),
-          const SizedBox(height: 32),
           TextButton(
             onPressed: () async {
               final confirmLogout = await showConfirmationDialog(
@@ -87,7 +79,7 @@ class SettingsView extends StatelessWidget {
             ),
             child: const Text('Eliminar cuenta'),
           ),
-          const SizedBox(height: 64),
+          const SizedBox(height: 34),
         ],
       ),
     );

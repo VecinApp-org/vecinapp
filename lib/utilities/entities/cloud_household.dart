@@ -9,6 +9,10 @@ class Household {
   final String street;
   final String number;
   final String? interior;
+  final String country;
+  final String municipality;
+  final String state;
+  final String postalCode;
   final double latitude;
   final double longitude;
   final String? neighborhoodId;
@@ -19,9 +23,13 @@ class Household {
     required this.street,
     required this.number,
     required this.interior,
+    required this.country,
     required this.latitude,
     required this.longitude,
     required this.neighborhoodId,
+    required this.municipality,
+    required this.postalCode,
+    required this.state,
   });
 
   factory Household.fromSnapshot(DocumentSnapshot snapshot) {
@@ -31,6 +39,10 @@ class Household {
       neighborhoodId: data[householdNeighborhoodIdFieldName] as String?,
       fullAddress: data[householdFullAddressFieldName] as String,
       street: data[householdStreetFieldName] as String,
+      country: data[householdCountryFieldName] as String,
+      municipality: data[householdMunicipalityFieldName] as String,
+      state: data[householdStateFieldName] as String,
+      postalCode: data[householdPostalCodeFieldName] as String,
       number: data[householdHouseNumberFieldName] as String,
       interior: data[householdInteriorFieldName] as String?,
       latitude: data[householdLocationFieldName].latitude as double,

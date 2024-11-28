@@ -8,14 +8,13 @@ import 'package:vecinapp/views/user_list_view.dart';
 
 class HouseholdView extends HookWidget {
   const HouseholdView({super.key, required this.household});
-
   final Household household;
 
   @override
   Widget build(BuildContext context) {
     final stream = useMemoized(() =>
         context.watch<AppBloc>().householdNeighbors(householdId: household.id));
-    final neighbors = useStream(stream);
+    final users = useStream(stream).data ?? [];
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
@@ -40,8 +39,15 @@ class HouseholdView extends HookWidget {
           )
         ],
       ),
-      body: UserListView(
-        users: neighbors.data ?? [],
+      body: Column(
+        children: [
+          Text('${household.street} #${household.number}',
+              style: Theme.of(context).textTheme.titleLarge),
+          Text(
+              '${household.postalCode} ${household.municipality}, ${household.state}, ${household.country}'),
+          const SizedBox(height: 20),
+          Expanded(child: UserListView(users: users))
+        ],
       ),
     );
   }
