@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
+import 'package:vecinapp/utilities/dialogs/show_pic_edit_options_dialog.dart';
 import 'package:vecinapp/utilities/dialogs/single_text_input_dialog.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/widgets/profile_picture.dart';
@@ -22,14 +23,7 @@ class ProfileView extends StatelessWidget {
             context.read<AppBloc>().add(const AppEventGoToNeighborhoodView());
           },
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              context.read<AppBloc>().add(const AppEventDeleteProfilePhoto());
-            },
-            icon: const Icon(Icons.delete),
-          )
-        ],
+        actions: [],
       ),
       body: ListView(
         padding: const EdgeInsets.all(3.0),
@@ -42,19 +36,33 @@ class ProfileView extends StatelessWidget {
                 radius: 60.0,
               ),
               onTap: () async {
-                final picker = ImagePicker();
-                final image = await picker.pickImage(
-                  source: ImageSource.gallery,
-                );
-                if (image == null) {
+                final option =
+                    await showPicEditOptionsDialog(context: context, text: '');
+                if (option == null) {
                   return;
                 }
-                if (context.mounted) {
-                  context.read<AppBloc>().add(
-                        AppEventUpdateProfilePhoto(
-                          imagePath: image.path,
-                        ),
-                      );
+                if (option == 'eliminar' && context.mounted) {
+                  context
+                      .read<AppBloc>()
+                      .add(const AppEventDeleteProfilePhoto());
+                  return;
+                }
+                if (option == 'cambiar') {
+                  final picker = ImagePicker();
+                  final image = await picker.pickImage(
+                    source: ImageSource.gallery,
+                  );
+                  if (image == null) {
+                    return;
+                  }
+                  if (context.mounted) {
+                    context.read<AppBloc>().add(
+                          AppEventUpdateProfilePhoto(
+                            imagePath: image.path,
+                          ),
+                        );
+                  }
+                  return;
                 }
               },
             ),
