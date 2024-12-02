@@ -833,26 +833,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
 
       //upload image
-      late final String url;
       try {
         final File image = File(event.imagePath);
-        url = await _storageProvider.uploadProfileImage(
+        await _storageProvider.uploadProfileImage(
           image: image,
           userId: user.uid!,
-        );
-      } catch (e) {
-        emit(AppStateViewingProfile(
-          cloudUser: cloudUser,
-          user: user,
-          exception: e,
-          isLoading: false,
-        ));
-        return;
-      }
-      // update cloud user's profile photo url
-      try {
-        await _cloudProvider.updateUserPhotoUrl(
-          photoUrl: url,
         );
       } catch (e) {
         emit(AppStateViewingProfile(
