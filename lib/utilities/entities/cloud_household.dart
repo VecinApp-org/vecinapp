@@ -9,6 +9,7 @@ class Household {
   final String street;
   final String number;
   final String? interior;
+  final String? neighborhood;
   final String country;
   final String municipality;
   final String state;
@@ -23,6 +24,7 @@ class Household {
     required this.street,
     required this.number,
     required this.interior,
+    required this.neighborhood,
     required this.country,
     required this.latitude,
     required this.longitude,
@@ -41,6 +43,7 @@ class Household {
       street: data[householdStreetFieldName] as String,
       country: data[householdCountryFieldName] as String,
       municipality: data[householdMunicipalityFieldName] as String,
+      neighborhood: data[householdNeighborhoodFieldName] as String?,
       state: data[householdStateFieldName] as String,
       postalCode: data[householdPostalCodeFieldName] as String,
       number: data[householdHouseNumberFieldName] as String,

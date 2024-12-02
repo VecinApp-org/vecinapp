@@ -16,6 +16,7 @@ import 'package:vecinapp/utilities/entities/address.dart';
 import 'package:vecinapp/services/geocoding/geocoding_exceptions.dart';
 import 'package:vecinapp/services/geocoding/geocoding_provider.dart';
 import 'package:vecinapp/services/storage/storage_provider.dart';
+// ignore: unused_import
 import 'dart:developer' as devtools show log;
 
 class AppBloc extends Bloc<AppEvent, AppState> {
