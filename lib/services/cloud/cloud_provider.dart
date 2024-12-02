@@ -29,6 +29,8 @@ abstract class CloudProvider {
 
   Future<void> exitHousehold();
 
+  Future<void> exitNeighborhood();
+
   Future<void> assignNeighborhood();
 
   Future<void> updateUserDisplayName({

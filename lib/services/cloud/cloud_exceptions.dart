@@ -39,3 +39,5 @@ class CouldNotDeleteCloudUserException extends CloudException {}
 class CouldNotExitHouseholdException extends CloudException {}
 
 class CouldNotGetHouseholdException extends CloudException {}
+
+class CouldNotExitNeighborhoodException extends CloudException {}

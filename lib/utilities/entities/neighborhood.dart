@@ -5,7 +5,7 @@ import 'package:vecinapp/services/cloud/cloud_constants.dart';
 
 @immutable
 class Neighborhood {
-  final String neighborhoodId;
+  final String id;
   final String neighborhoodName;
   final String country;
   final String state;
@@ -13,7 +13,7 @@ class Neighborhood {
   final List<Point> polygon;
 
   const Neighborhood({
-    required this.neighborhoodId,
+    required this.id,
     required this.neighborhoodName,
     required this.country,
     required this.state,
@@ -29,7 +29,7 @@ class Neighborhood {
       polygon.add(Point(x: point.latitude, y: point.longitude));
     }
     return Neighborhood(
-        neighborhoodId: doc.id,
+        id: doc.id,
         neighborhoodName: doc[neighborhoodNameFieldName] as String,
         country: doc[neighborhoodCountryFieldName] as String,
         state: doc[neighborhoodStateFieldName] as String,

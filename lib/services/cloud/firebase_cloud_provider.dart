@@ -330,6 +330,18 @@ class FirebaseCloudProvider implements CloudProvider {
   }
 
   @override
+  Future<void> exitNeighborhood() async {
+    try {
+      final cloudUser = await currentCloudUser;
+      await _households
+          .doc(cloudUser!.householdId)
+          .update({householdNeighborhoodIdFieldName: null});
+    } catch (e) {
+      throw CouldNotExitNeighborhoodException();
+    }
+  }
+
+  @override
   Future<void> assignNeighborhood() async {
     final authUser = _authProvider.currentUser!;
     final cloudUser = await currentCloudUser;

@@ -108,6 +108,10 @@ class AppEventExitHousehold extends AppEvent {
   const AppEventExitHousehold();
 }
 
+class AppEventExitNeighborhood extends AppEvent {
+  const AppEventExitNeighborhood();
+}
+
 class AppEventLookForNeighborhood extends AppEvent {
   const AppEventLookForNeighborhood();
 }

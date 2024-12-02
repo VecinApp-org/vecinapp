@@ -35,6 +35,16 @@ class AppStateUnInitalized extends AppState {
         );
 }
 
+class AppStateError extends AppState {
+  const AppStateError({
+    required exception,
+    required bool isLoading,
+  }) : super(
+          isLoading: isLoading,
+          exception: exception,
+        );
+}
+
 //AUTHENTICATION STATES
 class AppStateRegistering extends AppState with EquatableMixin {
   const AppStateRegistering({

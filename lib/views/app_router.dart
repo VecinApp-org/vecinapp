@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
+import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
 import 'package:vecinapp/services/geocoding/geocoding_exceptions.dart';
 import 'package:vecinapp/services/storage/storage_exceptions.dart';
@@ -168,6 +169,8 @@ class AppBlocRouter extends StatelessWidget {
           return const NoNeighborhoodView();
         } else if (state is AppStateConfirmingHomeAddress) {
           return ConfirmAddressView(addresses: state.addresses);
+        } else if (state is AppStateError) {
+          return const BadState();
         } else {
           return const BadState(); // This should never happen
         }
@@ -181,9 +184,17 @@ class BadState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
-        child: Text('BadState'),
+        child: Column(
+          children: [
+            Text('BadState'),
+            TextButton(
+                onPressed: () =>
+                    context.read<AppBloc>().add(const AppEventReset()),
+                child: const Text('Intentar de nuevo'))
+          ],
+        ),
       ),
     );
   }
