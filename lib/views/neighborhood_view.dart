@@ -5,6 +5,7 @@ import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/widgets/profile_picture.dart';
 import 'package:vecinapp/utilities/entities/neighborhood_tool.dart';
+import 'package:vecinapp/utilities/entities/neighborhood.dart';
 
 class ToolCard extends StatelessWidget {
   const ToolCard({
@@ -39,7 +40,8 @@ class ToolCard extends StatelessWidget {
 }
 
 class NeighborhoodView extends HookWidget {
-  const NeighborhoodView({super.key});
+  const NeighborhoodView({super.key, required this.neighborhood});
+  final Neighborhood neighborhood;
 
   final double spacing = 16;
 
@@ -57,11 +59,12 @@ class NeighborhoodView extends HookWidget {
     });
 
     final cloudUser = context.read<AppBloc>().state.cloudUser!;
+    final neighborhood = context.read<AppBloc>().state.neighborhood!;
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
           elevation: 3,
-          title: const Text('Las Brisas'),
+          title: Text(neighborhood.neighborhoodName),
           actions: <Widget>[
             Padding(
                 padding: const EdgeInsets.only(right: 13.0),

@@ -31,3 +31,6 @@ const neighborhoodsCollectionName = 'neighborhoods';
 const neighborhoodNameFieldName = 'name';
 const neighborhoodRulebooksCollectionName = 'rulebooks';
 const neighborhoodPolygonFieldName = 'polygon';
+const neighborhoodCountryFieldName = 'country';
+const neighborhoodStateFieldName = 'state';
+const neighborhoodMunicipalityFieldName = 'municipality';

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
+import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 
@@ -10,6 +11,10 @@ abstract class CloudProvider {
 
   Future<CloudUser?> get currentCloudUser;
   Future<CloudUser?> get cachedCloudUser;
+  Future<Neighborhood?> get cachedNeighborhood;
+  Future<Neighborhood?> get currentNeighborhood;
+  Future<Household?> get currentHousehold;
+  Future<Household?> get cachedHousehold;
 
   Future<void> createCloudUser({
     required String username,
@@ -38,7 +43,7 @@ abstract class CloudProvider {
     required String householdId,
   });
 
-  Future<Household> household({required String householdId});
+  Future<Household> otherHousehold({required String householdId});
 
   Stream<Iterable<Rulebook>> neighborhoodRulebooks({
     required String neighborhoodId,

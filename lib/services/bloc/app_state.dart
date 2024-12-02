@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show immutable;
 import 'package:vecinapp/utilities/entities/auth_user.dart';
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
+import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 
@@ -14,6 +15,7 @@ abstract class AppState {
   final AuthUser? user;
   final CloudUser? cloudUser;
   final Household? household;
+  final Neighborhood? neighborhood;
   const AppState({
     required this.isLoading,
     required this.exception,
@@ -21,6 +23,7 @@ abstract class AppState {
     this.loadingText,
     this.cloudUser,
     this.household,
+    this.neighborhood,
   });
 }
 
@@ -136,10 +139,12 @@ class AppStateViewingNeighborhood extends AppState with EquatableMixin {
     required exception,
     required bool isLoading,
     required CloudUser cloudUser,
+    required Neighborhood neighborhood,
   }) : super(
           isLoading: isLoading,
           exception: exception,
           cloudUser: cloudUser,
+          neighborhood: neighborhood,
         );
 
   @override
@@ -152,6 +157,7 @@ class AppStateViewingProfile extends AppState with EquatableMixin {
     required exception,
     required AuthUser user,
     required CloudUser cloudUser,
+    required Household? household,
     String? loadingText,
   }) : super(
           isLoading: isLoading,
@@ -159,6 +165,7 @@ class AppStateViewingProfile extends AppState with EquatableMixin {
           user: user,
           loadingText: loadingText,
           cloudUser: cloudUser,
+          household: household,
         );
 
   @override

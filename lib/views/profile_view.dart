@@ -5,17 +5,26 @@ import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/dialogs/show_pic_edit_options_dialog.dart';
 import 'package:vecinapp/utilities/dialogs/single_text_input_dialog.dart';
+import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/widgets/profile_picture.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 
 class ProfileView extends StatelessWidget {
-  const ProfileView({super.key, required this.cloudUser});
+  const ProfileView(
+      {super.key, required this.cloudUser, required this.household});
   final CloudUser cloudUser;
+  final Household? household;
   @override
   Widget build(BuildContext context) {
-    String displayName = cloudUser.displayName;
-    String username = cloudUser.username;
+    final String displayName = cloudUser.displayName;
+    final String username = cloudUser.username;
+    late final String householdName;
+    if (household == null) {
+      householdName = 'Sin Casa';
+    } else {
+      householdName = '${household?.street} #${household?.number}';
+    }
+
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
@@ -94,48 +103,31 @@ class ProfileView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 34),
-          HouseholdListTile(
-            householdId: cloudUser.householdId,
+          ListTile(
+            leading: const Icon(Icons.home),
+            title: Text(householdName),
+            trailing: const Icon(Icons.arrow_right),
+            onTap: () {
+              if (household == null) {
+                return;
+              }
+              context
+                  .read<AppBloc>()
+                  .add(AppEventGoToHouseholdView(household: household!));
+            },
           ),
           ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('Configuración'),
               trailing: const Icon(Icons.arrow_right),
               onTap: () {
-                context.read<AppBloc>().add(const AppEventGoToSettingsView());
+                if (household == null) {
+                  return;
+                }
+                context.read<AppBloc>().add(AppEventGoToSettingsView());
               }),
         ],
       ),
     );
-  }
-}
-
-class HouseholdListTile extends HookWidget {
-  const HouseholdListTile({super.key, required this.householdId});
-  final String? householdId;
-  @override
-  Widget build(BuildContext context) {
-    final householdFuture = useMemoized(
-        () => context.watch<AppBloc>().currentHousehold(householdId));
-    final snapshot = useFuture(householdFuture);
-    final household = snapshot.data;
-    String addressline;
-    if (household == null) {
-      addressline = '';
-    } else {
-      addressline = '${household.street} #${household.number}';
-    }
-    return ListTile(
-        leading: Icon(Icons.home),
-        title: Text(addressline),
-        trailing: Icon(Icons.arrow_right),
-        onTap: () {
-          if (household == null) {
-            return;
-          }
-          context
-              .read<AppBloc>()
-              .add(AppEventGoToHouseholdView(household: household));
-        });
   }
 }

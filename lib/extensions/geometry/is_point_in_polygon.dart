@@ -1,12 +1,4 @@
-class Point {
-  Point({required this.x, required this.y});
-
-  /// X axis coordinate or longitude
-  double x;
-
-  /// Y axis coordinate or latitude
-  double y;
-}
+import 'package:vecinapp/extensions/geometry/point.dart';
 
 class Poly {
   /// Check if a Point [point] is inside a polygon representing by a List of Point [vertices]

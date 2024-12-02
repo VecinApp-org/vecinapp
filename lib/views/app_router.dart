@@ -138,9 +138,14 @@ class AppBlocRouter extends StatelessWidget {
         } else if (state is AppStateNeedsVerification) {
           return const VerifyEmailView();
         } else if (state is AppStateViewingNeighborhood) {
-          return const NeighborhoodView();
+          return NeighborhoodView(
+            neighborhood: state.neighborhood!,
+          );
         } else if (state is AppStateViewingProfile) {
-          return ProfileView(cloudUser: state.cloudUser!);
+          return ProfileView(
+            cloudUser: state.cloudUser!,
+            household: state.household,
+          );
         } else if (state is AppStateViewingHousehold) {
           return HouseholdView(
             household: state.household!,

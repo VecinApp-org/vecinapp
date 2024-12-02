@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:vecinapp/extensions/geometry/point.dart';
 import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
+import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/services/cloud/cloud_constants.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
@@ -153,6 +155,53 @@ class FirebaseCloudProvider implements CloudProvider {
       return null;
     }
     return CloudUser.fromFirebase(doc: cachedDoc);
+  }
+
+  @override
+  Future<Household?> get currentHousehold async {
+    final user = await cachedCloudUser;
+    if (user == null) return null;
+    return await _households.doc(user.householdId!).get().then((value) {
+      if (!value.exists) return null;
+      return Household.fromSnapshot(value);
+    });
+  }
+
+  @override
+  Future<Household?> get cachedHousehold async {
+    final user = await cachedCloudUser;
+    if (user == null) return null;
+    return await _households
+        .doc(user.householdId!)
+        .get(GetOptions(source: Source.cache))
+        .then((value) {
+      if (!value.exists) return null;
+      return Household.fromSnapshot(value);
+    });
+  }
+
+  @override
+  Future<Neighborhood?> get currentNeighborhood async {
+    final user = await cachedCloudUser;
+    if (user == null) return null;
+    return await _neighborhood(neighborhoodId: user.neighborhoodId!)
+        .get()
+        .then((value) {
+      if (!value.exists) return null;
+      return Neighborhood.fromDocument(value);
+    });
+  }
+
+  @override
+  Future<Neighborhood?> get cachedNeighborhood async {
+    final user = await cachedCloudUser;
+    if (user == null) return null;
+    return await _neighborhood(neighborhoodId: user.neighborhoodId!)
+        .get(GetOptions(source: Source.cache))
+        .then((value) {
+      if (!value.exists) return null;
+      return Neighborhood.fromDocument(value);
+    });
   }
 
   @override
@@ -314,16 +363,13 @@ class FirebaseCloudProvider implements CloudProvider {
                   isEqualTo: householdData[householdMunicipalityFieldName])
               .get()
               .then((value) => value.docs);
-          devtools.log('Found ${nearestNeighborhoods.length} neighborhoods');
           //check if the point is in a neighborhood
           if (nearestNeighborhoods.isNotEmpty) {
             //Iterate through the results and check if the point is inside the polygon
             bool found = false;
             for (final neighborhood in nearestNeighborhoods) {
-              devtools.log('Checking neighborhood ${neighborhood.id}');
               final geoPoint = neighborhood[neighborhoodPolygonFieldName]
                   as Map<String, dynamic>;
-              devtools.log('GeoPoint: $geoPoint');
               final List<Point> polygon = [];
               for (final point in geoPoint.values) {
                 polygon.add(Point(x: point.latitude, y: point.longitude));
@@ -411,7 +457,7 @@ class FirebaseCloudProvider implements CloudProvider {
   }
 
   @override
-  Future<Household> household({required String householdId}) async {
+  Future<Household> otherHousehold({required String householdId}) async {
     try {
       final doc = await _households.doc(householdId).get();
       return Household.fromSnapshot(doc);

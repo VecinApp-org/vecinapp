@@ -23,7 +23,7 @@ class RegisterCloudUserView extends HookWidget {
             enableSuggestions: false,
             autocorrect: false,
             keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(labelText: 'Nombre')),
+            decoration: const InputDecoration(labelText: 'Nombre y Apellido')),
         TextField(
             autofocus: true,
             controller: usernameController,

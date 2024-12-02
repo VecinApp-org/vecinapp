@@ -82,7 +82,9 @@ class FirebaseStorageProvider implements StorageProvider {
     try {
       final filePath = 'user/$userId/profile_image';
       //check if the image exists in Firebase Storage
-      if (await checkFileExists(filePath)) {
+      final storageRef = FirebaseStorage.instance.ref(filePath);
+      final listResult = await storageRef.list();
+      if (listResult.items.isNotEmpty) {
         // return the image from Firebase Storage
         imageBytes = await FirebaseStorage.instance.ref(filePath).getData();
       } else {
@@ -127,17 +129,5 @@ class FirebaseStorageProvider implements StorageProvider {
       // ignore
     }
     devtools.log('Profile image deleted');
-  }
-}
-
-Future<bool> checkFileExists(String filePath) async {
-  final storageRef = FirebaseStorage.instance.ref(filePath);
-  try {
-    final listResult = await storageRef.list();
-    return listResult.items.isNotEmpty;
-  } catch (e) {
-    // Handle errors, such as file not found
-    devtools.log('Error checking file existence: $e');
-    return false;
   }
 }
