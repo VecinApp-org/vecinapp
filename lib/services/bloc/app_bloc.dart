@@ -150,6 +150,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
     });
 
+    on<AppEventGoToLogin>((event, emit) async {
+      emit(const AppStateLoggingIn(
+        exception: null,
+        isLoading: false,
+      ));
+    });
+
     on<AppEventLogOut>((event, emit) async {
       _authProvider.logOut();
       add(AppEventReset());
@@ -366,9 +373,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       if (!await isValidNeighborhoodAccess()) {
         add(const AppEventReset());
       }
+      final cloudUser = await _cloudProvider.cachedCloudUser;
       emit(AppStateViewingRulebooks(
         isLoading: false,
         exception: null,
+        cloudUser: cloudUser,
       ));
     });
 
@@ -391,10 +400,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         add(const AppEventReset());
         return;
       }
+      final cloudUser = await _cloudProvider.cachedCloudUser;
       emit(AppStateViewingRulebookDetails(
         rulebook: event.rulebook,
         isLoading: false,
         exception: null,
+        cloudUser: cloudUser!,
       ));
     });
 
@@ -742,8 +753,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         }
       }
       //Send user to rulebook details view
+      final cloudUser = await _cloudProvider.cachedCloudUser;
       emit(AppStateViewingRulebookDetails(
         rulebook: newRulebook,
+        cloudUser: cloudUser!,
         isLoading: false,
         exception: null,
       ));
@@ -760,10 +773,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //enable loading indicator
+      final cloudUser = await _cloudProvider.cachedCloudUser;
       emit(AppStateViewingRulebookDetails(
         rulebook: state.rulebook!,
         isLoading: true,
         exception: null,
+        cloudUser: cloudUser!,
       ));
       try {
         await _cloudProvider.deleteRulebook(
@@ -772,6 +787,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       } on CloudException catch (e) {
         emit(AppStateViewingRulebookDetails(
           rulebook: state.rulebook!,
+          cloudUser: cloudUser,
           isLoading: false,
           exception: e,
         ));
@@ -779,6 +795,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       } on Exception catch (e) {
         emit(AppStateViewingRulebookDetails(
           rulebook: state.rulebook!,
+          cloudUser: cloudUser,
           isLoading: false,
           exception: e,
         ));
@@ -788,6 +805,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(AppStateViewingRulebooks(
         isLoading: false,
         exception: null,
+        cloudUser: cloudUser,
       ));
     });
 

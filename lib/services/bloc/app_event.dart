@@ -26,6 +26,10 @@ class AppEventGoToForgotPassword extends AppEvent {
   const AppEventGoToForgotPassword({String? email}) : email = email ?? '';
 }
 
+class AppEventGoToLogin extends AppEvent {
+  const AppEventGoToLogin();
+}
+
 // AUTHENTICATION EVENTS
 class AppEventRegisterWithEmailAndPassword extends AppEvent {
   final String email;

@@ -154,11 +154,14 @@ class AppBlocRouter extends StatelessWidget {
         } else if (state is AppStateViewingSettings) {
           return SettingsView();
         } else if (state is AppStateViewingRulebooks) {
-          return const RulebooksView();
+          return RulebooksView(
+            cloudUser: state.cloudUser!,
+          );
         } else if (state is AppStateEditingRulebook) {
           return EditRulebookView(rulebook: state.rulebook);
         } else if (state is AppStateViewingRulebookDetails) {
-          return RulebookDetailsView(rulebook: state.rulebook);
+          return RulebookDetailsView(
+              rulebook: state.rulebook, cloudUser: state.cloudUser);
         } else if (state is AppStateDeletingAccount) {
           return const DeleteAccountView();
         } else if (state is AppStateCreatingCloudUser) {
@@ -192,7 +195,7 @@ class BadState extends StatelessWidget {
             TextButton(
                 onPressed: () =>
                     context.read<AppBloc>().add(const AppEventReset()),
-                child: const Text('Intentar de nuevo'))
+                child: const Text('Reiniciar'))
           ],
         ),
       ),

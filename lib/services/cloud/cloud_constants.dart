@@ -11,6 +11,7 @@ const userDisplayNameFieldName = 'display_name';
 const userHouseholdIdFieldName = 'household_id';
 const userNeighborhoodIdFieldName = 'neighborhood_id';
 const userProfilePhotoUrlFieldName = 'photo_url';
+const userAdminLevelFieldName = 'admin_level';
 
 // households
 const householdsCollectionName = 'households';

@@ -71,11 +71,11 @@ class RegisterView extends HookWidget {
                   passwordController2.text,
                 )),
             child: const Text('Crear cuenta')),
-        const SizedBox(height: 55),
+        const SizedBox(height: 8),
         //Go to login page
         TextButton(
             onPressed: () =>
-                context.read<AppBloc>().add(const AppEventLogOut()),
+                context.read<AppBloc>().add(const AppEventGoToLogin()),
             child: const Text('Ya tengo una cuenta'))
       ],
     );

@@ -209,7 +209,8 @@ class AppStateViewingRulebooks extends AppState {
   const AppStateViewingRulebooks({
     required bool isLoading,
     required exception,
-  }) : super(isLoading: isLoading, exception: exception);
+    required cloudUser,
+  }) : super(isLoading: isLoading, exception: exception, cloudUser: cloudUser);
 }
 
 class AppStateEditingRulebook extends AppState {
@@ -223,11 +224,13 @@ class AppStateEditingRulebook extends AppState {
 
 class AppStateViewingRulebookDetails extends AppState {
   final Rulebook rulebook;
+  final CloudUser cloudUser;
   const AppStateViewingRulebookDetails({
     required this.rulebook,
+    required this.cloudUser,
     required bool isLoading,
     required exception,
-  }) : super(isLoading: isLoading, exception: exception);
+  }) : super(isLoading: isLoading, exception: exception, cloudUser: cloudUser);
 }
 
 class AppStateDeletingAccount extends AppState {
