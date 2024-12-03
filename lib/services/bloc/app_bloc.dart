@@ -43,10 +43,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     on<AppEventReset>((event, emit) async {
       try {
+        //Start loading
         emit(const AppStateUnInitalized(
           isLoading: true,
         ));
+
+        //Get AuthUser
         final user = _authProvider.currentUser;
+
+        //check if user is not logged in
         if (user == null) {
           emit(
             const AppStateRegistering(
@@ -57,6 +62,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           return;
         }
 
+        //check if user is not verified
         if (!user.isEmailVerified) {
           emit(AppStateNeedsVerification(
             exception: null,
@@ -65,8 +71,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           return;
         }
 
+        //Get CloudUser
         final cloudUser = await _cloudProvider.currentCloudUser;
 
+        //check if CloudUser does not exist
         if (cloudUser == null) {
           emit(const AppStateCreatingCloudUser(
             isLoading: false,
@@ -75,13 +83,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           return;
         }
 
-        if (cloudUser.id != user.uid) {
-          add(AppEventLogOut());
-          return;
-        }
+        //check if CloudUser is not the same as AuthUser, this should never happen
+        assert(user.uid == cloudUser.id);
 
-        final household = await _cloudProvider.currentHousehold;
-        if (household == null) {
+        //check if CloudUser is in a Household
+        if (cloudUser.householdId == null) {
           emit(const AppStateSelectingHomeAddress(
             isLoading: false,
             exception: null,
@@ -89,13 +95,24 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           return;
         }
 
-        if (cloudUser.householdId != household.id) {
-          add(AppEventLogOut());
+        //get Household
+        final household = await _cloudProvider.currentHousehold;
+
+        //check if Household does not exist, this would mean the Household was deleted
+        if (household == null) {
+          await _cloudProvider.exitHousehold();
+          emit(const AppStateSelectingHomeAddress(
+            isLoading: false,
+            exception: null,
+          ));
           return;
         }
 
-        final neighborhood = await _cloudProvider.currentNeighborhood;
-        if (neighborhood == null) {
+        //check if CloudUser has a wrong HouseholdId, this should never happen
+        assert(cloudUser.householdId == household.id);
+
+        //check if user has a neighborhood
+        if (cloudUser.neighborhoodId == null) {
           emit(const AppStateNoNeighborhood(
             isLoading: false,
             exception: null,
@@ -103,22 +120,36 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           return;
         }
 
-        if (cloudUser.neighborhoodId != neighborhood.id) {
-          add(AppEventLogOut());
+        //get Neighborhood
+        final neighborhood = await _cloudProvider.currentNeighborhood;
+
+        //check if Neighborhood does not exist, this would mean the neighborhood was deleted
+        if (neighborhood == null) {
+          await _cloudProvider.exitNeighborhood();
+          emit(const AppStateNoNeighborhood(
+            isLoading: false,
+            exception: null,
+          ));
           return;
         }
 
-        if (household.neighborhoodId != neighborhood.id) {
-          add(AppEventExitHousehold());
-          return;
-        }
+        //check if CloudUser, Household and Neighborhood do not match, this should never happen
+        assert(cloudUser.neighborhoodId == neighborhood.id &&
+            neighborhood.id == household.neighborhoodId);
 
+        //check if household is not in the neighborhood area.
+        //this would mean the neighborhood area was edited and the household no longer belongs to the neighborhood.
         final point = Point(x: household.latitude, y: household.longitude);
         if (Poly.isPointInPolygon(point, neighborhood.polygon) == false) {
-          add(AppEventExitNeighborhood());
+          await _cloudProvider.exitNeighborhood();
+          emit(const AppStateNoNeighborhood(
+            isLoading: false,
+            exception: null,
+          ));
           return;
         }
 
+        //emit success
         emit(AppStateViewingNeighborhood(
           cloudUser: cloudUser,
           exception: null,
