@@ -33,7 +33,7 @@ class _DeleteAccountViewState extends State<DeleteAccountView> {
         leading: BackButton(
           onPressed: () {
             context.read<AppBloc>().add(
-                  const AppEventGoToSettingsView(),
+                  const AppEventReset(),
                 );
           },
         ),

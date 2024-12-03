@@ -164,7 +164,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
     });
 
-    //Authentication Routing Events
+    //Authentication Routing
     on<AppEventGoToRegistration>((event, emit) async {
       emit(const AppStateRegistering(
         exception: null,
@@ -188,21 +188,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
     });
 
-    on<AppEventLogOut>((event, emit) async {
-      _authProvider.logOut();
-      add(AppEventReset());
-    });
-
     //Authentication Events
     on<AppEventRegisterWithEmailAndPassword>((event, emit) async {
-      final email = event.email;
-      final password = event.password;
-      final passwordConfirmation = event.passwordConfirmation;
+      //no validation required
+
+      //start loading
+      emit(const AppStateRegistering(
+        exception: null,
+        isLoading: true,
+      ));
+      //create user
       try {
-        emit(const AppStateRegistering(
-          exception: null,
-          isLoading: true,
-        ));
+        final email = event.email;
+        final password = event.password;
+        final passwordConfirmation = event.passwordConfirmation;
         await _authProvider.createUser(
           email: email,
           password: password,
@@ -219,24 +218,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       add(AppEventReset());
     });
 
-    on<AppEventSendEmailVerification>((event, emit) async {
-      await _authProvider.sendEmailVerification();
-      emit(state);
-    });
-
-    on<AppEventConfirmUserIsVerified>((event, emit) async {
-      try {
-        await _authProvider.confirmUserIsVerified();
-      } on AuthException catch (e) {
-        emit(AppStateNeedsVerification(
-          exception: e,
-          isLoading: false,
-        ));
-      }
-      add(AppEventReset());
-    });
-
     on<AppEventLogInWithEmailAndPassword>((event, emit) async {
+      //no validation required
+
       //show loading
       emit(const AppStateLoggingIn(
         exception: null,
@@ -263,44 +247,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       add(const AppEventReset());
     });
 
-    on<AppEventDeleteAccount>((event, emit) async {
-      final user = _authProvider.currentUser;
-      if (user == null) {
-        emit(const AppStateLoggingIn(
-          exception: null,
-          isLoading: false,
-        ));
-        return;
-      }
-      emit(const AppStateDeletingAccount(
-        isLoading: true,
-        exception: null,
-        loadingText: 'Eliminando cuenta...',
-      ));
-      try {
-        await _authProvider.logInWithEmailAndPassword(
-          email: user.email!,
-          password: event.password,
-        );
-        await _storageProvider.deleteProfileImage(userId: user.uid!);
-        await _cloudProvider.deleteCloudUser();
-        await _authProvider.deleteAccount();
-      } catch (e) {
-        emit(AppStateDeletingAccount(
-          isLoading: false,
-          exception: e,
-        ));
-        return;
-      }
-      add(const AppEventReset());
-    });
-
     on<AppEventSendPasswordResetEmail>((event, emit) async {
-      final user = _authProvider.currentUser;
-      if (user == null) {
-        add(const AppEventReset());
-        return;
-      }
+      //no validation required
+
+      //send email
       try {
         emit(AppStateResettingPassword(
           exception: null,
@@ -325,62 +275,116 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
     });
 
-    //Neighborhood Routing
-    on<AppEventGoToNeighborhoodView>((event, emit) async {
-      //check if user is logged in, verified, has a household and a neighborhood
-      final user = _authProvider.currentUser;
-      final cloudUser = await _cloudProvider.cachedCloudUser ??
-          await _cloudProvider.currentCloudUser;
-      final neighborhood = await _cloudProvider.cachedNeighborhood ??
-          await _cloudProvider.currentNeighborhood;
-      if (user == null ||
-          !user.isEmailVerified ||
-          cloudUser == null ||
-          cloudUser.householdId == null ||
-          cloudUser.neighborhoodId == null ||
-          neighborhood == null) {
+    on<AppEventLogOut>((event, emit) async {
+      _authProvider.logOut();
+      add(AppEventReset());
+    });
+
+    on<AppEventSendEmailVerification>((event, emit) async {
+      //validate access
+      if (!_isValidAuthUserAccess()) {
+        add(const AppEventReset());
+        return;
+      }
+      //start loading
+      emit(const AppStateNeedsVerification(
+        exception: null,
+        isLoading: true,
+      ));
+      try {
+        await _authProvider.sendEmailVerification();
+      } catch (e) {
+        emit(AppStateNeedsVerification(
+          exception: e,
+          isLoading: false,
+        ));
+      }
+    });
+
+    on<AppEventConfirmUserIsVerified>((event, emit) async {
+      //validate access
+      if (!_isValidAuthUserAccess()) {
+        add(const AppEventReset());
+        return;
+      }
+      //start loading
+      emit(const AppStateNeedsVerification(
+        exception: null,
+        isLoading: true,
+      ));
+      //confirm verification
+      try {
+        await _authProvider.confirmUserIsVerified();
+      } on AuthException catch (e) {
+        emit(AppStateNeedsVerification(
+          exception: e,
+          isLoading: false,
+        ));
+      }
+      add(AppEventReset());
+    });
+
+    on<AppEventDeleteAccount>((event, emit) async {
+      //validate access
+      if (!await _isValidCloudUserAccess()) {
         add(const AppEventReset());
         return;
       }
 
+      //show loading
+      emit(const AppStateDeletingAccount(
+        isLoading: true,
+        exception: null,
+        loadingText: 'Eliminando cuenta...',
+      ));
+
+      //delete account
+      try {
+        final user = _authProvider.currentUser;
+        final cloudUser = await _cloudProvider.currentCloudUser;
+        await _authProvider.logInWithEmailAndPassword(
+          email: user!.email!,
+          password: event.password,
+        );
+        await _storageProvider.deleteProfileImage(userId: cloudUser!.id);
+        await _cloudProvider.deleteCloudUser();
+        await _authProvider.deleteAccount();
+      } catch (e) {
+        emit(AppStateDeletingAccount(
+          isLoading: false,
+          exception: e,
+        ));
+        return;
+      }
+      add(const AppEventReset());
+    });
+
+    //Neighborhood Routing
+    on<AppEventGoToNeighborhoodView>((event, emit) async {
+      final neighborhood = await _cloudProvider.cachedNeighborhood;
+      final cloudUser = await _cloudProvider.cachedCloudUser;
       emit(AppStateViewingNeighborhood(
-        cloudUser: cloudUser,
+        cloudUser: cloudUser!,
         isLoading: false,
         exception: null,
-        neighborhood: neighborhood,
+        neighborhood: neighborhood!,
       ));
     });
 
     on<AppEventGoToProfileView>((event, emit) async {
       final user = _authProvider.currentUser;
-      if (user == null || !user.isEmailVerified) {
-        add(const AppEventReset());
-        return;
-      }
-      final cloudUser = await _cloudProvider.cachedCloudUser ??
-          await _cloudProvider.currentCloudUser;
-      Household? household = await _cloudProvider.cachedHousehold ??
-          await _cloudProvider.currentHousehold;
+      final cloudUser = await _cloudProvider.cachedCloudUser;
+      final household = await _cloudProvider.cachedHousehold;
       emit(AppStateViewingProfile(
         cloudUser: cloudUser!,
         household: household,
-        user: user,
+        user: user!,
         isLoading: false,
         exception: null,
       ));
     });
 
     on<AppEventGoToHouseholdView>((event, emit) async {
-      final user = _authProvider.currentUser;
-      final cloudUser = await _cloudProvider.cachedCloudUser ??
-          await _cloudProvider.currentCloudUser;
-      if (user == null ||
-          !user.isEmailVerified ||
-          cloudUser == null ||
-          cloudUser.householdId == null) {
-        add(const AppEventReset());
-        return;
-      }
       emit(AppStateViewingHousehold(
         household: event.household,
         isLoading: false,
@@ -389,11 +393,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     on<AppEventGoToSettingsView>((event, emit) async {
-      final user = _authProvider.currentUser;
-      if (user == null || !user.isEmailVerified) {
-        add(const AppEventReset());
-        return;
-      }
       emit(const AppStateViewingSettings(
         isLoading: false,
         exception: null,
@@ -401,9 +400,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     on<AppEventGoToRulebooksView>((event, emit) async {
-      if (!await isValidNeighborhoodAccess()) {
-        add(const AppEventReset());
-      }
       final cloudUser = await _cloudProvider.cachedCloudUser;
       emit(AppStateViewingRulebooks(
         isLoading: false,
@@ -413,11 +409,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     on<AppEventGoToEditRulebookView>((event, emit) async {
-      final user = _authProvider.currentUser;
-      if (user == null || !user.isEmailVerified) {
-        add(const AppEventReset());
-        return;
-      }
       emit(AppStateEditingRulebook(
         rulebook: event.rulebook,
         isLoading: false,
@@ -426,11 +417,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     on<AppEventGoToRulebookDetailsView>((event, emit) async {
-      final user = _authProvider.currentUser;
-      if (user == null || !user.isEmailVerified) {
-        add(const AppEventReset());
-        return;
-      }
       final cloudUser = await _cloudProvider.cachedCloudUser;
       emit(AppStateViewingRulebookDetails(
         rulebook: event.rulebook,
@@ -441,30 +427,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     on<AppEventGoToDeleteAccountView>((event, emit) async {
-      final user = _authProvider.currentUser;
-      if (user == null || !user.isEmailVerified) {
-        add(const AppEventReset());
-        return;
-      }
       emit(const AppStateDeletingAccount(
         isLoading: false,
         exception: null,
       ));
     });
 
-    //Cloud Events
+    //Cloud User Events
     on<AppEventCreateCloudUser>((event, emit) async {
-      //check if user is logged in and authenticated
-      final user = _authProvider.currentUser;
-      if (user == null || !user.isEmailVerified) {
+      //validate access
+      if (!_isValidAuthUserAccess()) {
         add(const AppEventReset());
         return;
       }
-      //enable loading indicator
-      emit(AppStateCreatingCloudUser(
-        isLoading: true,
-        exception: null,
-      ));
       //create new cloud user
       try {
         await _cloudProvider.createCloudUser(
@@ -488,13 +463,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     on<AppEventUpdateHomeAddress>(
       (event, emit) async {
-        //check if user is logged in
-        final user = _authProvider.currentUser;
-        if (user == null) {
-          emit(const AppStateLoggingIn(
-            exception: null,
-            isLoading: false,
-          ));
+        //validate access
+        if (!await _isValidCloudUserAccess()) {
+          add(const AppEventReset());
           return;
         }
         //enable loading indicator
@@ -556,27 +527,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           ));
           return;
         }
-        final updatedCloudUser = await _cloudProvider.currentCloudUser;
-        final neighborhood = await _cloudProvider.currentNeighborhood;
-        //if the user has a neighborhood, send to viewing neighborhood
-        if (updatedCloudUser!.neighborhoodId != null) {
-          emit(AppStateViewingNeighborhood(
-            cloudUser: updatedCloudUser,
-            isLoading: false,
-            exception: null,
-            neighborhood: neighborhood!,
-          ));
-        } else {
-          //Send No Neighborhood (this view should try to find a neighborhood for the user's home)
-          emit(const AppStateNoNeighborhood(
-            isLoading: false,
-            exception: null,
-          ));
-        }
+        add(const AppEventReset());
       },
     );
 
     on<AppEventConfirmAddress>((event, emit) async {
+      //validate access
+      if (!await _isValidCloudUserAccess()) {
+        add(const AppEventReset());
+        return;
+      }
       //start loading indicator
       emit(AppStateConfirmingHomeAddress(
         isLoading: true,
@@ -616,13 +576,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     on<AppEventLookForNeighborhood>((event, emit) async {
-      //check if user is logged in
-      final user = _authProvider.currentUser;
-      if (user == null) {
-        emit(const AppStateLoggingIn(
-          exception: null,
-          isLoading: false,
-        ));
+      //validate access
+      if (!await _isValidHouseholdAccess()) {
+        add(const AppEventReset());
         return;
       }
       //enable loading indicator
@@ -653,6 +609,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     on<AppEventExitHousehold>((event, emit) async {
+      //validate access
+      if (!await _isValidHouseholdAccess()) {
+        add(const AppEventReset());
+        return;
+      }
+      //exit household
       try {
         await _cloudProvider.exitHousehold();
       } catch (_) {
@@ -661,40 +623,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       add(AppEventReset());
     });
 
-    on<AppEventExitNeighborhood>((event, emit) async {
-      try {
-        await _cloudProvider.exitNeighborhood();
-      } catch (_) {
-        add(AppEventReset());
-      }
-      add(AppEventReset());
-    });
-
     on<AppEventUpdateUserDisplayName>((event, emit) async {
-      //check if user is logged in
-      final user = _authProvider.currentUser;
-      if (user == null) {
-        emit(const AppStateLoggingIn(
-          exception: null,
-          isLoading: false,
-        ));
-        return;
-      }
-      //check if user is logged in to cloud
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      if (cloudUser == null) {
-        emit(const AppStateCreatingCloudUser(
-          exception: null,
-          isLoading: false,
-        ));
+      //validate access
+      if (!await _isValidCloudUserAccess()) {
+        add(const AppEventReset());
         return;
       }
       //start loading
+      final user = _authProvider.currentUser;
+      final cloudUser = await _cloudProvider.currentCloudUser;
       final household = state.household;
       emit(AppStateViewingProfile(
-        cloudUser: cloudUser,
+        cloudUser: cloudUser!,
         household: household,
-        user: user,
+        user: user!,
         exception: null,
         isLoading: true,
       ));
@@ -727,14 +669,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
     });
 
+    //Rulebook Events
     on<AppEventCreateOrUpdateRulebook>((event, emit) async {
-      //check if user is logged in
-      final user = _authProvider.currentUser;
-      if (user == null) {
-        emit(const AppStateLoggingIn(
-          exception: null,
-          isLoading: false,
-        ));
+      //validate access
+      if (!await _isValidNeighborhoodAccess()) {
+        add(const AppEventReset());
         return;
       }
       //enable loading indicator
@@ -794,13 +733,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     on<AppEventDeleteRulebook>((event, emit) async {
-      //check if user is logged in
-      final user = _authProvider.currentUser;
-      if (user == null) {
-        emit(const AppStateLoggingIn(
-          exception: null,
-          isLoading: false,
-        ));
+      //validate access
+      if (!await _isValidNeighborhoodAccess()) {
+        add(const AppEventReset());
         return;
       }
       //enable loading indicator
@@ -842,30 +777,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     //Storage events
     on<AppEventUpdateProfilePhoto>((event, emit) async {
-      //check if user is logged in
-      final user = _authProvider.currentUser;
-      if (user == null) {
-        emit(const AppStateLoggingIn(
-          exception: null,
-          isLoading: false,
-        ));
-        return;
-      }
-      //check if user has a cloud user
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      if (cloudUser == null) {
-        emit(const AppStateCreatingCloudUser(
-          isLoading: false,
-          exception: null,
-        ));
+      //validate access
+      if (!await _isValidCloudUserAccess()) {
+        add(const AppEventReset());
         return;
       }
       //start loading
+      final user = _authProvider.currentUser;
+      final cloudUser = await _cloudProvider.cachedCloudUser;
       final household = state.household;
       emit(AppStateViewingProfile(
-        cloudUser: cloudUser,
+        cloudUser: cloudUser!,
         household: household,
-        user: user,
+        user: user!,
         exception: null,
         isLoading: true,
         loadingText: 'Subiendo imagen...',
@@ -900,7 +824,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppEventDeleteProfilePhoto>(
       (event, emit) async {
         //validate access
-        if (!await isValidAuthUserAccess()) {
+        if (!await _isValidCloudUserAccess()) {
           add(const AppEventReset());
           return;
         }
@@ -940,49 +864,54 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     );
   }
 
-  Future<bool> isValidAuthUserAccess() async {
+  //Private methods
+  bool _isValidAuthUserAccess() {
     final authUser = _authProvider.currentUser;
-    if (authUser == null || !authUser.isEmailVerified) {
+    if (authUser == null) {
       return false;
     } else {
       return true;
     }
   }
 
-  Future<bool> isValidCloudUserAccess() async {
+  bool _isValidAuthUserVerificationAccess() {
+    final authUser = _authProvider.currentUser;
+    if (_isValidAuthUserAccess() == false ||
+        authUser!.isEmailVerified == false) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  Future<bool> _isValidCloudUserAccess() async {
     final authUser = _authProvider.currentUser;
     final cloudUser = await _cloudProvider.cachedCloudUser ??
         await _cloudProvider.currentCloudUser;
-    if (authUser == null ||
-        !authUser.isEmailVerified ||
+    if (_isValidAuthUserVerificationAccess() == false ||
         cloudUser == null ||
-        cloudUser.id != authUser.uid) {
+        cloudUser.id != authUser!.uid) {
       return false;
     } else {
       return true;
     }
   }
 
-  Future<bool> isValidHouseholdAccess() async {
-    final authUser = _authProvider.currentUser;
+  Future<bool> _isValidHouseholdAccess() async {
     final cloudUser = await _cloudProvider.cachedCloudUser ??
         await _cloudProvider.currentCloudUser;
     final household = await _cloudProvider.cachedHousehold ??
         await _cloudProvider.currentHousehold;
-    if (authUser == null ||
-        !authUser.isEmailVerified ||
-        cloudUser == null ||
-        cloudUser.id != authUser.uid ||
+    if (await _isValidCloudUserAccess() == false ||
         household == null ||
-        cloudUser.householdId != household.id) {
+        cloudUser!.householdId != household.id) {
       return false;
     } else {
       return true;
     }
   }
 
-  Future<bool> isValidNeighborhoodAccess() async {
-    final authUser = _authProvider.currentUser;
+  Future<bool> _isValidNeighborhoodAccess() async {
     final cloudUser = await _cloudProvider.cachedCloudUser ??
         await _cloudProvider.currentCloudUser;
     final household = await _cloudProvider.cachedHousehold ??
@@ -990,21 +919,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     final neighborhood = await _cloudProvider.cachedNeighborhood ??
         await _cloudProvider.currentNeighborhood;
 
-    if (authUser == null ||
-        !authUser.isEmailVerified ||
-        cloudUser == null ||
-        cloudUser.id != authUser.uid ||
-        household == null ||
+    if (await _isValidHouseholdAccess() == false ||
         neighborhood == null ||
-        neighborhood.id != cloudUser.neighborhoodId ||
-        household.id != cloudUser.householdId ||
-        household.neighborhoodId != neighborhood.id) {
+        neighborhood.id != cloudUser!.neighborhoodId ||
+        household!.neighborhoodId != neighborhood.id) {
       return false;
     } else {
       return true;
     }
   }
 
+  //Public methods
   Future<Uint8List?> profilePicture({required String? userId}) async {
     if (userId == null || userId.isEmpty) {
       return null;
