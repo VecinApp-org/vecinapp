@@ -190,8 +190,10 @@ class BadState extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text('BadState'),
+            Text('Ocurrió un error',
+                style: Theme.of(context).textTheme.headlineSmall),
             TextButton(
                 onPressed: () =>
                     context.read<AppBloc>().add(const AppEventReset()),

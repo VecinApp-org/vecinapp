@@ -75,18 +75,13 @@ class _DeleteAccountViewState extends State<DeleteAccountView> {
                       ))),
                 ),
                 const SizedBox(height: 55),
-                //Reset password button
-                OutlinedButton(
-                  onPressed: () {
-                    context.read<AppBloc>().add(const AppEventLogOut());
-                  },
-                  child: const Text('Regresar'),
-                ),
-                const SizedBox(height: 13),
-                //cancel button
                 FilledButton(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.red,
+                  style: ButtonStyle(
+                    foregroundColor: WidgetStateProperty.all(
+                      Theme.of(context).colorScheme.onErrorContainer,
+                    ),
+                    backgroundColor: WidgetStateProperty.all(
+                        Theme.of(context).colorScheme.errorContainer),
                   ),
                   onPressed: () {
                     final password = _controller.text;
@@ -95,6 +90,15 @@ class _DeleteAccountViewState extends State<DeleteAccountView> {
                         ));
                   },
                   child: const Text('Eliminar cuenta'),
+                ),
+                const SizedBox(height: 13),
+                TextButton(
+                  onPressed: () {
+                    context.read<AppBloc>().add(
+                          const AppEventReset(),
+                        );
+                  },
+                  child: const Text('Regresar'),
                 ),
               ],
             ),

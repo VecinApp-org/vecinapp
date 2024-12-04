@@ -3,16 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/dialogs/show_confirmation_dialog.dart';
-
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:vecinapp/services/settings/settings_controller.dart';
 
-class SettingsView extends StatelessWidget {
+class SettingsView extends HookWidget {
   SettingsView({super.key});
 
   final SettingsController controller = SettingsController();
 
   @override
   Widget build(BuildContext context) {
+    useListenable(controller);
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
@@ -26,25 +27,26 @@ class SettingsView extends StatelessWidget {
       body: Column(
         children: [
           ListTile(
-            leading: const Icon(Icons.light_mode_outlined),
             title: const Text('Tema'),
-            trailing: DropdownButton<ThemeMode>(
-                value: controller.themeMode,
-                onChanged: controller.updateThemeMode,
-                items: const [
-                  DropdownMenuItem(
-                    value: ThemeMode.dark,
-                    child: Text('Noche'),
-                  ),
-                  DropdownMenuItem(
-                    value: ThemeMode.light,
-                    child: Text('Día'),
-                  ),
-                  DropdownMenuItem(
-                    value: ThemeMode.system,
-                    child: Text('Sistema'),
-                  )
-                ]),
+            trailing: SegmentedButton(
+              onSelectionChanged: (selection) =>
+                  controller.updateThemeMode(selection.first),
+              segments: [
+                ButtonSegment(
+                  value: ThemeMode.system,
+                  icon: Icon(Icons.phone_android),
+                ),
+                ButtonSegment(
+                  value: ThemeMode.light,
+                  icon: Icon(Icons.light_mode),
+                ),
+                ButtonSegment(
+                  value: ThemeMode.dark,
+                  icon: Icon(Icons.dark_mode),
+                ),
+              ],
+              selected: <ThemeMode>{controller.themeMode},
+            ),
           ),
           Spacer(),
           TextButton(
@@ -64,11 +66,14 @@ class SettingsView extends StatelessWidget {
           ),
           TextButton(
             onPressed: () async {
-              final confirmLogout = await showConfirmationDialog(
+              final confirmDeleteAccout = await showConfirmationDialog(
                 context: context,
-                text: '¿Quieres eliminar tu cuenta?',
+                isDestructive: true,
+                title: 'Eliminar cuenta',
+                text: 'Esta acción es irreversible.',
+                confirmText: 'Eliminar todos mis datos',
               );
-              if (confirmLogout == true && context.mounted) {
+              if (confirmDeleteAccout == true && context.mounted) {
                 context.read<AppBloc>().add(
                       const AppEventGoToDeleteAccountView(),
                     );

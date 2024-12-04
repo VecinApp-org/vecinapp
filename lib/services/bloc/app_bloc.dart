@@ -276,7 +276,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     on<AppEventLogOut>((event, emit) async {
-      _authProvider.logOut();
+      await _authProvider.logOut();
       add(AppEventReset());
     });
 

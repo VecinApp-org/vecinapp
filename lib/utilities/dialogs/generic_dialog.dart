@@ -7,8 +7,10 @@ Future<T?> showGenericDialog<T>({
   required String title,
   required String content,
   required DialogOptionBuilder optionBuilder,
+  bool isDestructiveAction = false,
 }) {
   final options = optionBuilder();
+
   return showDialog<T>(
     context: context,
     builder: (context) {
@@ -25,6 +27,9 @@ Future<T?> showGenericDialog<T>({
                 Navigator.of(context).pop();
               }
             },
+            style: TextButton.styleFrom(
+              foregroundColor: isDestructiveAction ? Colors.red : null,
+            ),
             child: Text(optionTitle),
           );
         }).toList(),
