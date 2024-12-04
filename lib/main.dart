@@ -31,6 +31,7 @@ void main() async {
 
   // Initialize Storage
   final storageProvider = FirebaseStorageProvider();
+  await storageProvider.initialize();
 
   // Initialize Geocoding
   final geocodingProvider = OpenCageGeocodingProvider();

@@ -14,15 +14,26 @@ class ProfilePicture extends StatelessWidget {
     return FutureBuilder(
       future: profilePicture,
       builder: (context, snapshot) {
-        if (snapshot.data != null &&
-            snapshot.connectionState == ConnectionState.done) {
+        if (snapshot.data != null) {
           return CircleAvatar(
             radius: radius,
-            backgroundImage: Image.memory(snapshot.data!).image,
+            foregroundImage: Image.memory(snapshot.data!).image,
           );
         } else {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return CircleAvatar(
+              radius: radius,
+              foregroundColor: Theme.of(context).colorScheme.onSurface,
+              backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+              child: Icon(
+                Icons.person_2_rounded,
+                size: radius * 1.5,
+              ),
+            );
+          }
           return CircleAvatar(
             radius: radius,
+            backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
           );
         }
       },

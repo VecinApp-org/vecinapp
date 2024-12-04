@@ -8,6 +8,13 @@ import 'dart:developer' as devtools show log;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class FirebaseStorageProvider implements StorageProvider {
+  late final Directory _cacheDir;
+
+  @override
+  Future<void> initialize() async {
+    _cacheDir = await getApplicationDocumentsDirectory();
+  }
+
   @override
   Future<String> uploadProfileImage({
     required File image,
@@ -70,8 +77,7 @@ class FirebaseStorageProvider implements StorageProvider {
   @override
   Future<Uint8List?> getProfileImage({required String userId}) async {
     // create a cache directory
-    final cacheDir = await getApplicationDocumentsDirectory();
-    final cacheFile = File('${cacheDir.path}/$userId/profile_image');
+    final cacheFile = File('${_cacheDir.path}/$userId/profile_image');
 
     // check if the file exists
     if (cacheFile.existsSync()) {
