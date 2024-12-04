@@ -473,7 +473,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           isLoading: true,
           exception: null,
         ));
-
         //check if address is valid and get full address from geocoding
         late final List<Address> validAddresses;
         try {
@@ -482,7 +481,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             state: event.state,
             municipality: event.municipality,
             neighborhood: event.neighborhood,
-            streetLine1: event.streetLine1,
+            street: event.street,
+            housenumber: event.houseNumber,
             postalCode: event.postalCode,
             interior: event.interior,
             latitude: event.latitude,

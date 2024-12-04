@@ -51,10 +51,11 @@ class HouseholdView extends HookWidget {
       body: Column(
         children: [
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 13.0, vertical: 55.0),
+            padding: const EdgeInsets.symmetric(horizontal: 21.0, vertical: 34),
             child: Column(
               children: [
+                Icon(Icons.home, size: 34),
+                const SizedBox(height: 21),
                 Text(
                   line1,
                   style: Theme.of(context).textTheme.titleLarge,
@@ -68,6 +69,7 @@ class HouseholdView extends HookWidget {
               ],
             ),
           ),
+          const Divider(),
           Expanded(child: UserListView(users: users))
         ],
       ),

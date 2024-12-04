@@ -13,14 +13,16 @@ class OpenCageGeocodingProvider implements GeocodingProvider {
     required String state,
     required String municipality,
     required String neighborhood,
-    required String streetLine1,
+    required String street,
+    required String housenumber,
     required String postalCode,
     required String? interior,
     required double? latitude,
     required double? longitude,
   }) async {
     //check if fields are empty
-    if (streetLine1.trim().isEmpty ||
+    if (street.trim().isEmpty ||
+        housenumber.trim().isEmpty ||
         municipality.trim().isEmpty ||
         state.trim().isEmpty ||
         country.trim().isEmpty ||
@@ -29,7 +31,7 @@ class OpenCageGeocodingProvider implements GeocodingProvider {
     }
     //build address
     final String fullAddress =
-        '$streetLine1, ${neighborhood.trim()}, ${postalCode.trim()} ${municipality.trim()}, ${state.trim()}, ${country.trim()}';
+        '${street.trim()} ${housenumber.trim()}, ${neighborhood.trim()}, ${postalCode.trim()} ${municipality.trim()}, ${state.trim()}, ${country.trim()}';
     //build url
     late final Uri url;
     if (longitude == null || latitude == null) {

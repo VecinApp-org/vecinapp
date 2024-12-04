@@ -16,7 +16,8 @@ class SelectAddressView extends HookWidget {
     final municipalityController = useTextEditingController();
     final postalCodeController = useTextEditingController();
     final neighborhoodController = useTextEditingController();
-    final streetLine1Controller = useTextEditingController();
+    final streetController = useTextEditingController();
+    final housenumberController = useTextEditingController();
     final interiorController = useTextEditingController();
     final latitudeController = useValueNotifier<double?>(null);
     final longitudeController = useValueNotifier<double?>(null);
@@ -41,69 +42,88 @@ class SelectAddressView extends HookWidget {
           )
         ],
       ),
-      body: CenteredView(children: [
-        //show title
-        Text('Selecciona tu dirección',
-            style: Theme.of(context).textTheme.headlineMedium),
-        SizedBox(height: 8),
-        Text(
-          'La utilizaremos para encontrar tu vecindad',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        SizedBox(height: 55),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                  controller: streetLine1Controller,
-                  decoration: InputDecoration(labelText: 'Calle y Número')),
-            ),
-          ],
-        ),
-        TextField(
-            controller: interiorController,
-            decoration: InputDecoration(labelText: 'Interior (Opcional)')),
-        TextField(
-            controller: neighborhoodController,
-            decoration: InputDecoration(labelText: 'Colonia')),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: municipalityController,
-                decoration: InputDecoration(labelText: 'Municipio'),
-              ),
-            ),
-          ],
-        ),
-        Row(children: [
-          Expanded(
-              child: TextField(
-                  controller: postalCodeController,
-                  decoration: InputDecoration(labelText: 'Código Postal'))),
-          SizedBox(width: 13),
-          Expanded(
-            child: TextField(
-              controller: stateController,
-              decoration: InputDecoration(labelText: 'Estado'),
-            ),
+      body: CenteredView(
+        children: [
+          //show title
+          Text('Selecciona tu dirección',
+              style: Theme.of(context).textTheme.headlineMedium),
+          SizedBox(height: 8),
+          Text(
+            'La utilizaremos para encontrar tu vecindad',
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
-        ]),
-        SizedBox(height: 55),
-        FilledButton(
-            onPressed: () => context.read<AppBloc>().add(
-                AppEventUpdateHomeAddress(
-                    country: countryController.text.trim(),
-                    state: stateController.text.trim(),
-                    municipality: municipalityController.text.trim(),
-                    neighborhood: neighborhoodController.text.trim(),
-                    postalCode: postalCodeController.text.trim(),
-                    streetLine1: streetLine1Controller.text.trim(),
-                    interior: interiorController.text.trim(),
-                    latitude: latitudeController.value,
-                    longitude: longitudeController.value)),
-            child: const Text('Continuar')),
-      ]),
+          SizedBox(height: 55),
+          TextField(
+            controller: streetController,
+            decoration: InputDecoration(labelText: 'Calle'),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                    controller: housenumberController,
+                    decoration: InputDecoration(labelText: 'Número')),
+              ),
+              SizedBox(width: 13),
+              Expanded(
+                child: TextField(
+                    controller: interiorController,
+                    decoration: InputDecoration(labelText: 'Interior')),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                    controller: neighborhoodController,
+                    decoration: InputDecoration(labelText: 'Colonia')),
+              ),
+              SizedBox(width: 13),
+              Expanded(
+                  child: TextField(
+                      controller: postalCodeController,
+                      decoration: InputDecoration(labelText: 'Código Postal'))),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: municipalityController,
+                  decoration: InputDecoration(labelText: 'Municipio'),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: stateController,
+                  decoration: InputDecoration(labelText: 'Estado'),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 55),
+          FilledButton(
+              onPressed: () => context.read<AppBloc>().add(
+                  AppEventUpdateHomeAddress(
+                      country: countryController.text.trim(),
+                      state: stateController.text.trim(),
+                      municipality: municipalityController.text.trim(),
+                      neighborhood: neighborhoodController.text.trim(),
+                      postalCode: postalCodeController.text.trim(),
+                      street: streetController.text.trim(),
+                      houseNumber: housenumberController.text.trim(),
+                      interior: interiorController.text.trim(),
+                      latitude: latitudeController.value,
+                      longitude: longitudeController.value)),
+              child: const Text('Continuar')),
+          SizedBox(height: 55),
+        ],
+      ),
     );
   }
 }
