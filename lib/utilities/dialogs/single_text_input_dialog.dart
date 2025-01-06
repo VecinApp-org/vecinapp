@@ -5,6 +5,7 @@ Future<String?> showTextInputDialog({
   required String title,
   required String labelText,
   required String? initialValue,
+  String? text,
 }) {
   final controller = TextEditingController(text: initialValue);
 
@@ -13,12 +14,19 @@ Future<String?> showTextInputDialog({
     builder: (context) {
       return AlertDialog(
         title: Text(title),
-        content: TextField(
-          autofocus: true,
-          controller: controller,
-          decoration: InputDecoration(
-            labelText: labelText,
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(text ?? ''),
+            SizedBox(height: 16),
+            TextField(
+              autofocus: true,
+              controller: controller,
+              decoration: InputDecoration(
+                labelText: labelText,
+              ),
+            ),
+          ],
         ),
         actions: [
           TextButton(

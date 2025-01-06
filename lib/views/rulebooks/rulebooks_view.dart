@@ -15,11 +15,12 @@ class RulebooksView extends HookWidget {
     final rulebooks = useStream(stream);
     return Scaffold(
         appBar: AppBar(
-            leading: BackButton(
-                onPressed: () => context
-                    .read<AppBloc>()
-                    .add(const AppEventGoToNeighborhoodView())),
-            title: const Text('Reglamentos')),
+          leading: BackButton(
+              onPressed: () => context
+                  .read<AppBloc>()
+                  .add(const AppEventGoToNeighborhoodView())),
+          //title: const Text('Reglamentos'),
+        ),
         floatingActionButton: Visibility(
           visible: cloudUser.adminLevel >= 3,
           child: FloatingActionButton(

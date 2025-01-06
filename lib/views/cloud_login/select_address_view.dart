@@ -94,10 +94,7 @@ class SelectAddressView extends HookWidget {
                   decoration: InputDecoration(labelText: 'Municipio'),
                 ),
               ),
-            ],
-          ),
-          Row(
-            children: [
+              SizedBox(width: 13),
               Expanded(
                 child: TextField(
                   controller: stateController,

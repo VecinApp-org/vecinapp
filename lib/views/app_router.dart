@@ -161,7 +161,7 @@ class AppBlocRouter extends StatelessWidget {
           return EditRulebookView(rulebook: state.rulebook);
         } else if (state is AppStateViewingRulebookDetails) {
           return RulebookDetailsView(
-              rulebook: state.rulebook, cloudUser: state.cloudUser);
+              rulebook: state.rulebook, cloudUser: state.cloudUser!);
         } else if (state is AppStateDeletingAccount) {
           return const DeleteAccountView();
         } else if (state is AppStateCreatingCloudUser) {

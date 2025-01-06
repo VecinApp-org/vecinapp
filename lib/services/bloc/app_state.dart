@@ -224,11 +224,10 @@ class AppStateEditingRulebook extends AppState {
 
 class AppStateViewingRulebookDetails extends AppState {
   final Rulebook rulebook;
-  final CloudUser cloudUser;
   const AppStateViewingRulebookDetails({
     required this.rulebook,
-    required this.cloudUser,
-    required bool isLoading,
+    required cloudUser,
+    required isLoading,
     required exception,
   }) : super(isLoading: isLoading, exception: exception, cloudUser: cloudUser);
 }

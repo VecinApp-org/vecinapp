@@ -73,9 +73,7 @@ class AppEventSendPasswordResetEmail extends AppEvent {
 //NEIGHBORHOOD REGISTRATION EVENTS
 class AppEventCreateCloudUser extends AppEvent {
   final String displayName;
-  final String username;
   const AppEventCreateCloudUser({
-    required this.username,
     required this.displayName,
   });
 }

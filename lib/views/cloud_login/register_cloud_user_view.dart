@@ -11,12 +11,16 @@ class RegisterCloudUserView extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final displayNameController = useTextEditingController();
-    final usernameController = useTextEditingController();
     return CenteredView(
       children: [
-        Text('Registra tus datos',
-            style: Theme.of(context).textTheme.headlineMedium),
-        const SizedBox(height: 55),
+        Text(
+          '¡Hola!',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        const SizedBox(height: 21),
+        Text(
+            'Ingresa tu nombre y apellido para que tus vecinos te reconozcan.'),
+        const SizedBox(height: 34),
         TextField(
             autofocus: true,
             controller: displayNameController,
@@ -24,21 +28,13 @@ class RegisterCloudUserView extends HookWidget {
             autocorrect: false,
             keyboardType: TextInputType.emailAddress,
             decoration: const InputDecoration(labelText: 'Nombre y Apellido')),
-        TextField(
-            autofocus: true,
-            controller: usernameController,
-            enableSuggestions: false,
-            autocorrect: false,
-            keyboardType: TextInputType.emailAddress,
-            decoration:
-                const InputDecoration(labelText: 'Nombre de ususario único')),
         const SizedBox(height: 55),
         FilledButton(
-            onPressed: () async => context.read<AppBloc>().add(
-                AppEventCreateCloudUser(
-                    displayName: displayNameController.text,
-                    username: usernameController.text)),
-            child: const Text('Crear cuenta'))
+            onPressed: () async =>
+                context.read<AppBloc>().add(AppEventCreateCloudUser(
+                      displayName: displayNameController.text,
+                    )),
+            child: const Text('Continuar'))
       ],
     );
   }

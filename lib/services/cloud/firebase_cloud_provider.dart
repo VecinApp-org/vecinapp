@@ -133,10 +133,6 @@ class FirebaseCloudProvider implements CloudProvider {
 
     if (cloudUser.data() == null) return null;
 
-    if (cloudUser.data()![userUsernameFieldName] == null) {
-      return null;
-    }
-
     return CloudUser.fromFirebase(doc: cloudUser);
   }
 
@@ -150,10 +146,6 @@ class FirebaseCloudProvider implements CloudProvider {
         );
     if (!cachedDoc.exists) return null;
     if (cachedDoc.data() == null) return null;
-
-    if (cachedDoc.data()![userUsernameFieldName] == null) {
-      return null;
-    }
     return CloudUser.fromFirebase(doc: cachedDoc);
   }
 
@@ -206,11 +198,10 @@ class FirebaseCloudProvider implements CloudProvider {
 
   @override
   Future<void> createCloudUser({
-    required String username,
     required String displayName,
   }) async {
     // check if input is empty
-    if (displayName.isEmpty || username.isEmpty) {
+    if (displayName.isEmpty) {
       throw ChannelErrorCloudException();
     }
 
@@ -226,7 +217,6 @@ class FirebaseCloudProvider implements CloudProvider {
       final userId = _authProvider.currentUser!.uid;
       await _users.doc(userId).set({
         userDisplayNameFieldName: displayName,
-        userUsernameFieldName: username,
       });
     } on CloudException catch (e) {
       devtools.log(
@@ -284,7 +274,7 @@ class FirebaseCloudProvider implements CloudProvider {
           .get()
           .then((value) async {
         late DocumentSnapshot snapshot;
-        //get or create household
+        //create household if it doesn't exist
         if (value.docs.isEmpty) {
           snapshot = await _households.add({
             householdFullAddressFieldName: address.fullAddress,
@@ -302,6 +292,7 @@ class FirebaseCloudProvider implements CloudProvider {
             ),
           }).then((value) => value.get());
         } else {
+          //get household if it exists
           snapshot = value.docs.first;
         }
         // update the user's household id and neighborhood id if applicable

@@ -17,7 +17,6 @@ class ProfileView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String displayName = cloudUser.displayName;
-    final String username = cloudUser.username;
     late final String householdName;
     if (household == null) {
       householdName = 'Sin Casa';
@@ -76,7 +75,7 @@ class ProfileView extends StatelessWidget {
               },
             ),
           ),
-          const SizedBox(height: 34),
+          const SizedBox(height: 21),
           GestureDetector(
             child: Text(displayName,
                 textAlign: TextAlign.center,
@@ -86,6 +85,8 @@ class ProfileView extends StatelessWidget {
                 context: context,
                 initialValue: displayName,
                 title: 'Cambiar nombre',
+                text:
+                    'Para evitar robos de identidad, el tiene efecto en 3 días y los administradores pueden revisarlo.',
                 labelText: 'Nombre y Apellido(s)',
               );
               if (newUserDisplayName != null && context.mounted) {
@@ -93,14 +94,6 @@ class ProfileView extends StatelessWidget {
                     displayName: newUserDisplayName));
               }
             },
-          ),
-          const SizedBox(height: 8),
-          GestureDetector(
-            child: Text(
-              '@$username',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.labelMedium,
-            ),
           ),
           const SizedBox(height: 34),
           ListTile(

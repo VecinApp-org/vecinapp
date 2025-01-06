@@ -17,7 +17,6 @@ abstract class CloudProvider {
   Future<Household?> get cachedHousehold;
 
   Future<void> createCloudUser({
-    required String username,
     required String displayName,
   });
 

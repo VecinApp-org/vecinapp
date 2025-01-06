@@ -42,6 +42,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     on<AppEventReset>((event, emit) async {
+      devtools.log('AppEventReset');
       try {
         //Start loading
         emit(const AppStateUnInitalized(
@@ -88,6 +89,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
         //check if CloudUser is in a Household
         if (cloudUser.householdId == null) {
+          devtools.log('CloudUser is not in a Household');
           emit(const AppStateSelectingHomeAddress(
             isLoading: false,
             exception: null,
@@ -100,6 +102,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
         //check if Household does not exist, this would mean the Household was deleted
         if (household == null) {
+          devtools.log('Household does not exist');
           await _cloudProvider.exitHousehold();
           emit(const AppStateSelectingHomeAddress(
             isLoading: false,
@@ -443,7 +446,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       //create new cloud user
       try {
         await _cloudProvider.createCloudUser(
-          username: event.username,
           displayName: event.displayName,
         );
       } catch (e) {
@@ -454,11 +456,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
         return;
       }
-      //send to selecting home address
-      emit(const AppStateSelectingHomeAddress(
-        isLoading: false,
-        exception: null,
-      ));
+      add(const AppEventReset());
     });
 
     on<AppEventUpdateHomeAddress>(

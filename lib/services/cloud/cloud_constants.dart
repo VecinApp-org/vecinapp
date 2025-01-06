@@ -6,7 +6,6 @@ const rulebookTextFieldName = 'text';
 
 // users
 const usersCollectionName = 'users';
-const userUsernameFieldName = 'username';
 const userDisplayNameFieldName = 'display_name';
 const userHouseholdIdFieldName = 'household_id';
 const userNeighborhoodIdFieldName = 'neighborhood_id';
