@@ -46,6 +46,19 @@ class AppStateError extends AppState {
 }
 
 //AUTHENTICATION STATES
+class AppStateWelcomeViewing extends AppState with EquatableMixin {
+  const AppStateWelcomeViewing({
+    required bool isLoading,
+    required exception,
+  }) : super(
+          isLoading: isLoading,
+          exception: exception,
+        );
+
+  @override
+  List<Object?> get props => [exception, isLoading];
+}
+
 class AppStateRegistering extends AppState with EquatableMixin {
   const AppStateRegistering({
     required exception,

@@ -55,7 +55,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         //check if user is not logged in
         if (user == null) {
           emit(
-            const AppStateRegistering(
+            const AppStateWelcomeViewing(
               exception: null,
               isLoading: false,
             ),
@@ -168,6 +168,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     //Authentication Routing
+
+    on<AppEventGoToWelcomeView>((event, emit) async {
+      emit(const AppStateWelcomeViewing(
+        exception: null,
+        isLoading: false,
+      ));
+    });
+
     on<AppEventGoToRegistration>((event, emit) async {
       emit(const AppStateRegistering(
         exception: null,

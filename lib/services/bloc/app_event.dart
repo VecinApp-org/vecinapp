@@ -17,6 +17,10 @@ class AppEventReset extends AppEvent {
 }
 
 // AUTHENTICATION ROUTING EVENTS
+class AppEventGoToWelcomeView extends AppEvent {
+  const AppEventGoToWelcomeView();
+}
+
 class AppEventGoToRegistration extends AppEvent {
   const AppEventGoToRegistration();
 }

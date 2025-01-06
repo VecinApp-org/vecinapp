@@ -15,6 +15,7 @@ import 'package:vecinapp/views/cloud_login/no_neighborhood_view.dart';
 import 'package:vecinapp/views/cloud_login/register_cloud_user_view.dart';
 import 'package:vecinapp/views/delete_account_view.dart';
 import 'package:vecinapp/views/household_view.dart';
+import 'package:vecinapp/views/login/welcome_view.dart';
 import 'package:vecinapp/views/neighborhood_view.dart';
 import 'package:vecinapp/views/login/forgot_password_view.dart';
 import 'package:vecinapp/views/login/login_view.dart';
@@ -130,6 +131,8 @@ class AppBlocRouter extends StatelessWidget {
         devtools.log(state.runtimeType.toString());
         if (state is AppStateUnInitalized) {
           return const SplashView();
+        } else if (state is AppStateWelcomeViewing) {
+          return const WelcomeView();
         } else if (state is AppStateRegistering) {
           return const RegisterView();
         } else if (state is AppStateLoggingIn) {
@@ -139,24 +142,18 @@ class AppBlocRouter extends StatelessWidget {
         } else if (state is AppStateNeedsVerification) {
           return const VerifyEmailView();
         } else if (state is AppStateViewingNeighborhood) {
-          return NeighborhoodView(
-            neighborhood: state.neighborhood!,
-          );
+          return NeighborhoodView(neighborhood: state.neighborhood!);
         } else if (state is AppStateViewingProfile) {
           return ProfileView(
             cloudUser: state.cloudUser!,
             household: state.household,
           );
         } else if (state is AppStateViewingHousehold) {
-          return HouseholdView(
-            household: state.household!,
-          );
+          return HouseholdView(household: state.household!);
         } else if (state is AppStateViewingSettings) {
           return SettingsView();
         } else if (state is AppStateViewingRulebooks) {
-          return RulebooksView(
-            cloudUser: state.cloudUser!,
-          );
+          return RulebooksView(cloudUser: state.cloudUser!);
         } else if (state is AppStateEditingRulebook) {
           return EditRulebookView(rulebook: state.rulebook);
         } else if (state is AppStateViewingRulebookDetails) {
