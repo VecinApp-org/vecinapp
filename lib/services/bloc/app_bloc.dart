@@ -11,6 +11,7 @@ import 'package:vecinapp/services/cloud/cloud_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
+import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 import 'package:vecinapp/services/geocoding/geocoding_exceptions.dart';
@@ -410,33 +411,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
     });
 
-    on<AppEventGoToRulebooksView>((event, emit) async {
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      emit(AppStateViewingRulebooks(
-        isLoading: false,
-        exception: null,
-        cloudUser: cloudUser,
-      ));
-    });
-
-    on<AppEventGoToEditRulebookView>((event, emit) async {
-      emit(AppStateEditingRulebook(
-        rulebook: event.rulebook,
-        isLoading: false,
-        exception: null,
-      ));
-    });
-
-    on<AppEventGoToRulebookDetailsView>((event, emit) async {
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      emit(AppStateViewingRulebookDetails(
-        rulebook: event.rulebook,
-        isLoading: false,
-        exception: null,
-        cloudUser: cloudUser!,
-      ));
-    });
-
     on<AppEventGoToDeleteAccountView>((event, emit) async {
       emit(const AppStateDeletingAccount(
         isLoading: false,
@@ -675,6 +649,122 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
     });
 
+    //Storage events
+    on<AppEventUpdateProfilePhoto>((event, emit) async {
+      //validate access
+      if (!await _isValidCloudUserAccess()) {
+        add(const AppEventReset());
+        return;
+      }
+      //start loading
+      final user = _authProvider.currentUser;
+      final cloudUser = await _cloudProvider.cachedCloudUser;
+      final household = state.household;
+      emit(AppStateViewingProfile(
+        cloudUser: cloudUser!,
+        household: household,
+        user: user!,
+        exception: null,
+        isLoading: true,
+        loadingText: 'Subiendo imagen...',
+      ));
+
+      //upload image
+      try {
+        final File image = File(event.imagePath);
+        await _storageProvider.uploadProfileImage(
+          image: image,
+          userId: user.uid!,
+        );
+      } catch (e) {
+        emit(AppStateViewingProfile(
+          cloudUser: cloudUser,
+          household: household,
+          user: user,
+          exception: e,
+          isLoading: false,
+        ));
+        return;
+      }
+      emit(AppStateViewingProfile(
+        cloudUser: cloudUser,
+        household: household,
+        user: user,
+        exception: null,
+        isLoading: false,
+      ));
+    });
+
+    on<AppEventDeleteProfilePhoto>(
+      (event, emit) async {
+        //validate access
+        if (!await _isValidCloudUserAccess()) {
+          add(const AppEventReset());
+          return;
+        }
+        //start loading
+        final user = _authProvider.currentUser!;
+        final cloudUser = await _cloudProvider.cachedCloudUser;
+        final household = state.household;
+        emit(AppStateViewingProfile(
+          cloudUser: cloudUser!,
+          household: household,
+          user: user,
+          exception: null,
+          isLoading: true,
+          loadingText: 'Eliminando imagen...',
+        ));
+
+        try {
+          await _storageProvider.deleteProfileImage(userId: user.uid!);
+        } catch (e) {
+          emit(AppStateViewingProfile(
+            cloudUser: cloudUser,
+            household: household,
+            user: user,
+            exception: e,
+            isLoading: false,
+          ));
+        }
+
+        emit(AppStateViewingProfile(
+          cloudUser: cloudUser,
+          household: household,
+          user: user,
+          exception: null,
+          isLoading: false,
+        ));
+      },
+    );
+
+    //Rulebook Routing
+    on<AppEventGoToRulebooksView>((event, emit) async {
+      final cloudUser = await _cloudProvider.cachedCloudUser;
+      emit(AppStateViewingRulebooks(
+        isLoading: false,
+        exception: null,
+        cloudUser: cloudUser,
+      ));
+    });
+
+    on<AppEventGoToEditRulebookView>((event, emit) async {
+      emit(AppStateEditingRulebook(
+        rulebook: event.rulebook,
+        isLoading: false,
+        exception: null,
+      ));
+    });
+
+    on<AppEventGoToRulebookDetailsView>((event, emit) async {
+      final cloudUser = await _cloudProvider.cachedCloudUser;
+      emit(AppStateViewingRulebookDetails(
+        rulebook: event.rulebook,
+        isLoading: false,
+        exception: null,
+        cloudUser: cloudUser!,
+      ));
+    });
+
     //Rulebook Events
     on<AppEventCreateOrUpdateRulebook>((event, emit) async {
       //validate access
@@ -781,93 +871,139 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
     });
 
-    //Storage events
-    on<AppEventUpdateProfilePhoto>((event, emit) async {
-      //validate access
-      if (!await _isValidCloudUserAccess()) {
-        add(const AppEventReset());
-        return;
-      }
-      //start loading
-      final user = _authProvider.currentUser;
+    //Event Routing
+    on<AppEventGoToEventsView>((event, emit) async {
       final cloudUser = await _cloudProvider.cachedCloudUser;
-      final household = state.household;
-      emit(AppStateViewingProfile(
-        cloudUser: cloudUser!,
-        household: household,
-        user: user!,
-        exception: null,
-        isLoading: true,
-        loadingText: 'Subiendo imagen...',
-      ));
-
-      //upload image
-      try {
-        final File image = File(event.imagePath);
-        await _storageProvider.uploadProfileImage(
-          image: image,
-          userId: user.uid!,
-        );
-      } catch (e) {
-        emit(AppStateViewingProfile(
-          cloudUser: cloudUser,
-          household: household,
-          user: user,
-          exception: e,
-          isLoading: false,
-        ));
-        return;
-      }
-      emit(AppStateViewingProfile(
-        cloudUser: cloudUser,
-        household: household,
-        user: user,
-        exception: null,
+      emit(AppStateViewingEvents(
         isLoading: false,
+        exception: null,
+        cloudUser: cloudUser,
       ));
     });
 
-    on<AppEventDeleteProfilePhoto>(
-      (event, emit) async {
-        //validate access
-        if (!await _isValidCloudUserAccess()) {
-          add(const AppEventReset());
+    on<AppEventGoToEditEventView>((event, emit) async {
+      emit(AppStateEditingEvent(
+        event: event.event,
+        isLoading: false,
+        exception: null,
+      ));
+    });
+
+    on<AppEventGoToEventDetailsView>((event, emit) async {
+      final cloudUser = await _cloudProvider.cachedCloudUser;
+      emit(AppStateViewingEventDetails(
+        event: event.event,
+        isLoading: false,
+        exception: null,
+        cloudUser: cloudUser!,
+      ));
+    });
+
+    //Event Events
+    on<AppEventCreateOrUpdateEvent>((event, emit) async {
+      //validate access
+      if (!await _isValidNeighborhoodAccess()) {
+        add(const AppEventReset());
+        return;
+      }
+      //enable loading indicator
+      emit(AppStateEditingEvent(
+        event: state.event,
+        isLoading: true,
+        exception: null,
+      ));
+      //check if event is provided
+      late Event newEvent;
+      if (state.event != null) {
+        try {
+          //update existing event
+          await _cloudProvider.updateEvent(
+            eventId: state.event!.id,
+            title: event.title,
+            text: event.text,
+          );
+          newEvent = state.event!.copyWith(
+            newTitle: event.title,
+            newText: event.text,
+          );
+        } catch (e) {
+          //inform user of error
+          emit(AppStateEditingEvent(
+            event: state.event,
+            isLoading: false,
+            exception: e,
+          ));
           return;
         }
-        //start loading
-        final user = _authProvider.currentUser!;
-        final cloudUser = await _cloudProvider.cachedCloudUser;
-        final household = state.household;
-        emit(AppStateViewingProfile(
-          cloudUser: cloudUser!,
-          household: household,
-          user: user,
-          exception: null,
-          isLoading: true,
-          loadingText: 'Eliminando imagen...',
-        ));
-
+      } else {
+        //create new event
         try {
-          await _storageProvider.deleteProfileImage(userId: user.uid!);
+          newEvent = await _cloudProvider.createNewEvent(
+            title: event.title,
+            text: event.text,
+          );
         } catch (e) {
-          emit(AppStateViewingProfile(
-            cloudUser: cloudUser,
-            household: household,
-            user: user,
-            exception: e,
+          //inform user of error
+          emit(AppStateEditingEvent(
+            event: null,
             isLoading: false,
+            exception: e,
           ));
+          return;
         }
+      }
+      //Send user to event details view
+      final cloudUser = await _cloudProvider.cachedCloudUser;
+      emit(AppStateViewingEventDetails(
+        event: newEvent,
+        cloudUser: cloudUser!,
+        isLoading: false,
+        exception: null,
+      ));
+    });
 
-        emit(AppStateViewingProfile(
+    on<AppEventDeleteEvent>((event, emit) async {
+      //validate access
+      if (!await _isValidNeighborhoodAccess()) {
+        add(const AppEventReset());
+        return;
+      }
+      //enable loading indicator
+      final cloudUser = await _cloudProvider.cachedCloudUser;
+      emit(AppStateViewingEventDetails(
+        event: state.event!,
+        isLoading: true,
+        exception: null,
+        cloudUser: cloudUser!,
+      ));
+      try {
+        await _cloudProvider.deleteEvent(
+          eventId: state.event!.id,
+        );
+      } on CloudException catch (e) {
+        emit(AppStateViewingEventDetails(
+          event: state.event!,
           cloudUser: cloudUser,
-          household: household,
-          user: user,
-          exception: null,
           isLoading: false,
+          exception: e,
         ));
-      },
-    );
+        return;
+      } on Exception catch (e) {
+        emit(AppStateViewingEventDetails(
+          event: state.event!,
+          cloudUser: cloudUser,
+          isLoading: false,
+          exception: e,
+        ));
+        return;
+      }
+      //Send user to rulebooks view
+      emit(AppStateViewingEvents(
+        isLoading: false,
+        exception: null,
+        cloudUser: cloudUser,
+      ));
+    });
   }
 
   //Private methods
@@ -980,6 +1116,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   Stream<Iterable<Rulebook>> get rulebooks async* {
     final cloudUSer = await _cloudProvider.cachedCloudUser;
     yield* _cloudProvider.neighborhoodRulebooks(
+      neighborhoodId: cloudUSer!.neighborhoodId!,
+    );
+  }
+
+  Stream<Iterable<Event>> get events async* {
+    final cloudUSer = await _cloudProvider.cachedCloudUser;
+    yield* _cloudProvider.neighborhoodEvents(
       neighborhoodId: cloudUSer!.neighborhoodId!,
     );
   }

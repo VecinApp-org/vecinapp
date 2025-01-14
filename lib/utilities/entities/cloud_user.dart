@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:vecinapp/services/cloud/cloud_constants.dart';
+import 'dart:developer' as devtools show log; // ignore: unused_import
 
 @immutable
 class CloudUser {
@@ -9,7 +10,8 @@ class CloudUser {
   final String? householdId;
   final String? neighborhoodId;
   final String? photoUrl;
-  final int adminLevel;
+  final bool isNeighborhoodAdmin;
+  final bool isSuperAdmin;
 
   const CloudUser({
     required this.id,
@@ -17,29 +19,59 @@ class CloudUser {
     required this.householdId,
     required this.neighborhoodId,
     required this.photoUrl,
-    required this.adminLevel,
+    required this.isNeighborhoodAdmin,
+    required this.isSuperAdmin,
   });
 
   factory CloudUser.fromFirebase({required DocumentSnapshot doc}) {
     final docData = doc.data() as Map<String?, dynamic>;
-    if (docData[userAdminLevelFieldName] == null) {
-      docData[userAdminLevelFieldName] = 0;
+
+    late final bool isNeighborhoodAdmin;
+    late final bool isSuperAdmin;
+    switch (docData[userAdminLevelFieldName]) {
+      case null:
+        isNeighborhoodAdmin = false;
+        isSuperAdmin = false;
+      case 'neighborhoodadmin':
+        isNeighborhoodAdmin = true;
+        isSuperAdmin = false;
+      case 'superadmin':
+        isNeighborhoodAdmin = true;
+        isSuperAdmin = true;
+      default:
+        isNeighborhoodAdmin = false;
+        isSuperAdmin = false;
     }
+
     return CloudUser(
       id: doc.id,
       displayName: docData[userDisplayNameFieldName],
       householdId: docData[userHouseholdIdFieldName],
       neighborhoodId: docData[userNeighborhoodIdFieldName],
       photoUrl: docData[userProfilePhotoUrlFieldName],
-      adminLevel: docData[userAdminLevelFieldName],
+      isNeighborhoodAdmin: isNeighborhoodAdmin,
+      isSuperAdmin: isSuperAdmin,
     );
   }
 
   factory CloudUser.fromSnapshot(
       {required QueryDocumentSnapshot<Map<String?, dynamic>> snapshot}) {
     final docData = snapshot.data();
-    if (docData[userAdminLevelFieldName] == null) {
-      docData[userAdminLevelFieldName] = 0;
+    late final bool isNeighborhoodAdmin;
+    late final bool isSuperAdmin;
+    switch (docData[userAdminLevelFieldName]) {
+      case null:
+        isNeighborhoodAdmin = false;
+        isSuperAdmin = false;
+      case 'neighborhoodadmin':
+        isNeighborhoodAdmin = true;
+        isSuperAdmin = false;
+      case 'superadmin':
+        isNeighborhoodAdmin = true;
+        isSuperAdmin = true;
+      default:
+        isNeighborhoodAdmin = false;
+        isSuperAdmin = false;
     }
     return CloudUser(
         id: snapshot.id,
@@ -47,7 +79,8 @@ class CloudUser {
         householdId: docData[userHouseholdIdFieldName] as String?,
         neighborhoodId: docData[userNeighborhoodIdFieldName] as String?,
         photoUrl: docData[userProfilePhotoUrlFieldName] as String?,
-        adminLevel: docData[userAdminLevelFieldName] as int);
+        isNeighborhoodAdmin: isNeighborhoodAdmin,
+        isSuperAdmin: isSuperAdmin);
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
+import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 
@@ -145,6 +146,21 @@ class AppEventGoToSettingsView extends AppEvent {
   const AppEventGoToSettingsView();
 }
 
+class AppEventGoToDeleteAccountView extends AppEvent {
+  const AppEventGoToDeleteAccountView();
+}
+
+// PROFILE PHOTO EVENTS
+class AppEventDeleteProfilePhoto extends AppEvent {
+  const AppEventDeleteProfilePhoto();
+}
+
+class AppEventUpdateProfilePhoto extends AppEvent {
+  final String imagePath;
+  const AppEventUpdateProfilePhoto({required this.imagePath});
+}
+
+// RULEBOOK ROUTING EVENTS
 class AppEventGoToRulebooksView extends AppEvent {
   const AppEventGoToRulebooksView();
 }
@@ -157,10 +173,6 @@ class AppEventGoToEditRulebookView extends AppEvent {
 class AppEventGoToRulebookDetailsView extends AppEvent {
   final Rulebook rulebook;
   const AppEventGoToRulebookDetailsView({required this.rulebook});
-}
-
-class AppEventGoToDeleteAccountView extends AppEvent {
-  const AppEventGoToDeleteAccountView();
 }
 
 // RULEBOOK EVENTS
@@ -177,11 +189,31 @@ class AppEventDeleteRulebook extends AppEvent {
   const AppEventDeleteRulebook();
 }
 
-class AppEventDeleteProfilePhoto extends AppEvent {
-  const AppEventDeleteProfilePhoto();
+// EVENT ROUTING EVENTS
+class AppEventGoToEventsView extends AppEvent {
+  const AppEventGoToEventsView();
 }
 
-class AppEventUpdateProfilePhoto extends AppEvent {
-  final String imagePath;
-  const AppEventUpdateProfilePhoto({required this.imagePath});
+class AppEventGoToEditEventView extends AppEvent {
+  final Event? event;
+  const AppEventGoToEditEventView({this.event});
+}
+
+class AppEventGoToEventDetailsView extends AppEvent {
+  final Event event;
+  const AppEventGoToEventDetailsView({required this.event});
+}
+
+// EVENT EVENTS
+class AppEventCreateOrUpdateEvent extends AppEvent {
+  final String title;
+  final String text;
+  const AppEventCreateOrUpdateEvent({
+    required this.title,
+    required this.text,
+  });
+}
+
+class AppEventDeleteEvent extends AppEvent {
+  const AppEventDeleteEvent();
 }

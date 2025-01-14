@@ -4,6 +4,7 @@ import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
+import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/services/cloud/cloud_constants.dart';
@@ -26,6 +27,7 @@ class FirebaseCloudProvider implements CloudProvider {
     return _neighborhoods.doc(neighborhoodId);
   }
 
+  // RULEBOOKS
   CollectionReference<Map<String, dynamic>> _rulebooks(
       {required String neighborhoodId}) {
     return _neighborhood(neighborhoodId: neighborhoodId)
@@ -73,7 +75,7 @@ class FirebaseCloudProvider implements CloudProvider {
         rulebookTextFieldName: text,
       });
     } catch (e) {
-      throw CouldNotUpdateRulebooksException();
+      throw CouldNotUpdateRulebookException();
     }
   }
 
@@ -111,6 +113,94 @@ class FirebaseCloudProvider implements CloudProvider {
       return doc;
     } catch (e) {
       throw CouldNotCreateRulebookException();
+    }
+  }
+
+  // EVENTS
+  CollectionReference<Map<String, dynamic>> _events(
+      {required String neighborhoodId}) {
+    return _neighborhood(neighborhoodId: neighborhoodId)
+        .collection(neighborhoodEventsCollectionName);
+  }
+
+  DocumentReference<Map<String, dynamic>> _event({
+    required String neighborhoodId,
+    required String eventId,
+  }) {
+    return _events(neighborhoodId: neighborhoodId).doc(eventId);
+  }
+
+  @override
+  Future<void> deleteEvent({
+    required String eventId,
+  }) async {
+    try {
+      final user = await cachedCloudUser;
+      await _event(
+        neighborhoodId: user!.neighborhoodId!,
+        eventId: eventId,
+      ).delete();
+    } catch (e) {
+      throw CouldNotDeleteEventException();
+    }
+  }
+
+  @override
+  Future<void> updateEvent({
+    required String eventId,
+    required String title,
+    required String text,
+  }) async {
+    if (title.isEmpty || text.isEmpty) {
+      throw ChannelErrorCloudException();
+    }
+    try {
+      final user = await cachedCloudUser;
+      return await _event(
+        neighborhoodId: user!.neighborhoodId!,
+        eventId: eventId,
+      ).update({
+        eventsTitleFieldName: title,
+        eventsTextFieldName: text,
+      });
+    } catch (e) {
+      throw CouldNotUpdateEventException();
+    }
+  }
+
+  @override
+  Stream<Iterable<Event>> neighborhoodEvents({
+    required String neighborhoodId,
+  }) {
+    final allEvents = _events(neighborhoodId: neighborhoodId).snapshots().map(
+      (event) {
+        return event.docs.map((doc) {
+          return Event.fromSnapshot(doc);
+        });
+      },
+    );
+    return allEvents;
+  }
+
+  @override
+  Future<Event> createNewEvent({
+    required String title,
+    required String text,
+  }) async {
+    if (title.isEmpty || text.isEmpty) {
+      throw ChannelErrorCloudException();
+    }
+    try {
+      final user = await cachedCloudUser;
+      final doc = await _events(
+        neighborhoodId: user!.neighborhoodId!,
+      ).add({
+        eventsTitleFieldName: title,
+        eventsTextFieldName: text,
+      }).then((doc) => doc.get().then((doc) => Event.fromDocument(doc)));
+      return doc;
+    } catch (e) {
+      throw CouldNotCreateEventException();
     }
   }
 

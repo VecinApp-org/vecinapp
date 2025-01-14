@@ -55,6 +55,12 @@ class NeighborhoodView extends HookWidget {
           function: () =>
               context.read<AppBloc>().add(const AppEventGoToRulebooksView()),
         ),
+        NeighborhoodTool(
+          title: 'Eventos',
+          icon: Icon(Icons.event),
+          function: () =>
+              context.read<AppBloc>().add(const AppEventGoToEventsView()),
+        ),
       ];
     });
 

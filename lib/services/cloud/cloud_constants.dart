@@ -1,6 +1,5 @@
 // rulebooks
 const rulebooksCollectionName = 'rulebooks';
-const rulebookOwnerUserIdFieldName = 'user_id';
 const rulebookTitleFieldName = 'title';
 const rulebookTextFieldName = 'text';
 
@@ -30,7 +29,16 @@ const householdLocationFieldName = 'location';
 const neighborhoodsCollectionName = 'neighborhoods';
 const neighborhoodNameFieldName = 'name';
 const neighborhoodRulebooksCollectionName = 'rulebooks';
+const neighborhoodEventsCollectionName = 'events';
 const neighborhoodPolygonFieldName = 'polygon';
 const neighborhoodCountryFieldName = 'country';
 const neighborhoodStateFieldName = 'state';
 const neighborhoodMunicipalityFieldName = 'municipality';
+
+// events
+const eventsCollectionName = 'events';
+const eventsTitleFieldName = 'title';
+const eventsTextFieldName = 'text';
+const eventsDateFieldName = 'date';
+const eventsTimeFieldName = 'time';
+const eventsLocationFieldName = 'location';

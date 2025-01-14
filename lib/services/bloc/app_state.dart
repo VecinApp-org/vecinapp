@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show immutable;
 import 'package:vecinapp/utilities/entities/auth_user.dart';
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
+import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
@@ -218,6 +219,18 @@ class AppStateViewingSettings extends AppState {
   }) : super(isLoading: isLoading, exception: exception);
 }
 
+class AppStateDeletingAccount extends AppState {
+  const AppStateDeletingAccount({
+    required bool isLoading,
+    required exception,
+    loadingText,
+  }) : super(
+            isLoading: isLoading,
+            exception: exception,
+            loadingText: loadingText);
+}
+
+//RULEBOOK STATES
 class AppStateViewingRulebooks extends AppState {
   const AppStateViewingRulebooks({
     required bool isLoading,
@@ -245,15 +258,32 @@ class AppStateViewingRulebookDetails extends AppState {
   }) : super(isLoading: isLoading, exception: exception, cloudUser: cloudUser);
 }
 
-class AppStateDeletingAccount extends AppState {
-  const AppStateDeletingAccount({
+//EVENT STATES
+class AppStateViewingEvents extends AppState {
+  const AppStateViewingEvents({
     required bool isLoading,
     required exception,
-    loadingText,
-  }) : super(
-            isLoading: isLoading,
-            exception: exception,
-            loadingText: loadingText);
+    required cloudUser,
+  }) : super(isLoading: isLoading, exception: exception, cloudUser: cloudUser);
+}
+
+class AppStateEditingEvent extends AppState {
+  final Event? event;
+  const AppStateEditingEvent({
+    this.event,
+    required bool isLoading,
+    required exception,
+  }) : super(isLoading: isLoading, exception: exception);
+}
+
+class AppStateViewingEventDetails extends AppState {
+  final Event event;
+  const AppStateViewingEventDetails({
+    required this.event,
+    required cloudUser,
+    required isLoading,
+    required exception,
+  }) : super(isLoading: isLoading, exception: exception, cloudUser: cloudUser);
 }
 
 //EXTENSIONS
@@ -264,6 +294,18 @@ extension GetRulebook on AppState {
     }
     if (this is AppStateViewingRulebookDetails) {
       return (this as AppStateViewingRulebookDetails).rulebook;
+    }
+    return null;
+  }
+}
+
+extension GetEvent on AppState {
+  Event? get event {
+    if (this is AppStateEditingEvent) {
+      return (this as AppStateEditingEvent).event;
+    }
+    if (this is AppStateViewingEventDetails) {
+      return (this as AppStateViewingEventDetails).event;
     }
     return null;
   }
