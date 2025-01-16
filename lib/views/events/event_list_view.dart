@@ -32,7 +32,7 @@ class EventListView extends StatelessWidget {
                   );
             },
             title: Padding(
-              padding: const EdgeInsets.only(bottom: 4.0),
+              padding: const EdgeInsets.only(bottom: 5.0, top: 5.0),
               child: Text(
                 event.title,
                 style: Theme.of(context).textTheme.titleMedium,
@@ -48,7 +48,7 @@ class EventListView extends StatelessWidget {
                   '📅  ${DateFormat.EEEE().add_d().add_MMMM().add_jm().format(event.dateStart)}',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 3),
                 Text(
                   '📍  ${event.placeName}',
                   style: Theme.of(context).textTheme.bodySmall,

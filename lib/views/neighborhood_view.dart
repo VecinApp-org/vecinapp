@@ -18,7 +18,6 @@ class ToolCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: Theme.of(context).colorScheme.surfaceContainer,
-      elevation: 5,
       child: InkWell(
         onTap: tool.function,
         child: Center(
@@ -64,22 +63,19 @@ class NeighborhoodView extends HookWidget {
     final cloudUser = context.read<AppBloc>().state.cloudUser!;
     final neighborhood = context.read<AppBloc>().state.neighborhood!;
     return Scaffold(
-      appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-          elevation: 3,
-          title: Text(neighborhood.neighborhoodName),
-          actions: <Widget>[
-            Padding(
-                padding: const EdgeInsets.only(right: 13.0),
-                child: GestureDetector(
-                    onTap: () => context
-                        .read<AppBloc>()
-                        .add(const AppEventGoToProfileView()),
-                    child: ProfilePicture(
-                      radius: 16,
-                      id: cloudUser.id,
-                    )))
-          ]),
+      appBar:
+          AppBar(title: Text(neighborhood.neighborhoodName), actions: <Widget>[
+        Padding(
+            padding: const EdgeInsets.only(right: 13.0),
+            child: GestureDetector(
+                onTap: () => context
+                    .read<AppBloc>()
+                    .add(const AppEventGoToProfileView()),
+                child: ProfilePicture(
+                  radius: 16,
+                  id: cloudUser.id,
+                )))
+      ]),
       body: GridView.builder(
         padding: EdgeInsets.all(spacing),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

@@ -25,7 +25,9 @@ class ProfileView extends StatelessWidget {
     }
 
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         leading: BackButton(
           onPressed: () {
             context.read<AppBloc>().add(const AppEventGoToNeighborhoodView());
@@ -34,9 +36,9 @@ class ProfileView extends StatelessWidget {
         actions: [],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(3.0),
+        padding: const EdgeInsets.all(8.0),
+        shrinkWrap: true,
         children: [
-          const SizedBox(height: 32),
           Center(
             child: GestureDetector(
               child: ProfilePicture(

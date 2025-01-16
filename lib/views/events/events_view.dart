@@ -50,72 +50,80 @@ class EventsView extends HookWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-        child: ListView(
-          children: [
-            Visibility(
-              visible: happeningEvents?.isNotEmpty ?? false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Sucediendo ahora',
-                    style: Theme.of(context).textTheme.labelSmall,
+        child: events.data == null
+            ? Container()
+            : events.data!.isEmpty
+                ? Center(
+                    child: Text(
+                    'No hay eventos',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ))
+                : ListView(
+                    children: [
+                      Visibility(
+                        visible: happeningEvents?.isNotEmpty ?? false,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Sucediendo ahora',
+                              style: Theme.of(context).textTheme.labelSmall,
+                            ),
+                            EventListView(
+                              events: happeningEvents ?? [],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Visibility(
+                        visible: todaysEvents?.isNotEmpty ?? false,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Hoy',
+                              style: Theme.of(context).textTheme.labelSmall,
+                            ),
+                            EventListView(
+                              events: todaysEvents ?? [],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Visibility(
+                        visible: eventsAfterToday?.isNotEmpty ?? false,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Después',
+                              style: Theme.of(context).textTheme.labelSmall,
+                            ),
+                            EventListView(
+                              events: eventsAfterToday ?? [],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Visibility(
+                        visible: pastEvents?.isNotEmpty ?? false,
+                        child: Column(
+                          children: [
+                            TextButton(
+                                onPressed: () => toggleViewPastEvents.value =
+                                    !toggleViewPastEvents.value,
+                                child: const Text('Ver Eventos Pasados')),
+                            Visibility(
+                              visible: toggleViewPastEvents.value,
+                              child: EventListView(
+                                events: pastEvents ?? [],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  EventListView(
-                    events: happeningEvents ?? [],
-                  ),
-                ],
-              ),
-            ),
-            Visibility(
-              visible: todaysEvents?.isNotEmpty ?? false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Hoy',
-                    style: Theme.of(context).textTheme.labelSmall,
-                  ),
-                  EventListView(
-                    events: todaysEvents ?? [],
-                  ),
-                ],
-              ),
-            ),
-            Visibility(
-              visible: eventsAfterToday?.isNotEmpty ?? false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Después',
-                    style: Theme.of(context).textTheme.labelSmall,
-                  ),
-                  EventListView(
-                    events: eventsAfterToday ?? [],
-                  ),
-                ],
-              ),
-            ),
-            Visibility(
-              visible: pastEvents?.isNotEmpty ?? false,
-              child: Column(
-                children: [
-                  TextButton(
-                      onPressed: () => toggleViewPastEvents.value =
-                          !toggleViewPastEvents.value,
-                      child: const Text('Ver Eventos Pasados')),
-                  Visibility(
-                    visible: toggleViewPastEvents.value,
-                    child: EventListView(
-                      events: pastEvents ?? [],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

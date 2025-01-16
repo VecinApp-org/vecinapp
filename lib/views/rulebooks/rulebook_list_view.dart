@@ -21,22 +21,30 @@ class RulebookListView extends StatelessWidget {
           final rulebook = rulebooks.elementAt(index);
           return Column(
             children: [
-              ListTile(
-                onTap: () {
-                  context.read<AppBloc>().add(
-                        AppEventGoToRulebookDetailsView(
-                          rulebook: rulebook,
-                        ),
-                      );
-                },
-                title: Text(
-                  rulebook.title,
-                  maxLines: 1,
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
+              Card(
+                color: Theme.of(context).colorScheme.surfaceContainer,
+                margin:
+                    const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 5.0, top: 5.0),
+                  child: ListTile(
+                    leading: const Icon(Icons.library_books_outlined),
+                    onTap: () {
+                      context.read<AppBloc>().add(
+                            AppEventGoToRulebookDetailsView(
+                              rulebook: rulebook,
+                            ),
+                          );
+                    },
+                    title: Text(
+                      rulebook.title,
+                      maxLines: 2,
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                 ),
               ),
-              const Divider(),
             ],
           );
         });

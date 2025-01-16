@@ -48,11 +48,13 @@ class HouseholdView extends HookWidget {
           )
         ],
       ),
-      body: Column(
+      body: ListView(
+        shrinkWrap: true,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 21.0, vertical: 34),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.home, size: 34),
                 const SizedBox(height: 21),
@@ -69,8 +71,18 @@ class HouseholdView extends HookWidget {
               ],
             ),
           ),
-          const Divider(),
-          Expanded(child: UserListView(users: users))
+          Divider(
+            thickness: 8,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Miembros',
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+          ),
+          UserListView(users: users)
         ],
       ),
     );

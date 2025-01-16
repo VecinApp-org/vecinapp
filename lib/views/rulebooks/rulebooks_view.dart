@@ -15,6 +15,7 @@ class RulebooksView extends HookWidget {
     final rulebooks = useStream(stream);
     return Scaffold(
         appBar: AppBar(
+          title: const Text('Reglamentos'),
           leading: BackButton(
               onPressed: () => context
                   .read<AppBloc>()

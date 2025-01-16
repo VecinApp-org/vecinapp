@@ -29,7 +29,7 @@ import 'package:vecinapp/views/rulebooks/edit_rulebook_view.dart';
 import 'package:vecinapp/views/rulebooks/rulebook_details_view.dart';
 import 'package:vecinapp/views/rulebooks/rulebooks_view.dart';
 import 'package:vecinapp/views/settings_view.dart';
-import 'dart:developer' as devtools show log;
+import 'dart:developer' as devtools show log; // ignore: unused_import
 
 import 'package:vecinapp/views/splash_view.dart';
 
@@ -131,7 +131,7 @@ class AppBlocRouter extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        devtools.log(state.runtimeType.toString());
+        //devtools.log(state.runtimeType.toString());
         if (state is AppStateUnInitalized) {
           return const SplashView();
         } else if (state is AppStateWelcomeViewing) {

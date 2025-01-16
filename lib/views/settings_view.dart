@@ -24,7 +24,7 @@ class SettingsView extends HookWidget {
           },
         ),
       ),
-      body: Column(
+      body: ListView(
         children: [
           ListTile(
             title: const Text('Tema'),
@@ -48,7 +48,10 @@ class SettingsView extends HookWidget {
               selected: <ThemeMode>{controller.themeMode},
             ),
           ),
-          Spacer(),
+          Divider(
+            thickness: 8,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+          ),
           TextButton(
             onPressed: () async {
               final confirmLogout = await showConfirmationDialog(

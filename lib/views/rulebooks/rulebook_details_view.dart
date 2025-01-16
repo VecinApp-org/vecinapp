@@ -17,18 +17,18 @@ class RulebookDetailsView extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          leading: BackButton(
-              onPressed: () => context
-                  .read<AppBloc>()
-                  .add(const AppEventGoToRulebooksView())),
-          actions: [
-            IconButton(
-                icon: const Icon(Icons.share),
-                onPressed: () => Share.share(rulebook.shareRulebook)),
-            Visibility(
-              visible: cloudUser.isNeighborhoodAdmin,
-              child: PopupMenuButton<EditOrDelete>(onSelected: (value) async {
+      appBar: AppBar(
+        leading: BackButton(
+            onPressed: () =>
+                context.read<AppBloc>().add(const AppEventGoToRulebooksView())),
+        actions: [
+          IconButton(
+              icon: const Icon(Icons.share),
+              onPressed: () => Share.share(rulebook.shareRulebook)),
+          Visibility(
+            visible: cloudUser.isNeighborhoodAdmin,
+            child: PopupMenuButton<EditOrDelete>(
+              onSelected: (value) async {
                 switch (value) {
                   case EditOrDelete.edit:
                     context.read<AppBloc>().add(AppEventGoToEditRulebookView(
@@ -43,7 +43,8 @@ class RulebookDetailsView extends HookWidget {
                           .add(const AppEventDeleteRulebook());
                     }
                 }
-              }, itemBuilder: (context) {
+              },
+              itemBuilder: (context) {
                 return [
                   const PopupMenuItem<EditOrDelete>(
                     value: EditOrDelete.edit,
@@ -54,21 +55,27 @@ class RulebookDetailsView extends HookWidget {
                     child: Text('Eliminar'),
                   )
                 ];
-              }),
-            )
-          ],
-        ),
-        body: ListView(
-          padding: const EdgeInsets.all(32.0),
+              },
+            ),
+          )
+        ],
+      ),
+      body: Card(
+        color: Theme.of(context).colorScheme.surfaceContainer,
+        margin: const EdgeInsets.all(8),
+        child: ListView(
+          padding: const EdgeInsets.all(21.0),
           children: [
             Text(
               rulebook.title,
               style: const TextStyle(fontSize: 24),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 13),
             Text(rulebook.text)
           ],
-        ));
+        ),
+      ),
+    );
   }
 }
 
