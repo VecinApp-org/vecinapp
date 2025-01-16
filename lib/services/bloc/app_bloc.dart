@@ -783,15 +783,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       if (state.rulebook != null) {
         try {
           //update existing rulebook
+          final rulebookId = state.rulebook!.id;
           await _cloudProvider.updateRulebook(
-            rulebookId: state.rulebook!.id,
+            rulebookId: rulebookId,
             title: event.title,
             text: event.text,
           );
-          newRulebook = state.rulebook!.copyWith(
-            newTitle: event.title,
-            newText: event.text,
-          );
+          newRulebook =
+              await _cloudProvider.getRulebook(rulebookId: rulebookId);
         } catch (e) {
           //inform user of error
           emit(AppStateEditingRulebook(
@@ -917,15 +916,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       if (state.event != null) {
         try {
           //update existing event
+          final eventId = state.event!.id;
           await _cloudProvider.updateEvent(
-            eventId: state.event!.id,
+            eventId: eventId,
             title: event.title,
             text: event.text,
+            dateStart: event.dateStart,
+            dateEnd: event.dateEnd,
+            placeName: event.placeName,
+            location: event.location,
           );
-          newEvent = state.event!.copyWith(
-            newTitle: event.title,
-            newText: event.text,
-          );
+          newEvent = await _cloudProvider.getEvent(eventId: eventId);
         } catch (e) {
           //inform user of error
           emit(AppStateEditingEvent(
@@ -941,6 +942,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           newEvent = await _cloudProvider.createNewEvent(
             title: event.title,
             text: event.text,
+            dateStart: event.dateStart,
+            dateEnd: event.dateEnd,
+            placeName: event.placeName,
+            location: event.location,
           );
         } catch (e) {
           //inform user of error

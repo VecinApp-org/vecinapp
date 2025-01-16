@@ -21,17 +21,14 @@ class ToolCard extends StatelessWidget {
       elevation: 5,
       child: InkWell(
         onTap: tool.function,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                tool.icon,
-                const SizedBox(width: 8),
-                Text(tool.title),
-              ],
-            ),
+        child: Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              tool.icon,
+              const SizedBox(width: 8),
+              Text(tool.title),
+            ],
           ),
         ),
       ),
@@ -43,7 +40,7 @@ class NeighborhoodView extends HookWidget {
   const NeighborhoodView({super.key, required this.neighborhood});
   final Neighborhood neighborhood;
 
-  final double spacing = 16;
+  final double spacing = 8.0;
 
   @override
   Widget build(BuildContext context) {
@@ -87,8 +84,8 @@ class NeighborhoodView extends HookWidget {
         padding: EdgeInsets.all(spacing),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: MediaQuery.of(context).size.width < 600 ? 2 : 3,
-          childAspectRatio: 2.5 / 1,
-          crossAxisSpacing: spacing,
+          childAspectRatio: 1.6 / 1,
+          crossAxisSpacing: spacing / 2,
           mainAxisSpacing: spacing,
         ),
         itemCount: tools.length,

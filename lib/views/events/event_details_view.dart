@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
@@ -55,16 +56,31 @@ class EventDetailsView extends HookWidget {
             )
           ],
         ),
-        body: ListView(
-          padding: const EdgeInsets.all(32.0),
-          children: [
-            Text(
-              event.title,
-              style: const TextStyle(fontSize: 24),
-            ),
-            const SizedBox(height: 32),
-            Text(event.text)
-          ],
+        body: Card(
+          color: Theme.of(context).colorScheme.surfaceContainer,
+          margin: const EdgeInsets.all(8),
+          child: ListView(
+            padding: const EdgeInsets.only(left: 21.0, right: 21.0),
+            children: [
+              const SizedBox(height: 21),
+              Text(
+                event.title,
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              const SizedBox(height: 13),
+              Text(
+                '📅  ${DateFormat.EEEE().add_d().add_MMMM().add_jm().format(event.dateStart)}',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '📍  ${event.placeName}',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              const SizedBox(height: 13),
+              Text(event.text, style: Theme.of(context).textTheme.bodyMedium),
+            ],
+          ),
         ));
   }
 }

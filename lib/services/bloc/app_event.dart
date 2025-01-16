@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/event.dart';
+import 'package:vecinapp/utilities/entities/latlng.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 
@@ -208,9 +209,17 @@ class AppEventGoToEventDetailsView extends AppEvent {
 class AppEventCreateOrUpdateEvent extends AppEvent {
   final String title;
   final String text;
+  final DateTime dateStart;
+  final DateTime dateEnd;
+  final String placeName;
+  final LatLng? location;
   const AppEventCreateOrUpdateEvent({
     required this.title,
     required this.text,
+    required this.dateStart,
+    required this.dateEnd,
+    required this.placeName,
+    required this.location,
   });
 }
 

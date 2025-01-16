@@ -15,6 +15,7 @@ class RulebookListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+        shrinkWrap: true,
         itemCount: rulebooks.length,
         itemBuilder: (context, index) {
           final rulebook = rulebooks.elementAt(index);

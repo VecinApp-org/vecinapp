@@ -13,6 +13,7 @@ class EditEventView extends HookWidget {
   Widget build(BuildContext context) {
     final textController = useTextEditingController();
     final titleController = useTextEditingController();
+
     if (event != null) {
       if (event!.text.isNotEmpty && event!.title.isNotEmpty) {
         textController.text = event!.text;
@@ -37,11 +38,13 @@ class EditEventView extends HookWidget {
             decoration: const InputDecoration(labelText: 'Título'),
           ),
           const SizedBox(height: 8.0),
+          TextField(),
+          const SizedBox(height: 8.0),
           TextField(
             controller: textController,
             keyboardType: TextInputType.multiline,
             maxLines: null,
-            decoration: const InputDecoration(labelText: 'Contenido'),
+            decoration: const InputDecoration(labelText: 'Descripción'),
           ),
           const SizedBox(height: 32.0),
           FilledButton(
@@ -49,6 +52,10 @@ class EditEventView extends HookWidget {
               context.read<AppBloc>().add(AppEventCreateOrUpdateEvent(
                     title: titleController.text,
                     text: textController.text,
+                    dateStart: DateTime.now(),
+                    dateEnd: DateTime.now(),
+                    placeName: 'Default',
+                    location: null,
                   ));
             },
             child: const Text('Guardar'),

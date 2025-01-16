@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/event.dart';
+import 'package:vecinapp/utilities/entities/latlng.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
@@ -67,6 +68,8 @@ abstract class CloudProvider {
     required String rulebookId,
   });
 
+  Future<Rulebook> getRulebook({required String rulebookId});
+
   // EVENTS
   Stream<Iterable<Event>> neighborhoodEvents({
     required String neighborhoodId,
@@ -75,15 +78,25 @@ abstract class CloudProvider {
   Future<Event> createNewEvent({
     required String title,
     required String text,
+    required DateTime dateStart,
+    required DateTime dateEnd,
+    required String placeName,
+    required LatLng? location,
   });
 
   Future<void> updateEvent({
     required String eventId,
     required String title,
     required String text,
+    required DateTime dateStart,
+    required DateTime dateEnd,
+    required String placeName,
+    required LatLng? location,
   });
 
   Future<void> deleteEvent({
     required String eventId,
   });
+
+  Future<Event> getEvent({required String eventId});
 }

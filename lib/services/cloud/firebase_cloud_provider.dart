@@ -5,13 +5,13 @@ import 'package:vecinapp/services/cloud/cloud_provider.dart';
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/event.dart';
+import 'package:vecinapp/utilities/entities/latlng.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/services/cloud/cloud_constants.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
 import 'package:vecinapp/extensions/geometry/is_point_in_polygon.dart';
 import 'dart:developer' as devtools show log;
-
 import 'package:vecinapp/utilities/entities/address.dart';
 
 class FirebaseCloudProvider implements CloudProvider {
@@ -25,6 +25,11 @@ class FirebaseCloudProvider implements CloudProvider {
   DocumentReference<Map<String, dynamic>> _neighborhood(
       {required String neighborhoodId}) {
     return _neighborhoods.doc(neighborhoodId);
+  }
+
+  @override
+  Future<void> initialize({required authProvider}) async {
+    _authProvider = authProvider;
   }
 
   // RULEBOOKS
@@ -45,6 +50,12 @@ class FirebaseCloudProvider implements CloudProvider {
   Future<void> deleteRulebook({
     required String rulebookId,
   }) async {
+    // check if user is neighborhood admin
+    final user = await currentCloudUser;
+    if (!user!.isNeighborhoodAdmin) {
+      throw PermissionDeniedCloudException();
+    }
+    // delete rulebook
     try {
       final user = await cachedCloudUser;
       await _rulebook(
@@ -62,9 +73,16 @@ class FirebaseCloudProvider implements CloudProvider {
     required String title,
     required String text,
   }) async {
+    // check if user is neighborhood admin
+    final user = await currentCloudUser;
+    if (!user!.isNeighborhoodAdmin) {
+      throw PermissionDeniedCloudException();
+    }
+    // check rulebook is valid
     if (title.isEmpty || text.isEmpty) {
       throw ChannelErrorCloudException();
     }
+    // update rulebook
     try {
       final user = await cachedCloudUser;
       return await _rulebook(
@@ -76,6 +94,20 @@ class FirebaseCloudProvider implements CloudProvider {
       });
     } catch (e) {
       throw CouldNotUpdateRulebookException();
+    }
+  }
+
+  @override
+  Future<Rulebook> getRulebook({required String rulebookId}) async {
+    try {
+      final user = await cachedCloudUser;
+      final doc = await _rulebook(
+        neighborhoodId: user!.neighborhoodId!,
+        rulebookId: rulebookId,
+      ).get();
+      return Rulebook.fromDocument(doc);
+    } catch (e) {
+      throw CouldNotGetRulebookException();
     }
   }
 
@@ -99,9 +131,16 @@ class FirebaseCloudProvider implements CloudProvider {
     required String title,
     required String text,
   }) async {
+    // check if user is neighborhood admin
+    final user = await currentCloudUser;
+    if (!user!.isNeighborhoodAdmin) {
+      throw PermissionDeniedCloudException();
+    }
+    // check rulebook is valid
     if (title.isEmpty || text.isEmpty) {
       throw ChannelErrorCloudException();
     }
+    // create the rulebook
     try {
       final user = await cachedCloudUser;
       final doc = await _rulebooks(
@@ -134,10 +173,15 @@ class FirebaseCloudProvider implements CloudProvider {
   Future<void> deleteEvent({
     required String eventId,
   }) async {
+    // check if user is neighborhood admin
+    final user = await currentCloudUser;
+    if (!user!.isNeighborhoodAdmin) {
+      throw PermissionDeniedCloudException();
+    }
+    // delete the event
     try {
-      final user = await cachedCloudUser;
       await _event(
-        neighborhoodId: user!.neighborhoodId!,
+        neighborhoodId: user.neighborhoodId!,
         eventId: eventId,
       ).delete();
     } catch (e) {
@@ -150,18 +194,36 @@ class FirebaseCloudProvider implements CloudProvider {
     required String eventId,
     required String title,
     required String text,
+    required DateTime dateStart,
+    required DateTime dateEnd,
+    required String placeName,
+    required LatLng? location,
   }) async {
-    if (title.isEmpty || text.isEmpty) {
+    // check if user is neighborhood admin
+    final user = await currentCloudUser;
+    if (!user!.isNeighborhoodAdmin) {
+      throw PermissionDeniedCloudException();
+    }
+    // check if event is valid
+    if (title.isEmpty ||
+        text.isEmpty ||
+        placeName.isEmpty ||
+        dateStart.isAfter(dateEnd) ||
+        dateStart.isBefore(DateTime.now())) {
       throw ChannelErrorCloudException();
     }
+    // update the event
     try {
-      final user = await cachedCloudUser;
       return await _event(
-        neighborhoodId: user!.neighborhoodId!,
+        neighborhoodId: user.neighborhoodId!,
         eventId: eventId,
       ).update({
-        eventsTitleFieldName: title,
-        eventsTextFieldName: text,
+        eventTitleFieldName: title,
+        eventTextFieldName: text,
+        eventDateStartFieldName: dateStart,
+        eventDateEndFieldName: dateEnd,
+        eventPlaceNameFieldName: placeName,
+        eventLocationFieldName: location,
       });
     } catch (e) {
       throw CouldNotUpdateEventException();
@@ -186,17 +248,37 @@ class FirebaseCloudProvider implements CloudProvider {
   Future<Event> createNewEvent({
     required String title,
     required String text,
+    required DateTime dateStart,
+    required DateTime dateEnd,
+    required String placeName,
+    required LatLng? location,
   }) async {
-    if (title.isEmpty || text.isEmpty) {
+    // check if user is neighborhood admin
+    final user = await currentCloudUser;
+    if (!user!.isNeighborhoodAdmin) {
+      throw PermissionDeniedCloudException();
+    }
+    // check if event is valid
+    if (title.isEmpty ||
+        text.isEmpty ||
+        placeName.isEmpty ||
+        dateStart.isAfter(dateEnd) ||
+        dateStart.isBefore(DateTime.now())) {
       throw ChannelErrorCloudException();
     }
+    // create event
     try {
-      final user = await cachedCloudUser;
       final doc = await _events(
-        neighborhoodId: user!.neighborhoodId!,
+        neighborhoodId: user.neighborhoodId!,
       ).add({
-        eventsTitleFieldName: title,
-        eventsTextFieldName: text,
+        eventCreatorIdFieldName: user.id,
+        eventTitleFieldName: title,
+        eventTextFieldName: text,
+        eventDateStartFieldName: dateStart,
+        eventDateEndFieldName: dateEnd,
+        eventPlaceNameFieldName: placeName,
+        eventLocationFieldName:
+            location == null ? null : GeoPoint(location.lat, location.lng),
       }).then((doc) => doc.get().then((doc) => Event.fromDocument(doc)));
       return doc;
     } catch (e) {
@@ -205,10 +287,20 @@ class FirebaseCloudProvider implements CloudProvider {
   }
 
   @override
-  Future<void> initialize({required authProvider}) async {
-    _authProvider = authProvider;
+  Future<Event> getEvent({required String eventId}) async {
+    try {
+      final user = await cachedCloudUser;
+      final doc = await _event(
+        neighborhoodId: user!.neighborhoodId!,
+        eventId: eventId,
+      ).get();
+      return Event.fromDocument(doc);
+    } catch (e) {
+      throw CouldNotGetEventException();
+    }
   }
 
+  // USER
   @override
   Future<CloudUser?> get currentCloudUser async {
     final user = _authProvider.currentUser;
@@ -237,53 +329,6 @@ class FirebaseCloudProvider implements CloudProvider {
     if (!cachedDoc.exists) return null;
     if (cachedDoc.data() == null) return null;
     return CloudUser.fromFirebase(doc: cachedDoc);
-  }
-
-  @override
-  Future<Household?> get currentHousehold async {
-    final user = await cachedCloudUser;
-    if (user == null) return null;
-    return await _households.doc(user.householdId!).get().then((value) {
-      if (!value.exists) return null;
-      return Household.fromSnapshot(value);
-    });
-  }
-
-  @override
-  Future<Household?> get cachedHousehold async {
-    final user = await cachedCloudUser;
-    if (user == null) return null;
-    return await _households
-        .doc(user.householdId!)
-        .get(GetOptions(source: Source.cache))
-        .then((value) {
-      if (!value.exists) return null;
-      return Household.fromSnapshot(value);
-    });
-  }
-
-  @override
-  Future<Neighborhood?> get currentNeighborhood async {
-    final user = await cachedCloudUser;
-    if (user == null) return null;
-    return await _neighborhood(neighborhoodId: user.neighborhoodId!)
-        .get()
-        .then((value) {
-      if (!value.exists) return null;
-      return Neighborhood.fromDocument(value);
-    });
-  }
-
-  @override
-  Future<Neighborhood?> get cachedNeighborhood async {
-    final user = await cachedCloudUser;
-    if (user == null) return null;
-    return await _neighborhood(neighborhoodId: user.neighborhoodId!)
-        .get(GetOptions(source: Source.cache))
-        .then((value) {
-      if (!value.exists) return null;
-      return Neighborhood.fromDocument(value);
-    });
   }
 
   @override
@@ -327,6 +372,72 @@ class FirebaseCloudProvider implements CloudProvider {
     } catch (e) {
       throw CouldNotDeleteCloudUserException();
     }
+  }
+
+  @override
+  Future<void> updateUserDisplayName({
+    required String displayName,
+  }) async {
+    final userId = _authProvider.currentUser!.uid;
+    // check if displayName is empty
+    if (displayName.isEmpty) {
+      throw ChannelErrorCloudException();
+    }
+    final cachedUser = await cachedCloudUser;
+
+    if (cachedUser == null) {
+      throw UserDoesNotExistException();
+    }
+
+    if (displayName == cachedUser.displayName) {
+      return;
+    }
+
+    try {
+      // update the user display name
+      await _users.doc(userId).update({
+        userDisplayNameFieldName: displayName,
+      });
+    } catch (e) {
+      throw CouldNotUpdateUserException();
+    }
+  }
+
+  @override
+  Future<void> updateUserPhotoUrl({required String? photoUrl}) async {
+    final userId = _authProvider.currentUser!.uid;
+    try {
+      // update the user photo url
+      await _users.doc(userId).update({
+        userProfilePhotoUrlFieldName: photoUrl,
+      });
+    } catch (e) {
+      throw CouldNotUpdateUserException();
+    }
+  }
+
+  // HOUSEHOLD
+  @override
+  Future<Household?> get currentHousehold async {
+    final user = await cachedCloudUser;
+    if (user == null) return null;
+    return await _households.doc(user.householdId!).get().then((value) {
+      if (!value.exists) return null;
+      return Household.fromSnapshot(value);
+    });
+  }
+
+  @override
+  Future<Household?> get cachedHousehold async {
+    final user = await cachedCloudUser;
+    if (user == null) return null;
+    return await _households
+        .doc(user.householdId!)
+        .get(GetOptions(source: Source.cache))
+        .then((value) {
+      if (!value.exists) return null;
+      return Household.fromSnapshot(value);
+    });
   }
 
   @override
@@ -408,6 +519,31 @@ class FirebaseCloudProvider implements CloudProvider {
     } catch (e) {
       throw CouldNotExitHouseholdException();
     }
+  }
+
+  // NEIGHBORHOOD
+  @override
+  Future<Neighborhood?> get currentNeighborhood async {
+    final user = await cachedCloudUser;
+    if (user == null) return null;
+    return await _neighborhood(neighborhoodId: user.neighborhoodId!)
+        .get()
+        .then((value) {
+      if (!value.exists) return null;
+      return Neighborhood.fromDocument(value);
+    });
+  }
+
+  @override
+  Future<Neighborhood?> get cachedNeighborhood async {
+    final user = await cachedCloudUser;
+    if (user == null) return null;
+    return await _neighborhood(neighborhoodId: user.neighborhoodId!)
+        .get(GetOptions(source: Source.cache))
+        .then((value) {
+      if (!value.exists) return null;
+      return Neighborhood.fromDocument(value);
+    });
   }
 
   @override
@@ -507,48 +643,7 @@ class FirebaseCloudProvider implements CloudProvider {
     }
   }
 
-  @override
-  Future<void> updateUserDisplayName({
-    required String displayName,
-  }) async {
-    final userId = _authProvider.currentUser!.uid;
-    // check if displayName is empty
-    if (displayName.isEmpty) {
-      throw ChannelErrorCloudException();
-    }
-    final cachedUser = await cachedCloudUser;
-
-    if (cachedUser == null) {
-      throw UserDoesNotExistException();
-    }
-
-    if (displayName == cachedUser.displayName) {
-      return;
-    }
-
-    try {
-      // update the user display name
-      await _users.doc(userId).update({
-        userDisplayNameFieldName: displayName,
-      });
-    } catch (e) {
-      throw CouldNotUpdateUserException();
-    }
-  }
-
-  @override
-  Future<void> updateUserPhotoUrl({required String? photoUrl}) async {
-    final userId = _authProvider.currentUser!.uid;
-    try {
-      // update the user photo url
-      await _users.doc(userId).update({
-        userProfilePhotoUrlFieldName: photoUrl,
-      });
-    } catch (e) {
-      throw CouldNotUpdateUserException();
-    }
-  }
-
+  // NEIGHBORS
   @override
   Future<Household> otherHousehold({required String householdId}) async {
     try {

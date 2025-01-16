@@ -37,8 +37,10 @@ const neighborhoodMunicipalityFieldName = 'municipality';
 
 // events
 const eventsCollectionName = 'events';
-const eventsTitleFieldName = 'title';
-const eventsTextFieldName = 'text';
-const eventsDateFieldName = 'date';
-const eventsTimeFieldName = 'time';
-const eventsLocationFieldName = 'location';
+const eventCreatorIdFieldName = 'creator_id';
+const eventTitleFieldName = 'title';
+const eventTextFieldName = 'text';
+const eventDateStartFieldName = 'date_start';
+const eventDateEndFieldName = 'date_end';
+const eventPlaceNameFieldName = 'place_name';
+const eventLocationFieldName = 'place_geopoint';

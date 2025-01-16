@@ -49,6 +49,11 @@ class CouldNotCreateEventException extends CloudException {}
 
 class CouldNotGetEventsException extends CloudException {}
 
+class CouldNotGetEventException extends CloudException {}
+
 class CouldNotDeleteEventException extends CloudException {}
 
 class CouldNotUpdateEventException extends CloudException {}
+
+// Admin
+class PermissionDeniedCloudException extends CloudException {}
