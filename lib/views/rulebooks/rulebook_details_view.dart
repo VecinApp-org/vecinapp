@@ -5,8 +5,9 @@ import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
-import 'package:vecinapp/utilities/dialogs/show_confirmation_dialog.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:vecinapp/utilities/widgets/doc_view.dart';
+import 'package:vecinapp/utilities/widgets/edit_or_delete_popup.dart';
 
 class RulebookDetailsView extends HookWidget {
   const RulebookDetailsView(
@@ -16,70 +17,27 @@ class RulebookDetailsView extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: BackButton(
-            onPressed: () =>
-                context.read<AppBloc>().add(const AppEventGoToRulebooksView())),
-        actions: [
-          IconButton(
-              icon: const Icon(Icons.share),
-              onPressed: () => Share.share(rulebook.shareRulebook)),
-          Visibility(
-            visible: cloudUser.isNeighborhoodAdmin,
-            child: PopupMenuButton<EditOrDelete>(
-              onSelected: (value) async {
-                switch (value) {
-                  case EditOrDelete.edit:
-                    context.read<AppBloc>().add(AppEventGoToEditRulebookView(
-                          rulebook: rulebook,
-                        ));
-                  case EditOrDelete.delete:
-                    final shouldDelete = await showConfirmationDialog(
-                        context: context, text: '¿Eliminar el reglamento?');
-                    if (shouldDelete && context.mounted) {
-                      context
-                          .read<AppBloc>()
-                          .add(const AppEventDeleteRulebook());
-                    }
-                }
-              },
-              itemBuilder: (context) {
-                return [
-                  const PopupMenuItem<EditOrDelete>(
-                    value: EditOrDelete.edit,
-                    child: Text('Editar'),
-                  ),
-                  const PopupMenuItem<EditOrDelete>(
-                    value: EditOrDelete.delete,
-                    child: Text('Eliminar'),
-                  )
-                ];
-              },
-            ),
-          )
-        ],
-      ),
-      body: Card(
-        color: Theme.of(context).colorScheme.surfaceContainer,
-        margin: const EdgeInsets.all(8),
-        child: ListView(
-          padding: const EdgeInsets.all(21.0),
-          children: [
-            Text(
-              rulebook.title,
-              style: const TextStyle(fontSize: 24),
-            ),
-            const SizedBox(height: 13),
-            Text(rulebook.text)
-          ],
+    return DocView(
+      title: rulebook.title,
+      text: rulebook.text,
+      more: null,
+      appBarBackAction: () =>
+          context.read<AppBloc>().add(const AppEventGoToRulebooksView()),
+      appBarActions: [
+        IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: () => Share.share(rulebook.shareRulebook)),
+        Visibility(
+          visible: cloudUser.isNeighborhoodAdmin,
+          child: EditOrDeletePopupMenuIcon(
+            editAction: () => context
+                .read<AppBloc>()
+                .add(AppEventGoToEditRulebookView(rulebook: rulebook)),
+            deleteAction: () =>
+                context.read<AppBloc>().add(const AppEventDeleteRulebook()),
+          ),
         ),
-      ),
+      ],
     );
   }
-}
-
-enum EditOrDelete {
-  edit,
-  delete,
 }
