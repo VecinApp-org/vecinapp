@@ -8,10 +8,10 @@ class Event {
   final String id;
   final String creatorId;
   final String title;
-  final String text;
+  final String? text;
   final DateTime dateStart;
   final DateTime dateEnd;
-  final String placeName;
+  final String? placeName;
   final LatLng? location;
   const Event({
     required this.id,

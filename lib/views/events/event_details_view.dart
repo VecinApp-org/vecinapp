@@ -9,6 +9,7 @@ import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:vecinapp/utilities/widgets/doc_view.dart';
 import 'package:vecinapp/utilities/widgets/edit_or_delete_popup.dart';
+import 'package:vecinapp/views/user_list_view.dart';
 
 class EventDetailsView extends HookWidget {
   const EventDetailsView(
@@ -41,6 +42,7 @@ class EventDetailsView extends HookWidget {
         )
       ],
       more: [
+        const SizedBox(height: 8),
         Text(
           '📅  ${DateFormat.EEEE().add_d().add_MMMM().add_jm().format(event.dateStart)}',
           style: Theme.of(context).textTheme.bodySmall,
@@ -50,6 +52,8 @@ class EventDetailsView extends HookWidget {
           '📍  ${event.placeName}',
           style: Theme.of(context).textTheme.bodySmall,
         ),
+        const SizedBox(height: 4),
+        UserListView(users: [])
       ],
     );
   }
