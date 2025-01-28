@@ -53,76 +53,15 @@ class AppBlocRouter extends StatelessWidget {
         if (exception != null) {
           devtools.log(exception.toString());
           devtools.log(exception.hashCode.toString());
-          String message = exception.toString();
+          String message = 'Error mitológico';
           if (exception is AuthException) {
-            if (exception is GenericAuthException) {
-              message = 'Error de autenticación';
-            } else if (exception is InvalidCredentialAuthException) {
-              message = 'La combinación de correo y contraseña es incorrecta';
-            } else if (exception is EmailAlreadyInUseAuthException) {
-              message = 'El correo ya se encuentra registrado';
-            } else if (exception is WeakPasswordAuthException) {
-              message = 'La contraseña es muy débil';
-            } else if (exception is InvalidEmailAuthException) {
-              message = 'El correo está mal escrito';
-            } else if (exception
-                is PasswordConfirmationDoesNotMatchAuthException) {
-              message = 'Las contraseñas no coinciden';
-            } else if (exception is RequiresRecentLoginAuthException) {
-              message = 'Debes iniciar sesión antes de realizar esta operación';
-            } else if (exception is TooManyRequestsAuthException) {
-              message = 'Demasiados intentos de inicio de sesión';
-            } else if (exception is NetworkRequestFailedAuthException) {
-              message = 'No hay internet';
-            } else if (exception is UserNotLoggedInAuthException) {
-              message = 'Debes iniciar sesión antes de realizar esta operación';
-            } else if (exception is UserNotVerifiedAuthException) {
-              message = 'Aún no has verificado tu correo';
-            } else if (exception is ChannelErrorAuthException) {
-              message = 'Dejaste algo vacío';
-            }
+            message = exception.message;
           } else if (exception is CloudException) {
-            if (exception is CouldNotCreateRulebookException) {
-              message = 'No se pudo crear, intenta de nuevo';
-            } else if (exception is CouldNotDeleteRulebookException) {
-              message = 'No se pudo borrar. Intenta de nuevo';
-            } else if (exception is CouldNotUpdateRulebookException) {
-              message = 'No se pudo actualizar';
-            } else if (exception is CouldNotGetRulebookException) {
-              message = 'No se pudo obtener la información';
-            } else if (exception is ChannelErrorCloudException) {
-              message = 'Dejaste algo vacío';
-            } else {
-              message = 'Error de base de datos';
-            }
+            message = exception.message;
           } else if (exception is StorageException) {
-            if (exception is ImageTooLargeStorageException) {
-              message = 'La imagen es demasiado grande';
-            } else if (exception is CouldNotUploadImageStorageException) {
-              message = 'No se pudo cargar la imagen';
-            } else if (exception is GenericStorageException) {
-              message = 'Error de almacenamiento';
-            } else if (exception is ImageNotFoundStorageException) {
-              message = 'No se pudo cargar la imagen';
-            } else if (exception is ImageTooLargeStorageException) {
-              message = 'Esa imagen es demasiado grande';
-            } else if (exception is CouldNotDeleteImageStorageException) {
-              message = 'No se pudo borrar la imagen';
-            } else {
-              message = 'Error de almacenamiento desconocido';
-            }
+            message = exception.message;
           } else if (exception is GeocodingException) {
-            if (exception is ChannelErrorGeocodingException) {
-              message = 'Dejaste algo vacío';
-            } else if (exception is NoValidAddressFoundGeocodingException) {
-              message = 'No se encontraron resultados';
-            } else if (exception is GenericGeocodingException) {
-              message = 'Error de geocodificación';
-            } else {
-              message = 'Error de geocodificación desconocido';
-            }
-          } else {
-            message = 'Error mitológico';
+            message = exception.message;
           }
           showErrorDialog(
             text: message,

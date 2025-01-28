@@ -1,13 +1,29 @@
 class StorageException implements Exception {
-  const StorageException();
+  final String message;
+  const StorageException({this.message = 'Error de almacenamiento'});
 }
 
-class GenericStorageException implements StorageException {}
+class GenericStorageException extends StorageException {
+  const GenericStorageException({String? message})
+      : super(message: 'Error de almacenamiento');
+}
 
-class CouldNotUploadImageStorageException implements StorageException {}
+class CouldNotUploadImageStorageException extends StorageException {
+  const CouldNotUploadImageStorageException({String? message})
+      : super(message: 'No se pudo subir la imagen');
+}
 
-class ImageNotFoundStorageException implements StorageException {}
+class ImageNotFoundStorageException extends StorageException {
+  const ImageNotFoundStorageException({String? message})
+      : super(message: 'Imagen no encontrada');
+}
 
-class ImageTooLargeStorageException implements StorageException {}
+class ImageTooLargeStorageException extends StorageException {
+  const ImageTooLargeStorageException({String? message})
+      : super(message: 'La imagen es demasiado grande');
+}
 
-class CouldNotDeleteImageStorageException implements StorageException {}
+class CouldNotDeleteImageStorageException extends StorageException {
+  const CouldNotDeleteImageStorageException({String? message})
+      : super(message: 'No se pudo eliminar la imagen');
+}
