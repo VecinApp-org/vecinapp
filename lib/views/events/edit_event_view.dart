@@ -6,6 +6,7 @@ import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:vecinapp/utilities/widgets/doc_view.dart';
+import 'dart:developer' as devtools show log; // ignore: unused_import
 
 class EditEventView extends HookWidget {
   const EditEventView({super.key, this.event});
@@ -24,22 +25,25 @@ class EditEventView extends HookWidget {
     final timeStartController = useTextEditingController();
     final dateEndController = useTextEditingController();
     final timeEndController = useTextEditingController();
+
     // set values from event if it exists
-    if (event != null) {
-      textController.text = event!.text ?? '';
-      titleController.text = event!.title;
-      placeController.text = event!.placeName ?? '';
-      selectedStartDate.value = event!.dateStart;
-      selectedEndDate.value = event!.dateEnd;
-      dateStartController.text =
-          DateFormat('dd/MM/yyyy').format(selectedStartDate.value!);
-      timeStartController.text =
-          DateFormat('HH:mm').format(selectedStartDate.value!);
-      dateEndController.text =
-          DateFormat('dd/MM/yyyy').format(selectedEndDate.value!);
-      timeEndController.text =
-          DateFormat('HH:mm').format(selectedEndDate.value!);
-    }
+    useEffect(() {
+      if (event != null) {
+        textController.text = event!.text ?? '';
+        titleController.text = event!.title;
+        placeController.text = event!.placeName ?? '';
+        selectedStartDate.value = event!.dateStart;
+        selectedEndDate.value = event!.dateEnd;
+        dateStartController.text =
+            DateFormat.MMMEd().format(selectedStartDate.value!);
+        timeStartController.text =
+            DateFormat.jm().format(selectedStartDate.value!);
+        dateEndController.text =
+            DateFormat.MMMEd().format(selectedEndDate.value!);
+        timeEndController.text = DateFormat.jm().format(selectedEndDate.value!);
+      }
+      return null;
+    }, [event]);
 
     return DocView(
       appBarTitle: event == null ? 'Nuevo Evento' : 'Editar Evento',
@@ -51,7 +55,6 @@ class EditEventView extends HookWidget {
       more: [
         TextField(
           controller: titleController,
-          readOnly: true,
           autofocus: true,
           keyboardType: TextInputType.multiline,
           maxLines: 3,
@@ -76,10 +79,11 @@ class EditEventView extends HookWidget {
                                     const InputDecoration(labelText: 'Fecha'),
                                 readOnly: true,
                                 onTap: () async {
+                                  // show the date picker
                                   final newStartDate = await showDatePicker(
                                     context: context,
                                     firstDate: DateTime.now()
-                                        .subtract(const Duration(days: 7)),
+                                        .subtract(const Duration(days: 60)),
                                     lastDate: DateTime.now()
                                         .add(const Duration(days: 365)),
                                     currentDate: DateTime.now(),
@@ -88,21 +92,26 @@ class EditEventView extends HookWidget {
                                   );
                                   if (newStartDate != null &&
                                       newStartDate != selectedStartDate.value) {
-                                    selectedStartDate.value =
-                                        newStartDate.add(Duration(
-                                      hours:
-                                          selectedStartDate.value?.hour ?? 10,
-                                      minutes:
-                                          selectedStartDate.value?.minute ?? 0,
-                                    ));
+                                    final oldDateStart =
+                                        selectedStartDate.value!;
+                                    final oldDateEnd = selectedEndDate.value!;
+                                    final timeDifference =
+                                        oldDateEnd.difference(oldDateStart);
+                                    devtools.log(timeDifference.toString());
+                                    // update the start and end dates
+                                    selectedStartDate.value = newStartDate.add(
+                                        Duration(
+                                            hours: oldDateStart.hour,
+                                            minutes: oldDateStart.minute));
+                                    selectedEndDate.value = selectedStartDate
+                                        .value!
+                                        .add(timeDifference);
+                                    // update the text controllers
                                     dateStartController.text =
                                         DateFormat.MMMEd()
                                             .format(selectedStartDate.value!);
                                     timeStartController.text = DateFormat.jm()
                                         .format(selectedStartDate.value!);
-                                    selectedEndDate.value = selectedStartDate
-                                        .value!
-                                        .add(Duration(hours: 1));
                                     dateEndController.text = DateFormat.MMMEd()
                                         .format(selectedEndDate.value!);
                                     timeEndController.text = DateFormat.jm()
@@ -119,43 +128,30 @@ class EditEventView extends HookWidget {
                                     const InputDecoration(labelText: 'Hora'),
                                 readOnly: true,
                                 onTap: () async {
-                                  final newStartDate = await showTimePicker(
+                                  final newStartTime = await showTimePicker(
                                     context: context,
                                     initialTime: TimeOfDay.fromDateTime(
                                         selectedStartDate.value ??
                                             DateTime.now()),
                                   );
-                                  if (newStartDate != null) {
-                                    if (selectedStartDate.value == null) {
-                                      selectedStartDate.value = DateTime(
-                                        selectedStartDate.value?.year ??
-                                            DateTime.now().year,
-                                        selectedStartDate.value?.month ??
-                                            DateTime.now().month,
-                                        selectedStartDate.value?.day ??
-                                            DateTime.now().day,
-                                        newStartDate.hour,
-                                        newStartDate.minute,
-                                      );
-                                      selectedEndDate.value = selectedStartDate
-                                          .value!
-                                          .add(Duration(hours: 1));
-                                    } else {
-                                      final timeDifference =
-                                          selectedStartDate.value!.difference(
-                                        selectedEndDate.value!,
-                                      );
-                                      selectedStartDate.value = DateTime(
-                                        selectedStartDate.value!.year,
-                                        selectedStartDate.value!.month,
-                                        selectedStartDate.value!.day,
-                                        newStartDate.hour,
-                                        newStartDate.minute,
-                                      );
-                                      selectedEndDate.value = selectedStartDate
-                                          .value!
-                                          .add(timeDifference);
-                                    }
+                                  if (newStartTime != null) {
+                                    final oldDateStart =
+                                        selectedStartDate.value!;
+                                    final oldDateEnd = selectedEndDate.value!;
+                                    final timeDifference =
+                                        oldDateEnd.difference(oldDateStart);
+                                    // update the start and end dates
+                                    selectedStartDate.value = DateTime(
+                                      oldDateStart.year,
+                                      oldDateStart.month,
+                                      oldDateStart.day,
+                                      newStartTime.hour,
+                                      newStartTime.minute,
+                                    );
+                                    selectedEndDate.value = selectedStartDate
+                                        .value!
+                                        .add(timeDifference);
+                                    // update the text controllers
                                     dateStartController.text =
                                         DateFormat.MMMEd()
                                             .format(selectedStartDate.value!);
@@ -183,8 +179,8 @@ class EditEventView extends HookWidget {
                                 onTap: () async {
                                   final newEndDate = await showDatePicker(
                                     context: context,
-                                    firstDate: DateTime.now()
-                                        .subtract(const Duration(days: 7)),
+                                    firstDate: selectedStartDate.value ??
+                                        DateTime.now(),
                                     lastDate: DateTime.now()
                                         .add(const Duration(days: 365)),
                                     currentDate: DateTime.now(),
@@ -193,11 +189,11 @@ class EditEventView extends HookWidget {
                                   );
                                   if (newEndDate != null &&
                                       newEndDate != selectedEndDate.value) {
+                                    final oldDateEnd = selectedEndDate.value!;
                                     selectedEndDate.value =
                                         newEndDate.add(Duration(
-                                      hours: selectedEndDate.value?.hour ?? 10,
-                                      minutes:
-                                          selectedEndDate.value?.minute ?? 0,
+                                      hours: oldDateEnd.hour,
+                                      minutes: oldDateEnd.minute,
                                     ));
                                     dateEndController.text = DateFormat.MMMEd()
                                         .format(selectedEndDate.value!);
@@ -215,27 +211,24 @@ class EditEventView extends HookWidget {
                                     labelText: 'Hora Final'),
                                 readOnly: true,
                                 onTap: () async {
-                                  final newEndDate = await showTimePicker(
+                                  final oldDateEnd = selectedEndDate.value!;
+                                  final newEndTime = await showTimePicker(
                                     context: context,
-                                    initialTime: TimeOfDay.fromDateTime(
-                                        selectedEndDate.value ??
-                                            DateTime.now()),
+                                    initialTime:
+                                        TimeOfDay.fromDateTime(oldDateEnd),
                                   );
-                                  if (newEndDate != null) {
-                                    selectedStartDate.value = DateTime(
-                                      selectedStartDate.value?.year ??
-                                          DateTime.now().year,
-                                      selectedStartDate.value?.month ??
-                                          DateTime.now().month,
-                                      selectedStartDate.value?.day ??
-                                          DateTime.now().day,
-                                      newEndDate.hour,
-                                      newEndDate.minute,
+                                  if (newEndTime != null) {
+                                    selectedEndDate.value = DateTime(
+                                      oldDateEnd.year,
+                                      oldDateEnd.month,
+                                      oldDateEnd.day,
+                                      newEndTime.hour,
+                                      newEndTime.minute,
                                     );
                                     dateEndController.text = DateFormat.MMMEd()
-                                        .format(selectedStartDate.value!);
+                                        .format(selectedEndDate.value!);
                                     timeEndController.text = DateFormat.jm()
-                                        .format(selectedStartDate.value!);
+                                        .format(selectedEndDate.value!);
                                   }
                                 },
                               ),
@@ -261,8 +254,10 @@ class EditEventView extends HookWidget {
                   const SizedBox(width: 8.0),
                 ],
               )
-            : Row(
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const SizedBox(height: 8.0),
                   TextButton.icon(
                     iconAlignment: IconAlignment.start,
                     label: const Text('Agregar Fecha'),
@@ -271,7 +266,7 @@ class EditEventView extends HookWidget {
                       final newStartDate = await showDatePicker(
                         context: context,
                         firstDate:
-                            DateTime.now().subtract(const Duration(days: 7)),
+                            DateTime.now().subtract(const Duration(days: 60)),
                         lastDate: DateTime.now().add(const Duration(days: 365)),
                         currentDate: DateTime.now(),
                         initialDate: DateTime.now(),
@@ -311,8 +306,8 @@ class EditEventView extends HookWidget {
             context.read<AppBloc>().add(AppEventCreateOrUpdateEvent(
                   title: titleController.text,
                   text: textController.text,
-                  dateStart: DateTime.now(),
-                  dateEnd: DateTime.now(),
+                  dateStart: selectedStartDate.value,
+                  dateEnd: selectedEndDate.value,
                   placeName: placeController.text,
                   location: null,
                 ));

@@ -192,11 +192,11 @@ class FirebaseCloudProvider implements CloudProvider {
   @override
   Future<void> updateEvent({
     required String eventId,
-    required String title,
-    required String text,
-    required DateTime dateStart,
-    required DateTime dateEnd,
-    required String placeName,
+    required String? title,
+    required String? text,
+    required DateTime? dateStart,
+    required DateTime? dateEnd,
+    required String? placeName,
     required LatLng? location,
   }) async {
     // check if user is neighborhood admin
@@ -205,12 +205,20 @@ class FirebaseCloudProvider implements CloudProvider {
       throw PermissionDeniedCloudException();
     }
     // check if event is valid
-    if (title.isEmpty ||
-        text.isEmpty ||
-        placeName.isEmpty ||
-        dateStart.isAfter(dateEnd) ||
-        dateStart.isBefore(DateTime.now())) {
+    if (title == null ||
+        title.isEmpty ||
+        dateStart == null ||
+        dateEnd == null) {
       throw ChannelErrorCloudException();
+    }
+    // check if end date is after start
+    if (dateStart.isAfter(dateEnd)) {
+      throw EventStartsAfterEndsCloudException();
+    }
+    // check if event date is valid
+    if (dateStart.isBefore(DateTime.now().subtract(const Duration(days: 60))) ||
+        dateEnd.isAfter(DateTime.now().add(const Duration(days: 365)))) {
+      throw EventDateInvalidCloudException();
     }
     // update the event
     try {
@@ -246,11 +254,11 @@ class FirebaseCloudProvider implements CloudProvider {
 
   @override
   Future<Event> createNewEvent({
-    required String title,
-    required String text,
-    required DateTime dateStart,
-    required DateTime dateEnd,
-    required String placeName,
+    required String? title,
+    required String? text,
+    required DateTime? dateStart,
+    required DateTime? dateEnd,
+    required String? placeName,
     required LatLng? location,
   }) async {
     // check if user is neighborhood admin
@@ -258,12 +266,19 @@ class FirebaseCloudProvider implements CloudProvider {
     if (!user!.isNeighborhoodAdmin) {
       throw PermissionDeniedCloudException();
     }
-    // check if event is valid
-    if (title.isEmpty ||
-        text.isEmpty ||
-        placeName.isEmpty ||
-        dateStart.isAfter(dateEnd) ||
-        dateStart.isBefore(DateTime.now())) {
+    // check required fields
+    if (title == null ||
+        title.isEmpty ||
+        dateStart == null ||
+        dateEnd == null) {
+      throw ChannelErrorCloudException();
+    }
+    // check if end date is after start
+    if (dateStart.isAfter(dateEnd)) {
+      throw ChannelErrorCloudException();
+    }
+    // check if events starts in the past
+    if (dateStart.isBefore(DateTime.now())) {
       throw ChannelErrorCloudException();
     }
     // create event

@@ -207,11 +207,11 @@ class AppEventGoToEventDetailsView extends AppEvent {
 
 // EVENT EVENTS
 class AppEventCreateOrUpdateEvent extends AppEvent {
-  final String title;
-  final String text;
-  final DateTime dateStart;
-  final DateTime dateEnd;
-  final String placeName;
+  final String? title;
+  final String? text;
+  final DateTime? dateStart;
+  final DateTime? dateEnd;
+  final String? placeName;
   final LatLng? location;
   const AppEventCreateOrUpdateEvent({
     required this.title,

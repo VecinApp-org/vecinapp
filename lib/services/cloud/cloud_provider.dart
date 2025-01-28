@@ -76,21 +76,21 @@ abstract class CloudProvider {
   });
 
   Future<Event> createNewEvent({
-    required String title,
-    required String text,
-    required DateTime dateStart,
-    required DateTime dateEnd,
-    required String placeName,
+    required String? title,
+    required String? text,
+    required DateTime? dateStart,
+    required DateTime? dateEnd,
+    required String? placeName,
     required LatLng? location,
   });
 
   Future<void> updateEvent({
     required String eventId,
-    required String title,
-    required String text,
-    required DateTime dateStart,
-    required DateTime dateEnd,
-    required String placeName,
+    required String? title,
+    required String? text,
+    required DateTime? dateStart,
+    required DateTime? dateEnd,
+    required String? placeName,
     required LatLng? location,
   });
 

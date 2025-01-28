@@ -55,5 +55,9 @@ class CouldNotDeleteEventException extends CloudException {}
 
 class CouldNotUpdateEventException extends CloudException {}
 
+class EventStartsAfterEndsCloudException extends CloudException {}
+
+class EventDateInvalidCloudException extends CloudException {}
+
 // Admin
 class PermissionDeniedCloudException extends CloudException {}
