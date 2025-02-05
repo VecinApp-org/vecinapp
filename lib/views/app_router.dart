@@ -23,7 +23,7 @@ import 'package:vecinapp/views/login/forgot_password_view.dart';
 import 'package:vecinapp/views/login/login_view.dart';
 import 'package:vecinapp/views/login/register_view.dart';
 import 'package:vecinapp/views/login/verify_email_view.dart';
-import 'package:vecinapp/views/neighborhood_view2.dart';
+import 'package:vecinapp/views/neighborhood_view.dart';
 import 'package:vecinapp/views/profile_view.dart';
 import 'package:vecinapp/views/rulebooks/edit_rulebook_view.dart';
 import 'package:vecinapp/views/rulebooks/rulebook_details_view.dart';
@@ -83,7 +83,7 @@ class AppBlocRouter extends StatelessWidget {
         } else if (state is AppStateNeedsVerification) {
           return const VerifyEmailView();
         } else if (state is AppStateViewingNeighborhood) {
-          return NeighborhoodView2(neighborhood: state.neighborhood!);
+          return NeighborhoodView(neighborhood: state.neighborhood!);
         } else if (state is AppStateViewingProfile) {
           return ProfileView(
             cloudUser: state.cloudUser!,
@@ -94,7 +94,7 @@ class AppBlocRouter extends StatelessWidget {
         } else if (state is AppStateViewingSettings) {
           return SettingsView();
         } else if (state is AppStateViewingRulebooks) {
-          return NeighborhoodView2(
+          return NeighborhoodView(
               neighborhood: state.neighborhood!,
               selectedIndex: NeighborhoodPageIndex.rulebooks);
         } else if (state is AppStateEditingRulebook) {
@@ -103,7 +103,7 @@ class AppBlocRouter extends StatelessWidget {
           return RulebookDetailsView(
               rulebook: state.rulebook, cloudUser: state.cloudUser!);
         } else if (state is AppStateViewingEvents) {
-          return NeighborhoodView2(
+          return NeighborhoodView(
             neighborhood: state.neighborhood!,
             selectedIndex: NeighborhoodPageIndex.events,
           );
