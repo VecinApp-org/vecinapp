@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:vecinapp/constants/neighborhood_page_index.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
@@ -16,51 +17,63 @@ class NeighborhoodView extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentPageIndex = useState(selectedIndex ?? 0);
+    final pageController = usePageController(initialPage: selectedIndex ?? 0);
+    final currentPageIndex =
+        useState(selectedIndex ?? NeighborhoodPageIndex.events);
     final cloudUser = context.read<AppBloc>().state.cloudUser!;
     return Scaffold(
-      key: const Key('neighborhoodView'),
-      appBar: AppBar(
-        elevation: 1,
-        title: Text(
-          neighborhood.neighborhoodName,
+        key: const Key('neighborhoodView'),
+        appBar: AppBar(
+          elevation: 1,
+          title: Text(
+            neighborhood.neighborhoodName,
+          ),
+          actions: <Widget>[
+            Padding(
+                padding: const EdgeInsets.only(right: 13.0),
+                child: GestureDetector(
+                    onTap: () => context
+                        .read<AppBloc>()
+                        .add(const AppEventGoToProfileView()),
+                    child: ProfilePicture(
+                      radius: 16,
+                      id: cloudUser.id,
+                    )))
+          ],
         ),
-        actions: <Widget>[
-          Padding(
-              padding: const EdgeInsets.only(right: 13.0),
-              child: GestureDetector(
-                  onTap: () => context
-                      .read<AppBloc>()
-                      .add(const AppEventGoToProfileView()),
-                  child: ProfilePicture(
-                    radius: 16,
-                    id: cloudUser.id,
-                  )))
-        ],
-      ),
-      bottomNavigationBar: NavigationBar(
-        animationDuration: Duration(milliseconds: 300),
-        onDestinationSelected: (int index) {
-          currentPageIndex.value = index;
-        },
-        selectedIndex: currentPageIndex.value,
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.event_outlined),
-            selectedIcon: Icon(Icons.event),
-            label: 'Eventos',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.library_books_outlined),
-            selectedIcon: Icon(Icons.library_books),
-            label: 'Reglamentos',
-          ),
-        ],
-      ),
-      body: <Widget>[
-        EventsView(cloudUser: cloudUser),
-        RulebooksView(cloudUser: cloudUser),
-      ][currentPageIndex.value],
-    );
+        bottomNavigationBar: NavigationBar(
+          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+          onDestinationSelected: (int index) async {
+            await pageController.animateToPage(
+              index,
+              duration: kThemeAnimationDuration,
+              curve: Curves.easeInOut,
+            );
+            currentPageIndex.value = index;
+          },
+          selectedIndex: currentPageIndex.value,
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.event_outlined),
+              selectedIcon: Icon(Icons.event),
+              label: 'Eventos',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.library_books_outlined),
+              selectedIcon: Icon(Icons.library_books),
+              label: 'Reglamentos',
+            ),
+          ],
+        ),
+        body: PageView(
+          controller: pageController,
+          onPageChanged: (index) {
+            currentPageIndex.value = index;
+          },
+          children: [
+            EventsView(cloudUser: cloudUser),
+            RulebooksView(cloudUser: cloudUser),
+          ],
+        ));
   }
 }
