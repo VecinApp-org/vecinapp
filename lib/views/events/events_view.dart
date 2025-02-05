@@ -34,20 +34,17 @@ class EventsView extends HookWidget {
         events.data?.where((event) => event.dateEnd.isBefore(currentDate));
     final toggleViewPastEvents = useState<bool>(false);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Eventos'),
-        leading: BackButton(
-            onPressed: () => context
-                .read<AppBloc>()
-                .add(const AppEventGoToNeighborhoodView())),
-      ),
-      floatingActionButton: Visibility(
-        visible: cloudUser.isNeighborhoodAdmin,
-        child: FloatingActionButton(
-            onPressed: () =>
-                context.read<AppBloc>().add(const AppEventGoToEditEventView()),
-            child: const Icon(Icons.add)),
-      ),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            context.read<AppBloc>().add(
+                  AppEventGoToEditEventView(
+                    event: null,
+                  ),
+                );
+          },
+          child: const Icon(
+            Icons.add,
+          )),
       body: Padding(
         padding: const EdgeInsets.only(left: 8.0, right: 8.0),
         child: events.data == null

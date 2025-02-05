@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vecinapp/constants/neighborhood_page_index.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
@@ -16,18 +17,16 @@ import 'package:vecinapp/views/cloud_login/register_cloud_user_view.dart';
 import 'package:vecinapp/views/delete_account_view.dart';
 import 'package:vecinapp/views/events/edit_event_view.dart';
 import 'package:vecinapp/views/events/event_details_view.dart';
-import 'package:vecinapp/views/events/events_view.dart';
 import 'package:vecinapp/views/household_view.dart';
 import 'package:vecinapp/views/login/welcome_view.dart';
-import 'package:vecinapp/views/neighborhood_view.dart';
 import 'package:vecinapp/views/login/forgot_password_view.dart';
 import 'package:vecinapp/views/login/login_view.dart';
 import 'package:vecinapp/views/login/register_view.dart';
 import 'package:vecinapp/views/login/verify_email_view.dart';
+import 'package:vecinapp/views/neighborhood_view2.dart';
 import 'package:vecinapp/views/profile_view.dart';
 import 'package:vecinapp/views/rulebooks/edit_rulebook_view.dart';
 import 'package:vecinapp/views/rulebooks/rulebook_details_view.dart';
-import 'package:vecinapp/views/rulebooks/rulebooks_view.dart';
 import 'package:vecinapp/views/settings_view.dart';
 import 'dart:developer' as devtools show log; // ignore: unused_import
 
@@ -70,7 +69,7 @@ class AppBlocRouter extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        //devtools.log(state.runtimeType.toString());
+        devtools.log(state.runtimeType.toString());
         if (state is AppStateUnInitalized) {
           return const SplashView();
         } else if (state is AppStateWelcomeViewing) {
@@ -84,7 +83,7 @@ class AppBlocRouter extends StatelessWidget {
         } else if (state is AppStateNeedsVerification) {
           return const VerifyEmailView();
         } else if (state is AppStateViewingNeighborhood) {
-          return NeighborhoodView(neighborhood: state.neighborhood!);
+          return NeighborhoodView2(neighborhood: state.neighborhood!);
         } else if (state is AppStateViewingProfile) {
           return ProfileView(
             cloudUser: state.cloudUser!,
@@ -95,14 +94,19 @@ class AppBlocRouter extends StatelessWidget {
         } else if (state is AppStateViewingSettings) {
           return SettingsView();
         } else if (state is AppStateViewingRulebooks) {
-          return RulebooksView(cloudUser: state.cloudUser!);
+          return NeighborhoodView2(
+              neighborhood: state.neighborhood!,
+              selectedIndex: NeighborhoodPageIndex.rulebooks);
         } else if (state is AppStateEditingRulebook) {
           return EditRulebookView(rulebook: state.rulebook);
         } else if (state is AppStateViewingRulebookDetails) {
           return RulebookDetailsView(
               rulebook: state.rulebook, cloudUser: state.cloudUser!);
         } else if (state is AppStateViewingEvents) {
-          return EventsView(cloudUser: state.cloudUser!);
+          return NeighborhoodView2(
+            neighborhood: state.neighborhood!,
+            selectedIndex: NeighborhoodPageIndex.events,
+          );
         } else if (state is AppStateEditingEvent) {
           return EditEventView(event: state.event);
         } else if (state is AppStateViewingEventDetails) {

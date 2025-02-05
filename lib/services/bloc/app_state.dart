@@ -236,7 +236,12 @@ class AppStateViewingRulebooks extends AppState {
     required bool isLoading,
     required exception,
     required cloudUser,
-  }) : super(isLoading: isLoading, exception: exception, cloudUser: cloudUser);
+    required neighborhood,
+  }) : super(
+            isLoading: isLoading,
+            exception: exception,
+            cloudUser: cloudUser,
+            neighborhood: neighborhood);
 }
 
 class AppStateEditingRulebook extends AppState {
@@ -264,7 +269,12 @@ class AppStateViewingEvents extends AppState {
     required bool isLoading,
     required exception,
     required cloudUser,
-  }) : super(isLoading: isLoading, exception: exception, cloudUser: cloudUser);
+    required neighborhood,
+  }) : super(
+            isLoading: isLoading,
+            exception: exception,
+            cloudUser: cloudUser,
+            neighborhood: neighborhood);
 }
 
 class AppStateEditingEvent extends AppState {

@@ -14,6 +14,7 @@ class EditEventView extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    devtools.log('EditEventView build');
     DateTime? startDate;
     final selectedStartDate = useState<DateTime?>(startDate);
     DateTime? endDate;

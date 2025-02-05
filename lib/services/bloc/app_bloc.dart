@@ -47,7 +47,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       try {
         //Start loading
         emit(const AppStateUnInitalized(
-          isLoading: true,
+          isLoading: false,
         ));
 
         //Get AuthUser
@@ -740,10 +740,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     //Rulebook Routing
     on<AppEventGoToRulebooksView>((event, emit) async {
       final cloudUser = await _cloudProvider.cachedCloudUser;
+      final neighborhood = await _cloudProvider.cachedNeighborhood;
       emit(AppStateViewingRulebooks(
         isLoading: false,
         exception: null,
         cloudUser: cloudUser,
+        neighborhood: neighborhood,
       ));
     });
 
@@ -835,6 +837,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
       //enable loading indicator
       final cloudUser = await _cloudProvider.cachedCloudUser;
+      final neighborhood = await _cloudProvider.cachedNeighborhood;
       emit(AppStateViewingRulebookDetails(
         rulebook: state.rulebook!,
         isLoading: true,
@@ -864,6 +867,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
       //Send user to rulebooks view
       emit(AppStateViewingRulebooks(
+        neighborhood: neighborhood,
         isLoading: false,
         exception: null,
         cloudUser: cloudUser,
@@ -873,10 +877,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     //Event Routing
     on<AppEventGoToEventsView>((event, emit) async {
       final cloudUser = await _cloudProvider.cachedCloudUser;
+      final neighborhood = await _cloudProvider.cachedNeighborhood;
       emit(AppStateViewingEvents(
         isLoading: false,
         exception: null,
         cloudUser: cloudUser,
+        neighborhood: neighborhood,
       ));
     });
 
@@ -975,6 +981,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
       //enable loading indicator
       final cloudUser = await _cloudProvider.cachedCloudUser;
+      final neighborhood = await _cloudProvider.cachedNeighborhood;
       emit(AppStateViewingEventDetails(
         event: state.event!,
         isLoading: true,
@@ -985,14 +992,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         await _cloudProvider.deleteEvent(
           eventId: state.event!.id,
         );
-      } on CloudException catch (e) {
-        emit(AppStateViewingEventDetails(
-          event: state.event!,
-          cloudUser: cloudUser,
-          isLoading: false,
-          exception: e,
-        ));
-        return;
       } on Exception catch (e) {
         emit(AppStateViewingEventDetails(
           event: state.event!,
@@ -1003,7 +1002,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //Send user to rulebooks view
-      emit(AppStateViewingEvents(
+      emit(AppStateViewingNeighborhood(
+        neighborhood: neighborhood!,
         isLoading: false,
         exception: null,
         cloudUser: cloudUser,

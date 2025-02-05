@@ -14,22 +14,15 @@ class RulebooksView extends HookWidget {
     final stream = useMemoized(() => context.watch<AppBloc>().rulebooks);
     final rulebooks = useStream(stream);
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Reglamentos'),
-          leading: BackButton(
-              onPressed: () => context
-                  .read<AppBloc>()
-                  .add(const AppEventGoToNeighborhoodView())),
-          //title: const Text('Reglamentos'),
+      key: const Key('rulebooksView'),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () =>
+            context.read<AppBloc>().add(const AppEventGoToEditRulebookView()),
+        child: const Icon(
+          Icons.add,
         ),
-        floatingActionButton: Visibility(
-          visible: cloudUser.isNeighborhoodAdmin,
-          child: FloatingActionButton(
-              onPressed: () => context
-                  .read<AppBloc>()
-                  .add(const AppEventGoToEditRulebookView()),
-              child: const Icon(Icons.add)),
-        ),
-        body: RulebookListView(rulebooks: rulebooks.data ?? []));
+      ),
+      body: RulebookListView(rulebooks: rulebooks.data ?? []),
+    );
   }
 }

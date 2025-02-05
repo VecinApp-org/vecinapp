@@ -24,9 +24,9 @@ class RulebookListView extends StatelessWidget {
               Card(
                 color: Theme.of(context).colorScheme.surfaceContainer,
                 margin:
-                    const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
+                    const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 5.0, top: 5.0),
+                  padding: const EdgeInsets.only(bottom: 4.0, top: 4.0),
                   child: ListTile(
                     leading: const Icon(Icons.library_books_outlined),
                     onTap: () {
