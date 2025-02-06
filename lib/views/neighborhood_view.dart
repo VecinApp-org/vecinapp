@@ -44,12 +44,12 @@ class NeighborhoodView extends HookWidget {
         bottomNavigationBar: NavigationBar(
           labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
           onDestinationSelected: (int index) async {
+            currentPageIndex.value = index;
             await pageController.animateToPage(
               index,
               duration: kThemeAnimationDuration,
               curve: Curves.easeInOut,
             );
-            currentPageIndex.value = index;
           },
           selectedIndex: currentPageIndex.value,
           destinations: const [

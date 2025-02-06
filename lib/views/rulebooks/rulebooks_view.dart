@@ -22,7 +22,8 @@ class RulebooksView extends HookWidget {
           Icons.add,
         ),
       ),
-      body: RulebookListView(rulebooks: rulebooks.data ?? []),
+      body: SingleChildScrollView(
+          child: RulebookListView(rulebooks: rulebooks.data ?? [])),
     );
   }
 }

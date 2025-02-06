@@ -10,24 +10,29 @@ import 'package:flutter/material.dart';
 //Purple: 280
 //Magenta: 300
 
-const double primaryHue = 80;
-const double primarySaturation = 0.6;
+//Hue
+const double baseHue = 160;
 
-const double secondaryHue = 80;
+//Saturation
+const double primaryHue = baseHue;
+const double primarySaturation = 0.9;
+
+const double secondaryHue = baseHue;
 const double secondarySaturation = 0.6;
 
-const double tertiaryHue = 220;
-const double tertiarySaturation = 0.6;
+const double tertiaryHue = baseHue;
+const double tertiarySaturation = 0.3;
 
 const double errorHue = 0;
 const double errorSaturation = 0.75;
 
-const double neutralHue = 240;
-const double neutralSaturation = 0.07;
+const double neutralHue = baseHue;
+const double neutralSaturation = 0.1;
 
-const double neutralVariantHue = 0;
-const double neutralVariantSaturation = 0.04;
+const double neutralVariantHue = baseHue;
+const double neutralVariantSaturation = 0.05;
 
+//Light Theme
 ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     colorScheme: ColorScheme(
@@ -67,7 +72,7 @@ ThemeData lightTheme = ThemeData(
       //surface
       surfaceDim: n87,
       surface: n98,
-      surfaceBright: n98,
+      surfaceBright: n99,
       surfaceContainerLowest: n100,
       surfaceContainerLow: n96,
       surfaceContainer: n94,
@@ -85,6 +90,7 @@ ThemeData lightTheme = ThemeData(
       scrim: n0,
     ));
 
+//Dark Theme
 ThemeData darkTheme = ThemeData(
   useMaterial3: true,
   colorScheme: ColorScheme(
