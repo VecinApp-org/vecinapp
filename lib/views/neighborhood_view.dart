@@ -24,7 +24,6 @@ class NeighborhoodView extends HookWidget {
     return Scaffold(
         key: const Key('neighborhoodView'),
         appBar: AppBar(
-          elevation: 1,
           title: Text(
             neighborhood.neighborhoodName,
           ),
@@ -64,6 +63,21 @@ class NeighborhoodView extends HookWidget {
               label: 'Reglamentos',
             ),
           ],
+        ),
+        floatingActionButton: Visibility(
+          visible: cloudUser.isNeighborhoodAdmin,
+          child: <Widget>[
+            FloatingActionButton(
+                onPressed: () =>
+                    context.read<AppBloc>().add(AppEventGoToEditEventView()),
+                child: const Icon(Icons.add)),
+            FloatingActionButton(
+              onPressed: () => context
+                  .read<AppBloc>()
+                  .add(const AppEventGoToEditRulebookView()),
+              child: const Icon(Icons.add),
+            ),
+          ][currentPageIndex.value],
         ),
         body: PageView(
           controller: pageController,

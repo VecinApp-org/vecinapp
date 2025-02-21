@@ -8,7 +8,7 @@ class SplashView extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: Text(
-          'SplashView',
+          'VecinApp',
           style: Theme.of(context).textTheme.headlineLarge,
         ),
       ),

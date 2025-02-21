@@ -5,7 +5,7 @@ import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 
 class RulebookListView extends StatelessWidget {
-  final Iterable<Rulebook> rulebooks;
+  final List<Rulebook> rulebooks;
 
   const RulebookListView({
     super.key,
@@ -15,37 +15,29 @@ class RulebookListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+        physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         itemCount: rulebooks.length,
         itemBuilder: (context, index) {
           final rulebook = rulebooks.elementAt(index);
-          return Column(
-            children: [
-              Card(
-                color: Theme.of(context).colorScheme.surfaceContainer,
-                margin:
-                    const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 4.0, top: 4.0),
-                  child: ListTile(
-                    leading: const Icon(Icons.library_books_outlined),
-                    onTap: () {
-                      context.read<AppBloc>().add(
-                            AppEventGoToRulebookDetailsView(
-                              rulebook: rulebook,
-                            ),
-                          );
-                    },
-                    title: Text(
-                      rulebook.title,
-                      maxLines: 2,
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
+          return Card(
+            //color: Theme.of(context).colorScheme.surfaceContainer,
+            child: ListTile(
+              leading: const Icon(Icons.library_books_outlined),
+              onTap: () {
+                context.read<AppBloc>().add(
+                      AppEventGoToRulebookDetailsView(
+                        rulebook: rulebook,
+                      ),
+                    );
+              },
+              title: Text(
+                rulebook.title,
+                maxLines: 2,
+                softWrap: true,
+                overflow: TextOverflow.ellipsis,
               ),
-            ],
+            ),
           );
         });
   }

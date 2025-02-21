@@ -6,7 +6,7 @@ import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:intl/intl.dart';
 
 class EventListView extends StatelessWidget {
-  final Iterable<Event> events;
+  final List<Event> events;
 
   const EventListView({
     super.key,
@@ -16,13 +16,12 @@ class EventListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: events.length,
       itemBuilder: (context, index) {
         final event = events.elementAt(index);
         return Card(
-          color: Theme.of(context).colorScheme.surfaceContainer,
-          margin: const EdgeInsets.only(bottom: 8, top: 8),
           child: ListTile(
             onTap: () {
               context.read<AppBloc>().add(
@@ -31,15 +30,12 @@ class EventListView extends StatelessWidget {
                     ),
                   );
             },
-            title: Padding(
-              padding: const EdgeInsets.only(bottom: 5.0, top: 5.0),
-              child: Text(
-                event.title,
-                style: Theme.of(context).textTheme.titleMedium,
-                maxLines: 1,
-                softWrap: true,
-                overflow: TextOverflow.ellipsis,
-              ),
+            title: Text(
+              event.title,
+              style: Theme.of(context).textTheme.titleMedium,
+              maxLines: 1,
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

@@ -28,7 +28,6 @@ class DocView extends StatelessWidget {
         actions: appBarActions,
       ),
       body: Card(
-        color: Theme.of(context).colorScheme.surfaceContainer,
         margin: const EdgeInsets.all(8),
         child: ListView(
           padding: const EdgeInsets.all(13),
