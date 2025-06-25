@@ -424,6 +424,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
     });
 
+    on<AppEventGoToNeighborhoodDetailsView>((event, emit) async {
+      emit(AppStateViewingNeighborhoodDetails(
+        neighborhood: event.neighborhood,
+        isLoading: false,
+        exception: null,
+      ));
+    });
+
     on<AppEventGoToSettingsView>((event, emit) async {
       emit(const AppStateViewingSettings(
         isLoading: false,
@@ -783,11 +791,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppEventGoToRulebooksView>((event, emit) async {
       final cloudUser = await _cloudProvider.cachedCloudUser;
       final neighborhood = await _cloudProvider.cachedNeighborhood;
+      final household = await _cloudProvider.cachedHousehold;
       emit(AppStateViewingRulebooks(
         isLoading: false,
         exception: null,
         cloudUser: cloudUser,
         neighborhood: neighborhood,
+        household: household,
       ));
     });
 
@@ -908,11 +918,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //Send user to rulebooks view
+      final household = await _cloudProvider.cachedHousehold;
       emit(AppStateViewingRulebooks(
         neighborhood: neighborhood,
         isLoading: false,
         exception: null,
         cloudUser: cloudUser,
+        household: household,
       ));
     });
 
@@ -920,11 +932,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppEventGoToEventsView>((event, emit) async {
       final cloudUser = await _cloudProvider.cachedCloudUser;
       final neighborhood = await _cloudProvider.cachedNeighborhood;
+      final household = await _cloudProvider.cachedHousehold;
       emit(AppStateViewingEvents(
         isLoading: false,
         exception: null,
         cloudUser: cloudUser,
         neighborhood: neighborhood,
+        household: household,
       ));
     });
 

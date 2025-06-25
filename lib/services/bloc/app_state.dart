@@ -225,6 +225,18 @@ class AppStateViewingHousehold extends AppState {
         );
 }
 
+class AppStateViewingNeighborhoodDetails extends AppState {
+  const AppStateViewingNeighborhoodDetails({
+    required bool isLoading,
+    required exception,
+    required Neighborhood neighborhood,
+  }) : super(
+          isLoading: isLoading,
+          exception: exception,
+          neighborhood: neighborhood,
+        );
+}
+
 class AppStateViewingSettings extends AppState {
   const AppStateViewingSettings({
     required bool isLoading,
@@ -245,16 +257,18 @@ class AppStateDeletingAccount extends AppState {
 
 //RULEBOOK STATES
 class AppStateViewingRulebooks extends AppState {
-  const AppStateViewingRulebooks({
-    required bool isLoading,
-    required exception,
-    required cloudUser,
-    required neighborhood,
-  }) : super(
+  const AppStateViewingRulebooks(
+      {required bool isLoading,
+      required exception,
+      required cloudUser,
+      required neighborhood,
+      required household})
+      : super(
             isLoading: isLoading,
             exception: exception,
             cloudUser: cloudUser,
-            neighborhood: neighborhood);
+            neighborhood: neighborhood,
+            household: household);
 }
 
 class AppStateEditingRulebook extends AppState {
@@ -283,11 +297,13 @@ class AppStateViewingEvents extends AppState {
     required exception,
     required cloudUser,
     required neighborhood,
+    required household,
   }) : super(
             isLoading: isLoading,
             exception: exception,
             cloudUser: cloudUser,
-            neighborhood: neighborhood);
+            neighborhood: neighborhood,
+            household: household);
 }
 
 class AppStateEditingEvent extends AppState {

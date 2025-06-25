@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' show immutable;
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:vecinapp/utilities/entities/latlng.dart';
+import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 
@@ -145,6 +146,11 @@ class AppEventGoToHouseholdView extends AppEvent {
   const AppEventGoToHouseholdView({
     required this.household,
   });
+}
+
+class AppEventGoToNeighborhoodDetailsView extends AppEvent {
+  final Neighborhood neighborhood;
+  const AppEventGoToNeighborhoodDetailsView({required this.neighborhood});
 }
 
 class AppEventGoToSettingsView extends AppEvent {

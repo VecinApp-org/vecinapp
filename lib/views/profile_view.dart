@@ -132,7 +132,15 @@ class ProfileView extends StatelessWidget {
                 leading: const Icon(Icons.group),
                 title: Text(neighborhoodName),
                 trailing: const Icon(Icons.arrow_right),
-                onTap: () {}),
+                onTap: () {
+                  if (neighborhood == null) {
+                    return;
+                  } else {
+                    context.read<AppBloc>().add(
+                        AppEventGoToNeighborhoodDetailsView(
+                            neighborhood: neighborhood!));
+                  }
+                }),
           ),
           ListTile(
             leading: const Icon(Icons.settings),
