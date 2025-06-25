@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:vecinapp/constants/neighborhood_page_index.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
-import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
-import 'package:vecinapp/utilities/widgets/profile_picture.dart';
 import 'package:vecinapp/views/events/events_view.dart';
+import 'package:vecinapp/views/forum/forum_view.dart';
+import 'package:vecinapp/views/pooling/pooling_view.dart';
+import 'package:vecinapp/views/reports/reports_view.dart';
 import 'package:vecinapp/views/rulebooks/rulebooks_view.dart';
 
 class NeighborhoodView extends HookWidget {
@@ -18,30 +18,12 @@ class NeighborhoodView extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final pageController = usePageController(initialPage: selectedIndex ?? 0);
-    final currentPageIndex =
-        useState(selectedIndex ?? NeighborhoodPageIndex.events);
+    final currentPageIndex = useState(selectedIndex ?? 0);
     final cloudUser = context.read<AppBloc>().state.cloudUser!;
     return Scaffold(
         key: const Key('neighborhoodView'),
-        appBar: AppBar(
-          title: Text(
-            neighborhood.neighborhoodName,
-          ),
-          actions: <Widget>[
-            Padding(
-                padding: const EdgeInsets.only(right: 13.0),
-                child: GestureDetector(
-                    onTap: () => context
-                        .read<AppBloc>()
-                        .add(const AppEventGoToProfileView()),
-                    child: ProfilePicture(
-                      radius: 16,
-                      id: cloudUser.id,
-                    )))
-          ],
-        ),
         bottomNavigationBar: NavigationBar(
-          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           onDestinationSelected: (int index) async {
             currentPageIndex.value = index;
             await pageController.animateToPage(
@@ -53,40 +35,44 @@ class NeighborhoodView extends HookWidget {
           selectedIndex: currentPageIndex.value,
           destinations: const [
             NavigationDestination(
+              icon: Icon(Icons.forum_outlined),
+              selectedIcon: Icon(Icons.forum),
+              label: 'Foro',
+            ),
+            NavigationDestination(
               icon: Icon(Icons.event_outlined),
               selectedIcon: Icon(Icons.event),
               label: 'Eventos',
             ),
             NavigationDestination(
+              icon: Icon(Icons.report_outlined),
+              selectedIcon: Icon(Icons.report),
+              label: 'Reportes',
+            ),
+            NavigationDestination(
               icon: Icon(Icons.library_books_outlined),
               selectedIcon: Icon(Icons.library_books),
-              label: 'Reglamentos',
+              label: 'Recursos',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.payments_outlined),
+              selectedIcon: Icon(Icons.payments),
+              label: 'Caja',
             ),
           ],
         ),
-        floatingActionButton: Visibility(
-          visible: cloudUser.isNeighborhoodAdmin,
-          child: <Widget>[
-            FloatingActionButton(
-                onPressed: () =>
-                    context.read<AppBloc>().add(AppEventGoToEditEventView()),
-                child: const Icon(Icons.add)),
-            FloatingActionButton(
-              onPressed: () => context
-                  .read<AppBloc>()
-                  .add(const AppEventGoToEditRulebookView()),
-              child: const Icon(Icons.add),
-            ),
-          ][currentPageIndex.value],
-        ),
         body: PageView(
           controller: pageController,
+          allowImplicitScrolling: true,
           onPageChanged: (index) {
             currentPageIndex.value = index;
           },
           children: [
+            ForumView(cloudUser: cloudUser, neighborhood: neighborhood),
             EventsView(cloudUser: cloudUser),
+            ReportsView(),
             RulebooksView(cloudUser: cloudUser),
+            PoolingView(cloudUser: cloudUser),
           ],
         ));
   }

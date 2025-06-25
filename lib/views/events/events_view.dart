@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
+import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/views/events/event_list_view.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -64,70 +65,79 @@ class EventsView extends HookWidget {
       return isAfterNow && isNotToday;
     }).toList();
     final toggleViewPastEvents = useState<bool>(false);
-    return ListView(
-      shrinkWrap: true,
-      children: [
-        ListSectionTitle(
-          text: 'Sucediendo ahora',
-          visible: happeningEvents.isNotEmpty,
-        ),
-        Visibility(
-          visible: happeningEvents.isNotEmpty,
-          child: EventListView(
-            events: happeningEvents,
-          ),
-        ),
-        ListSectionTitle(
-          text: 'Hoy',
-          visible: todaysEvents.isNotEmpty,
-        ),
-        Visibility(
-          visible: todaysEvents.isNotEmpty,
-          child: EventListView(
-            events: todaysEvents,
-          ),
-        ),
-        ListSectionTitle(
-          text: 'Próximos 7 dias',
-          visible: nextWeekEvents.isNotEmpty,
-        ),
-        Visibility(
-          visible: nextWeekEvents.isNotEmpty,
-          child: EventListView(
-            events: nextWeekEvents,
-          ),
-        ),
-        ListSectionTitle(
-          text: 'Después',
-          visible: eventsAfterWeek.isNotEmpty,
-        ),
-        Visibility(
-          visible: eventsAfterWeek.isNotEmpty,
-          child: EventListView(
-            events: eventsAfterWeek,
-          ),
-        ),
-        Visibility(
-          visible: pastEvents.isNotEmpty,
-          child: TextButton(
+
+    return Scaffold(
+        floatingActionButton: Visibility(
+          visible: cloudUser.isNeighborhoodAdmin,
+          child: FloatingActionButton(
               onPressed: () =>
-                  toggleViewPastEvents.value = !toggleViewPastEvents.value,
-              child: toggleViewPastEvents.value
-                  ? Text('Ocultar')
-                  : Text('Ver Eventos Pasados')),
+                  context.read<AppBloc>().add(AppEventGoToEditEventView()),
+              child: const Icon(Icons.add)),
         ),
-        Visibility(
-          visible: pastEvents.isNotEmpty && !toggleViewPastEvents.value,
-          child: SizedBox(height: 170),
-        ),
-        Visibility(
-          visible: pastEvents.isNotEmpty && toggleViewPastEvents.value,
-          child: EventListView(
-            events: pastEvents,
-          ),
-        ),
-      ],
-    );
+        body: ListView(
+          shrinkWrap: true,
+          children: [
+            ListSectionTitle(
+              text: 'Sucediendo ahora',
+              visible: happeningEvents.isNotEmpty,
+            ),
+            Visibility(
+              visible: happeningEvents.isNotEmpty,
+              child: EventListView(
+                events: happeningEvents,
+              ),
+            ),
+            ListSectionTitle(
+              text: 'Hoy',
+              visible: todaysEvents.isNotEmpty,
+            ),
+            Visibility(
+              visible: todaysEvents.isNotEmpty,
+              child: EventListView(
+                events: todaysEvents,
+              ),
+            ),
+            ListSectionTitle(
+              text: 'Próximos 7 dias',
+              visible: nextWeekEvents.isNotEmpty,
+            ),
+            Visibility(
+              visible: nextWeekEvents.isNotEmpty,
+              child: EventListView(
+                events: nextWeekEvents,
+              ),
+            ),
+            ListSectionTitle(
+              text: 'Después',
+              visible: eventsAfterWeek.isNotEmpty,
+            ),
+            Visibility(
+              visible: eventsAfterWeek.isNotEmpty,
+              child: EventListView(
+                events: eventsAfterWeek,
+              ),
+            ),
+            Visibility(
+              visible: pastEvents.isNotEmpty,
+              child: TextButton(
+                  onPressed: () =>
+                      toggleViewPastEvents.value = !toggleViewPastEvents.value,
+                  child: toggleViewPastEvents.value
+                      ? Text('Ocultar')
+                      : Text('Ver Eventos Pasados')),
+            ),
+            Visibility(
+              visible: pastEvents.isNotEmpty && !toggleViewPastEvents.value,
+              child: SizedBox(height: 170),
+            ),
+            Visibility(
+              visible: pastEvents.isNotEmpty && toggleViewPastEvents.value,
+              child: EventListView(
+                events: pastEvents,
+              ),
+            ),
+          ],
+        ));
   }
 }
 
