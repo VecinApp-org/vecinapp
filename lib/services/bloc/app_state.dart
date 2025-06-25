@@ -145,11 +145,20 @@ class AppStateConfirmingHomeAddress extends AppState {
 }
 
 class AppStateNoNeighborhood extends AppState with EquatableMixin {
-  const AppStateNoNeighborhood({required bool isLoading, required exception})
-      : super(isLoading: isLoading, exception: exception);
+  const AppStateNoNeighborhood({
+    required bool isLoading,
+    required exception,
+    required CloudUser cloudUser,
+    required Household household,
+  }) : super(
+          isLoading: isLoading,
+          exception: exception,
+          cloudUser: cloudUser,
+          household: household,
+        );
 
   @override
-  List<Object?> get props => [exception, isLoading];
+  List<Object?> get props => [exception, isLoading, cloudUser, household];
 }
 
 class AppStateWelcomeToNeighborhood extends AppState {
@@ -163,12 +172,14 @@ class AppStateViewingNeighborhood extends AppState with EquatableMixin {
     required exception,
     required bool isLoading,
     required CloudUser cloudUser,
+    required Household household,
     required Neighborhood neighborhood,
   }) : super(
           isLoading: isLoading,
           exception: exception,
           cloudUser: cloudUser,
           neighborhood: neighborhood,
+          household: household,
         );
 
   @override
@@ -182,6 +193,7 @@ class AppStateViewingProfile extends AppState with EquatableMixin {
     required AuthUser user,
     required CloudUser cloudUser,
     required Household? household,
+    required Neighborhood? neighborhood,
     String? loadingText,
   }) : super(
           isLoading: isLoading,
@@ -190,6 +202,7 @@ class AppStateViewingProfile extends AppState with EquatableMixin {
           loadingText: loadingText,
           cloudUser: cloudUser,
           household: household,
+          neighborhood: neighborhood,
         );
 
   @override

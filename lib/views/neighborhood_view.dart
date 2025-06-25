@@ -1,29 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:vecinapp/services/bloc/app_bloc.dart';
+import 'package:vecinapp/utilities/entities/cloud_household.dart';
+import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/views/events/events_view.dart';
 import 'package:vecinapp/views/forum/forum_view.dart';
 import 'package:vecinapp/views/pooling/pooling_view.dart';
+import 'package:vecinapp/views/profile_view.dart';
 import 'package:vecinapp/views/reports/reports_view.dart';
 import 'package:vecinapp/views/rulebooks/rulebooks_view.dart';
 
 class NeighborhoodView extends HookWidget {
   const NeighborhoodView(
-      {super.key, required this.neighborhood, this.selectedIndex});
+      {super.key,
+      required this.neighborhood,
+      this.selectedIndex,
+      required this.household,
+      required this.cloudUser});
   final int? selectedIndex;
   final Neighborhood neighborhood;
+  final Household household;
+  final CloudUser cloudUser;
 
   @override
   Widget build(BuildContext context) {
     final pageController = usePageController(initialPage: selectedIndex ?? 0);
     final currentPageIndex = useState(selectedIndex ?? 0);
-    final cloudUser = context.read<AppBloc>().state.cloudUser!;
     return Scaffold(
         key: const Key('neighborhoodView'),
         bottomNavigationBar: NavigationBar(
-          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
           onDestinationSelected: (int index) async {
             currentPageIndex.value = index;
             await pageController.animateToPage(
@@ -59,6 +65,10 @@ class NeighborhoodView extends HookWidget {
               selectedIcon: Icon(Icons.payments),
               label: 'Caja',
             ),
+            NavigationDestination(
+                icon: Icon(Icons.person),
+                selectedIcon: Icon(Icons.person),
+                label: 'Perfil'),
           ],
         ),
         body: PageView(
@@ -73,6 +83,10 @@ class NeighborhoodView extends HookWidget {
             ReportsView(),
             RulebooksView(cloudUser: cloudUser),
             PoolingView(cloudUser: cloudUser),
+            ProfileView(
+                cloudUser: cloudUser,
+                household: household,
+                neighborhood: neighborhood),
           ],
         ));
   }

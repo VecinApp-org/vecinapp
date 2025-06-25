@@ -7,6 +7,8 @@ class PoolingView extends StatelessWidget {
   final CloudUser cloudUser;
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Caja WIP'));
+    return Scaffold(
+        appBar: AppBar(title: Text('Caja')),
+        body: Center(child: Text('Caja WIP')));
   }
 }

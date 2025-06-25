@@ -36,6 +36,10 @@ class AppEventGoToLogin extends AppEvent {
   const AppEventGoToLogin();
 }
 
+class AppEventGoToNoNeighborhoodView extends AppEvent {
+  const AppEventGoToNoNeighborhoodView();
+}
+
 // AUTHENTICATION EVENTS
 class AppEventRegisterWithEmailAndPassword extends AppEvent {
   final String email;

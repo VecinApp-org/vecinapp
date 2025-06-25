@@ -67,6 +67,9 @@ class EventsView extends HookWidget {
     final toggleViewPastEvents = useState<bool>(false);
 
     return Scaffold(
+        appBar: AppBar(
+          title: const Text('Eventos'),
+        ),
         floatingActionButton: Visibility(
           visible: cloudUser.isNeighborhoodAdmin,
           child: FloatingActionButton(

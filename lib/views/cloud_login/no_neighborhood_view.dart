@@ -2,52 +2,45 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
+import 'package:vecinapp/utilities/entities/cloud_household.dart';
+import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/widgets/centered_view.dart';
+import 'package:vecinapp/utilities/widgets/profile_picture.dart';
 
 class NoNeighborhoodView extends StatelessWidget {
-  const NoNeighborhoodView({super.key});
+  const NoNeighborhoodView(
+      {super.key, required this.cloudUser, required this.household});
+  final CloudUser cloudUser;
+  final Household household;
   @override
   Widget build(BuildContext context) {
-    context.read<AppBloc>().add(const AppEventLookForNeighborhood());
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          PopupMenuButton<AddressActions>(
-            onSelected: (value) {
-              switch (value) {
-                case AddressActions.changeAddress:
-                  context.read<AppBloc>().add(const AppEventExitHousehold());
-                  break;
-                case AddressActions.logOut:
-                  context.read<AppBloc>().add(const AppEventLogOut());
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: AddressActions.changeAddress,
-                child: Text('Salir de la casa'),
-              ),
-              const PopupMenuItem(
-                value: AddressActions.logOut,
-                child: Text('Cerrar Sesión'),
-              )
-            ],
-          )
+        actions: <Widget>[
+          Padding(
+              padding: const EdgeInsets.only(right: 13.0),
+              child: GestureDetector(
+                  onTap: () => context
+                      .read<AppBloc>()
+                      .add(const AppEventGoToProfileView()),
+                  child: ProfilePicture(
+                    radius: 16,
+                    id: cloudUser.id,
+                  )))
         ],
       ),
       body: CenteredView(
         children: [
           Text(
-            'Sin Vecindad',
-            style: Theme.of(context).textTheme.headlineLarge,
+            'Tu casa aún no está asociada a ninguna vecindad.',
+            style: Theme.of(context).textTheme.headlineMedium,
           ),
           const SizedBox(height: 55),
-          TextButton(
+          FilledButton(
               onPressed: () => context
                   .read<AppBloc>()
                   .add(const AppEventLookForNeighborhood()),
-              child: const Text('Reintentar'))
+              child: const Text('Buscar vecindad'))
         ],
       ),
     );

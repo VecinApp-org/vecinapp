@@ -7,12 +7,17 @@ import 'package:vecinapp/utilities/dialogs/show_pic_edit_options_dialog.dart';
 import 'package:vecinapp/utilities/dialogs/single_text_input_dialog.dart';
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
+import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/utilities/widgets/profile_picture.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView(
-      {super.key, required this.cloudUser, required this.household});
+      {super.key,
+      required this.cloudUser,
+      required this.neighborhood,
+      required this.household});
   final CloudUser cloudUser;
+  final Neighborhood? neighborhood;
   final Household? household;
   @override
   Widget build(BuildContext context) {
@@ -21,19 +26,25 @@ class ProfileView extends StatelessWidget {
     if (household == null) {
       householdName = 'Sin Casa';
     } else {
-      householdName = '${household?.street} #${household?.number}';
+      householdName = '${household!.street} #${household!.number}';
+    }
+
+    late final String neighborhoodName;
+    if (neighborhood == null) {
+      neighborhoodName = 'Sin Barrio';
+    } else {
+      neighborhoodName = '${neighborhood!.neighborhoodName} ';
     }
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        leading: BackButton(
-          onPressed: () {
-            context.read<AppBloc>().add(const AppEventGoToNeighborhoodView());
-          },
-        ),
-        actions: [],
+        leading: (neighborhood == null)
+            ? BackButton(
+                onPressed: () => context
+                    .read<AppBloc>()
+                    .add(const AppEventGoToNoNeighborhoodView()),
+              )
+            : null,
       ),
       body: ListView(
         padding: const EdgeInsets.all(8.0),
@@ -98,29 +109,39 @@ class ProfileView extends StatelessWidget {
             },
           ),
           const SizedBox(height: 34),
-          ListTile(
-            leading: const Icon(Icons.home),
-            title: Text(householdName),
-            trailing: const Icon(Icons.arrow_right),
-            onTap: () {
-              if (household == null) {
-                return;
-              }
-              context
-                  .read<AppBloc>()
-                  .add(AppEventGoToHouseholdView(household: household!));
-            },
-          ),
-          ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Configuración'),
+          Visibility(
+            visible: household != null,
+            child: ListTile(
+              leading: const Icon(Icons.home),
+              title: Text(householdName),
               trailing: const Icon(Icons.arrow_right),
               onTap: () {
                 if (household == null) {
                   return;
+                } else {
+                  context
+                      .read<AppBloc>()
+                      .add(AppEventGoToHouseholdView(household: household!));
                 }
-                context.read<AppBloc>().add(AppEventGoToSettingsView());
-              }),
+              },
+            ),
+          ),
+          Visibility(
+            visible: neighborhood != null,
+            child: ListTile(
+                leading: const Icon(Icons.group),
+                title: Text(neighborhoodName),
+                trailing: const Icon(Icons.arrow_right),
+                onTap: () {}),
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text('Configuración'),
+            trailing: const Icon(Icons.arrow_right),
+            onTap: () {
+              context.read<AppBloc>().add(AppEventGoToSettingsView());
+            },
+          ),
         ],
       ),
     );

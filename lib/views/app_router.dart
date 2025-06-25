@@ -83,19 +83,34 @@ class AppBlocRouter extends StatelessWidget {
         } else if (state is AppStateNeedsVerification) {
           return const VerifyEmailView();
         } else if (state is AppStateViewingNeighborhood) {
-          return NeighborhoodView(neighborhood: state.neighborhood!);
-        } else if (state is AppStateViewingProfile) {
-          return ProfileView(
+          return NeighborhoodView(
             cloudUser: state.cloudUser!,
-            household: state.household,
+            neighborhood: state.neighborhood!,
+            household: state.household!,
           );
+        } else if (state is AppStateViewingProfile) {
+          if (state.neighborhood == null || state.household == null) {
+            return ProfileView(
+              cloudUser: state.cloudUser!,
+              neighborhood: state.neighborhood,
+              household: state.household,
+            );
+          } else {
+            return NeighborhoodView(
+                cloudUser: state.cloudUser!,
+                neighborhood: state.neighborhood!,
+                household: state.household!,
+                selectedIndex: NeighborhoodPageIndex.profile);
+          }
         } else if (state is AppStateViewingHousehold) {
           return HouseholdView(household: state.household!);
         } else if (state is AppStateViewingSettings) {
           return SettingsView();
         } else if (state is AppStateViewingRulebooks) {
           return NeighborhoodView(
+              cloudUser: state.cloudUser!,
               neighborhood: state.neighborhood!,
+              household: state.household!,
               selectedIndex: NeighborhoodPageIndex.rulebooks);
         } else if (state is AppStateEditingRulebook) {
           return EditRulebookView(rulebook: state.rulebook);
@@ -104,7 +119,9 @@ class AppBlocRouter extends StatelessWidget {
               rulebook: state.rulebook, cloudUser: state.cloudUser!);
         } else if (state is AppStateViewingEvents) {
           return NeighborhoodView(
+            cloudUser: state.cloudUser!,
             neighborhood: state.neighborhood!,
+            household: state.household!,
             selectedIndex: NeighborhoodPageIndex.events,
           );
         } else if (state is AppStateEditingEvent) {
@@ -119,7 +136,10 @@ class AppBlocRouter extends StatelessWidget {
         } else if (state is AppStateSelectingHomeAddress) {
           return const SelectAddressView();
         } else if (state is AppStateNoNeighborhood) {
-          return const NoNeighborhoodView();
+          return NoNeighborhoodView(
+            cloudUser: state.cloudUser!,
+            household: state.household!,
+          );
         } else if (state is AppStateConfirmingHomeAddress) {
           return ConfirmAddressView(addresses: state.addresses);
         } else if (state is AppStateError) {

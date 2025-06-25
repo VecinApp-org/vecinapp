@@ -25,6 +25,7 @@ class RulebooksView extends HookWidget {
     final list = rulebooks.data!.toList();
     list.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     return Scaffold(
+      appBar: AppBar(title: const Text('Reglamentos')),
       floatingActionButton: Visibility(
         visible: cloudUser.isNeighborhoodAdmin,
         child: FloatingActionButton(

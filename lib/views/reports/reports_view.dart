@@ -7,6 +7,8 @@ class ReportsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Reportes WIP'));
+    return Scaffold(
+        appBar: AppBar(title: const Text('Reportes')),
+        body: Center(child: Text('Reportes WIP')));
   }
 }

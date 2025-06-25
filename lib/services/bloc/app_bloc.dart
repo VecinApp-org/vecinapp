@@ -117,9 +117,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
         //check if user has a neighborhood
         if (cloudUser.neighborhoodId == null) {
-          emit(const AppStateNoNeighborhood(
+          emit(AppStateNoNeighborhood(
             isLoading: false,
             exception: null,
+            cloudUser: cloudUser,
+            household: household,
           ));
           return;
         }
@@ -130,9 +132,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         //check if Neighborhood does not exist, this would mean the neighborhood was deleted
         if (neighborhood == null) {
           await _cloudProvider.exitNeighborhood();
-          emit(const AppStateNoNeighborhood(
+          emit(AppStateNoNeighborhood(
             isLoading: false,
             exception: null,
+            cloudUser: cloudUser,
+            household: household,
           ));
           return;
         }
@@ -146,9 +150,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         final point = Point(x: household.latitude, y: household.longitude);
         if (Poly.isPointInPolygon(point, neighborhood.polygon) == false) {
           await _cloudProvider.exitNeighborhood();
-          emit(const AppStateNoNeighborhood(
+          emit(AppStateNoNeighborhood(
             isLoading: false,
             exception: null,
+            cloudUser: cloudUser,
+            household: household,
           ));
           return;
         }
@@ -159,6 +165,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           exception: null,
           isLoading: false,
           neighborhood: neighborhood,
+          household: household,
         ));
       } catch (e) {
         emit(AppStateError(
@@ -197,6 +204,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(const AppStateLoggingIn(
         exception: null,
         isLoading: false,
+      ));
+    });
+
+    on<AppEventGoToNoNeighborhoodView>((event, emit) async {
+      emit(AppStateNoNeighborhood(
+        exception: null,
+        isLoading: false,
+        cloudUser: state.cloudUser!,
+        household: state.household!,
       ));
     });
 
@@ -375,20 +391,24 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppEventGoToNeighborhoodView>((event, emit) async {
       final neighborhood = await _cloudProvider.cachedNeighborhood;
       final cloudUser = await _cloudProvider.cachedCloudUser;
+      final household = await _cloudProvider.cachedHousehold;
       emit(AppStateViewingNeighborhood(
         cloudUser: cloudUser!,
         isLoading: false,
         exception: null,
         neighborhood: neighborhood!,
+        household: household!,
       ));
     });
 
     on<AppEventGoToProfileView>((event, emit) async {
       final user = _authProvider.currentUser;
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      final household = await _cloudProvider.cachedHousehold;
+      final cloudUser = await _cloudProvider.currentCloudUser;
+      final household = await _cloudProvider.currentHousehold;
+      final neighborhood = await _cloudProvider.currentNeighborhood;
       emit(AppStateViewingProfile(
         cloudUser: cloudUser!,
+        neighborhood: neighborhood,
         household: household,
         user: user!,
         isLoading: false,
@@ -538,6 +558,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
       final updatedCloudUser = await _cloudProvider.currentCloudUser;
       final neighborhood = await _cloudProvider.currentNeighborhood;
+      final household = await _cloudProvider.currentHousehold;
       //if the user has a neighborhood, send to viewing neighborhood
       if (updatedCloudUser!.neighborhoodId != null) {
         emit(AppStateViewingNeighborhood(
@@ -545,12 +566,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           isLoading: false,
           exception: null,
           neighborhood: neighborhood!,
+          household: household!,
         ));
       } else {
         //Send No Neighborhood (this view should try to find a neighborhood for the user's home)
-        emit(const AppStateNoNeighborhood(
+        emit(AppStateNoNeighborhood(
           isLoading: false,
           exception: null,
+          cloudUser: updatedCloudUser,
+          household: household!,
         ));
       }
     });
@@ -565,6 +589,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(AppStateNoNeighborhood(
         isLoading: true,
         exception: null,
+        cloudUser: state.cloudUser!,
+        household: state.household!,
       ));
       //change the user's neighborhood
       try {
@@ -574,17 +600,21 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         emit(AppStateNoNeighborhood(
           isLoading: false,
           exception: null,
+          cloudUser: state.cloudUser!,
+          household: state.household!,
         ));
         return;
       }
       //send to viewing neighborhood
       final updatedCloudUser = await _cloudProvider.currentCloudUser;
       final neighborhood = await _cloudProvider.currentNeighborhood;
+      final household = await _cloudProvider.currentHousehold;
       emit(AppStateViewingNeighborhood(
         cloudUser: updatedCloudUser!,
         isLoading: false,
         exception: null,
         neighborhood: neighborhood!,
+        household: household!,
       ));
     });
 
@@ -613,9 +643,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final user = _authProvider.currentUser;
       final cloudUser = await _cloudProvider.currentCloudUser;
       final household = state.household;
+      final neighborhood = state.neighborhood;
       emit(AppStateViewingProfile(
         cloudUser: cloudUser!,
         household: household,
+        neighborhood: neighborhood,
         user: user!,
         exception: null,
         isLoading: true,
@@ -631,6 +663,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         emit(AppStateViewingProfile(
           cloudUser: cloudUser,
           household: household,
+          neighborhood: neighborhood,
           user: user,
           exception: e,
           isLoading: false,
@@ -643,6 +676,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(AppStateViewingProfile(
         cloudUser: updatedUser!,
         household: household,
+        neighborhood: neighborhood,
         user: user,
         exception: null,
         isLoading: false,
@@ -660,9 +694,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final user = _authProvider.currentUser;
       final cloudUser = await _cloudProvider.cachedCloudUser;
       final household = state.household;
+      final neighborhood = state.neighborhood;
       emit(AppStateViewingProfile(
         cloudUser: cloudUser!,
         household: household,
+        neighborhood: neighborhood,
         user: user!,
         exception: null,
         isLoading: true,
@@ -680,6 +716,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         emit(AppStateViewingProfile(
           cloudUser: cloudUser,
           household: household,
+          neighborhood: neighborhood,
           user: user,
           exception: e,
           isLoading: false,
@@ -689,6 +726,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(AppStateViewingProfile(
         cloudUser: cloudUser,
         household: household,
+        neighborhood: neighborhood,
         user: user,
         exception: null,
         isLoading: false,
@@ -706,9 +744,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         final user = _authProvider.currentUser!;
         final cloudUser = await _cloudProvider.cachedCloudUser;
         final household = state.household;
+        final neighborhood = state.neighborhood;
         emit(AppStateViewingProfile(
           cloudUser: cloudUser!,
           household: household,
+          neighborhood: neighborhood,
           user: user,
           exception: null,
           isLoading: true,
@@ -721,6 +761,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           emit(AppStateViewingProfile(
             cloudUser: cloudUser,
             household: household,
+            neighborhood: neighborhood,
             user: user,
             exception: e,
             isLoading: false,
@@ -730,6 +771,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         emit(AppStateViewingProfile(
           cloudUser: cloudUser,
           household: household,
+          neighborhood: neighborhood,
           user: user,
           exception: null,
           isLoading: false,
@@ -982,6 +1024,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       //enable loading indicator
       final cloudUser = await _cloudProvider.cachedCloudUser;
       final neighborhood = await _cloudProvider.cachedNeighborhood;
+      final household = await _cloudProvider.cachedHousehold;
       emit(AppStateViewingEventDetails(
         event: state.event!,
         isLoading: true,
@@ -1007,6 +1050,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         isLoading: false,
         exception: null,
         cloudUser: cloudUser,
+        household: household!,
       ));
     });
   }

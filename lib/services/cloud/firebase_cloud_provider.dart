@@ -436,6 +436,7 @@ class FirebaseCloudProvider implements CloudProvider {
   Future<Household?> get currentHousehold async {
     final user = await cachedCloudUser;
     if (user == null) return null;
+    if (user.householdId == null) return null;
     return await _households.doc(user.householdId!).get().then((value) {
       if (!value.exists) return null;
       return Household.fromSnapshot(value);
@@ -446,6 +447,7 @@ class FirebaseCloudProvider implements CloudProvider {
   Future<Household?> get cachedHousehold async {
     final user = await cachedCloudUser;
     if (user == null) return null;
+    if (user.householdId == null) return null;
     return await _households
         .doc(user.householdId!)
         .get(GetOptions(source: Source.cache))
@@ -541,6 +543,7 @@ class FirebaseCloudProvider implements CloudProvider {
   Future<Neighborhood?> get currentNeighborhood async {
     final user = await cachedCloudUser;
     if (user == null) return null;
+    if (user.neighborhoodId == null) return null;
     return await _neighborhood(neighborhoodId: user.neighborhoodId!)
         .get()
         .then((value) {
@@ -553,6 +556,7 @@ class FirebaseCloudProvider implements CloudProvider {
   Future<Neighborhood?> get cachedNeighborhood async {
     final user = await cachedCloudUser;
     if (user == null) return null;
+    if (user.neighborhoodId == null) return null;
     return await _neighborhood(neighborhoodId: user.neighborhoodId!)
         .get(GetOptions(source: Source.cache))
         .then((value) {
