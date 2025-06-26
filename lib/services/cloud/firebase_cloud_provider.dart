@@ -242,14 +242,17 @@ class FirebaseCloudProvider implements CloudProvider {
   Stream<Iterable<Event>> neighborhoodEvents({
     required String neighborhoodId,
   }) {
-    final allEvents = _events(neighborhoodId: neighborhoodId).snapshots().map(
+    final upcomingEvents = _events(neighborhoodId: neighborhoodId)
+        .where(eventDateEndFieldName, isGreaterThan: DateTime.now())
+        .snapshots()
+        .map(
       (event) {
         return event.docs.map((doc) {
           return Event.fromSnapshot(doc);
         });
       },
     );
-    return allEvents;
+    return upcomingEvents;
   }
 
   @override

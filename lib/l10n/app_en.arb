@@ -1,0 +1,22 @@
+{
+  "@@locale": "en",
+  "appTitle": "Community Security App",
+  "happeningNow": "Happening Now, ends at {time}",
+  "@happeningNow": {
+    "description": "A message indicating an event is currently active.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "16:00"
+      }
+    }
+  },
+  "tomorrow": "Tomorrow, {dateTime}",
+  "@tomorrow": {
+    "placeholders": {
+      "dateTime": {
+        "type": "String"
+      }
+    }
+  }
+}

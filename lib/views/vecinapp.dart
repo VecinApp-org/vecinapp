@@ -6,8 +6,7 @@ import 'package:vecinapp/services/settings/settings_controller.dart';
 import 'package:vecinapp/services/storage/storage_provider.dart';
 import 'package:vecinapp/views/app_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-//import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-//import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/settings/theme_constants.dart';
@@ -40,6 +39,8 @@ class VecinApp extends StatelessWidget {
           listenable: settingsController,
           builder: (BuildContext context, Widget? child) {
             return MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
               debugShowCheckedModeBanner: false,
               restorationScopeId: 'vecinapp',
               theme: lightTheme,
@@ -51,35 +52,3 @@ class VecinApp extends StatelessWidget {
     );
   }
 }
-
-/* REMOVED FROM MATERIAL APP FOR LATER USE WHEN I LEARN ABOUT LOCALIZATIONS AND DEEPLINKS
-//Localizations
-localizationsDelegates: const [
-  AppLocalizations.delegate,
-  GlobalMaterialLocalizations.delegate,
-  GlobalWidgetsLocalizations.delegate,
-  GlobalCupertinoLocalizations.delegate,
-],
-supportedLocales: const [
-  Locale('en', ''), // English, no country code
-],
-onGenerateTitle: (BuildContext context) =>
-    AppLocalizations.of(context)!.appTitle,
-
-//Deep links
-onGenerateRoute: (RouteSettings routeSettings) {
-  devtools.log('onGenerateRoute ${routeSettings.name}');
-  return MaterialPageRoute<void>(
-    settings: routeSettings,
-    builder: (BuildContext context) {
-      devtools.log('builder ${routeSettings.name}');
-      switch (routeSettings.name) {
-        case settingsRouteName:
-          return SettingsView(controller: settingsController);
-        default:
-          return const AppRoot();
-      }
-    },
-  );
-},
-*/

@@ -1,0 +1,6 @@
+{
+  "@@locale": "es",
+  "appTitle": "App de Vecinos",
+  "happeningNow": "Sucediendo Ahora, termina a las {time}",
+  "tomorrow": "Mañana, {dateTime}"
+}

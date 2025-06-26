@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vecinapp/extensions/formatting/format_event_date_time.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/entities/event.dart';
-import 'package:intl/intl.dart';
 
 class EventListView extends StatelessWidget {
   final List<Event> events;
@@ -41,7 +41,7 @@ class EventListView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '📅  ${DateFormat.EEEE().add_d().add_MMMM().add_jm().format(event.dateStart)}',
+                  '📅  ${formatEventDateTime(event.dateStart, endTime: event.dateEnd)}',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
                 const SizedBox(height: 3),
