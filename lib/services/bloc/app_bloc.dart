@@ -12,6 +12,7 @@ import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/event.dart';
+import 'package:vecinapp/utilities/entities/post.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 import 'package:vecinapp/services/geocoding/geocoding_exceptions.dart';
@@ -1067,6 +1068,54 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         household: household!,
       ));
     });
+
+    //Posts Routing
+    on<AppEventGoToPostsView>((event, emit) async {
+      final cloudUser = await _cloudProvider.cachedCloudUser;
+      final neighborhood = await _cloudProvider.cachedNeighborhood;
+      final household = await _cloudProvider.cachedHousehold;
+      emit(AppStateViewingPosts(
+        isLoading: false,
+        exception: null,
+        cloudUser: cloudUser,
+        neighborhood: neighborhood,
+        household: household,
+      ));
+    });
+    on<AppEventGoToCreatePostView>((event, emit) async {
+      emit(AppStateCreatingPost(
+        isLoading: false,
+        exception: null,
+      ));
+    });
+
+    //Posts Events
+    on<AppEventCreatePost>((event, emit) async {
+      //validate access
+      if (!await _isValidNeighborhoodAccess()) {
+        add(const AppEventReset());
+        return;
+      }
+      //enable loading indicator
+      emit(AppStateCreatingPost(isLoading: true, exception: null));
+      //create post
+      try {
+        await _cloudProvider.createNewPost(text: event.text);
+      } on Exception catch (e) {
+        emit(AppStateCreatingPost(isLoading: false, exception: e));
+        return;
+      }
+      final cloudUser = await _cloudProvider.cachedCloudUser;
+      final neighborhood = await _cloudProvider.cachedNeighborhood;
+      final household = await _cloudProvider.cachedHousehold;
+      emit(AppStateViewingPosts(
+        isLoading: false,
+        exception: null,
+        cloudUser: cloudUser,
+        neighborhood: neighborhood,
+        household: household,
+      ));
+    });
   }
 
   //Private methods
@@ -1186,6 +1235,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   Stream<Iterable<Event>> get events async* {
     final cloudUSer = await _cloudProvider.cachedCloudUser;
     yield* _cloudProvider.neighborhoodEvents(
+      neighborhoodId: cloudUSer!.neighborhoodId!,
+    );
+  }
+
+  Stream<Iterable<Post>> get posts async* {
+    final cloudUSer = await _cloudProvider.cachedCloudUser;
+    yield* _cloudProvider.neighborhoodPosts(
       neighborhoodId: cloudUSer!.neighborhoodId!,
     );
   }

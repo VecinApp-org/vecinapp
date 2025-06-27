@@ -17,6 +17,7 @@ import 'package:vecinapp/views/cloud_login/register_cloud_user_view.dart';
 import 'package:vecinapp/views/delete_account_view.dart';
 import 'package:vecinapp/views/events/edit_event_view.dart';
 import 'package:vecinapp/views/events/event_details_view.dart';
+import 'package:vecinapp/views/forum/create_post_view.dart';
 import 'package:vecinapp/views/household_view.dart';
 import 'package:vecinapp/views/login/welcome_view.dart';
 import 'package:vecinapp/views/login/forgot_password_view.dart';
@@ -127,11 +128,20 @@ class AppBlocRouter extends StatelessWidget {
             household: state.household!,
             selectedIndex: NeighborhoodPageIndex.events,
           );
+        } else if (state is AppStateViewingPosts) {
+          return NeighborhoodView(
+            cloudUser: state.cloudUser!,
+            neighborhood: state.neighborhood!,
+            household: state.household!,
+            selectedIndex: NeighborhoodPageIndex.forum,
+          );
         } else if (state is AppStateEditingEvent) {
           return EditEventView(event: state.event);
         } else if (state is AppStateViewingEventDetails) {
           return EventDetailsView(
               event: state.event, cloudUser: state.cloudUser!);
+        } else if (state is AppStateCreatingPost) {
+          return const CreatePostView();
         } else if (state is AppStateDeletingAccount) {
           return const DeleteAccountView();
         } else if (state is AppStateCreatingCloudUser) {

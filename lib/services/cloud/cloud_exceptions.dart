@@ -131,6 +131,22 @@ class EventDateInvalidCloudException extends CloudException {
       : super(message: 'La fecha del evento es demasiado lejana');
 }
 
+// Posts
+class CouldNotCreatePostException extends CloudException {
+  const CouldNotCreatePostException()
+      : super(message: 'No se pudo crear la publicación');
+}
+
+class CouldNotGetPostException extends CloudException {
+  const CouldNotGetPostException()
+      : super(message: 'No se pudo obtener la publicación');
+}
+
+class CouldNotDeletePostException extends CloudException {
+  const CouldNotDeletePostException()
+      : super(message: 'No se pudo borrar la publicación');
+}
+
 // Admin
 class PermissionDeniedCloudException extends CloudException {
   const PermissionDeniedCloudException() : super(message: 'Permiso denegado');

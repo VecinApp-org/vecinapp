@@ -3,6 +3,7 @@ import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:vecinapp/utilities/entities/latlng.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
+import 'package:vecinapp/utilities/entities/post.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 
@@ -235,4 +236,35 @@ class AppEventCreateOrUpdateEvent extends AppEvent {
 
 class AppEventDeleteEvent extends AppEvent {
   const AppEventDeleteEvent();
+}
+
+// POSTS ROUTING EVENTS
+class AppEventGoToPostsView extends AppEvent {
+  const AppEventGoToPostsView();
+}
+
+class AppEventGoToPostDetailsView extends AppEvent {
+  final Post post;
+  const AppEventGoToPostDetailsView({required this.post});
+}
+
+class AppEventGoToCreatePostView extends AppEvent {
+  const AppEventGoToCreatePostView();
+}
+
+// POSTS EVENTS
+
+class AppEventCreatePost extends AppEvent {
+  final String text;
+  const AppEventCreatePost({required this.text});
+}
+
+class AppEventUpdatePost extends AppEvent {
+  final Post post;
+  const AppEventUpdatePost({required this.post});
+}
+
+class AppEventDeletePost extends AppEvent {
+  final Post post;
+  const AppEventDeletePost({required this.post});
 }

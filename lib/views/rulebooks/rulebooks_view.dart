@@ -19,13 +19,13 @@ class RulebooksView extends HookWidget {
     }
 
     if (rulebooks.data!.isEmpty) {
-      return const Center(child: Text('No hay reglamentos'));
+      return const Center(child: Text('No hay recursos'));
     }
 
     final list = rulebooks.data!.toList();
     list.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     return Scaffold(
-      appBar: AppBar(title: const Text('Reglamentos')),
+      appBar: AppBar(title: const Text('Recursos')),
       floatingActionButton: Visibility(
         visible: cloudUser.isNeighborhoodAdmin,
         child: FloatingActionButton(

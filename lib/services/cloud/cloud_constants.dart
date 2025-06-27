@@ -44,3 +44,18 @@ const eventDateStartFieldName = 'date_start';
 const eventDateEndFieldName = 'date_end';
 const eventPlaceNameFieldName = 'place_name';
 const eventLocationFieldName = 'place_geopoint';
+
+// posts
+const postsCollectionName = 'posts';
+const postCreatorIdFieldName = 'creator_id';
+const postCreatorNameFieldName = 'creator_name';
+const postTextFieldName = 'text';
+const postTimeCreatedFieldName = 'time_created';
+const postImageUrlFieldName = 'image_url';
+
+// comments
+const commentsCollectionName = 'comments';
+const commentCreatorIdFieldName = 'creator_id';
+const commentCreatorNameFieldName = 'creator_name';
+const commentTextFieldName = 'text';
+const commentDateFieldName = 'time_created';

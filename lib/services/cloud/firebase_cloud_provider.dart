@@ -7,6 +7,7 @@ import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:vecinapp/utilities/entities/latlng.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
+import 'package:vecinapp/utilities/entities/post.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/services/cloud/cloud_constants.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
@@ -315,6 +316,77 @@ class FirebaseCloudProvider implements CloudProvider {
       return Event.fromDocument(doc);
     } catch (e) {
       throw CouldNotGetEventException();
+    }
+  }
+
+  // POSTS
+
+  CollectionReference<Map<String, dynamic>> _posts(
+          {required String neighborhoodId}) =>
+      _neighborhoods.doc(neighborhoodId).collection('posts');
+
+  DocumentReference<Map<String, dynamic>> _post(
+          {required String neighborhoodId, required String postId}) =>
+      _posts(neighborhoodId: neighborhoodId).doc(postId);
+
+  @override
+  Stream<Iterable<Post>> neighborhoodPosts({required String neighborhoodId}) {
+    return _posts(neighborhoodId: neighborhoodId).snapshots().map(
+      (post) {
+        return post.docs.map((doc) {
+          return Post.fromSnapshot(doc);
+        });
+      },
+    );
+  }
+
+  @override
+  Future<Post> createNewPost({required String? text}) async {
+    // check required fields
+    if (text == null || text.isEmpty) {
+      throw ChannelErrorCloudException();
+    }
+    // create post
+    try {
+      final user = await currentCloudUser;
+      final authuser = _authProvider.currentUser;
+      final doc = await _posts(neighborhoodId: user!.neighborhoodId!).add({
+        postCreatorIdFieldName: authuser!.uid,
+        postTextFieldName: text,
+        postCreatorNameFieldName: user.displayName,
+        postTimeCreatedFieldName: DateTime.now(),
+      }).then((doc) => doc.get().then((doc) => Post.fromDocument(doc)));
+      devtools.log(doc.toString());
+      devtools.log('The post was created');
+      return doc;
+    } catch (e) {
+      devtools.log(e.toString());
+      throw CouldNotCreatePostException();
+    }
+  }
+
+  @override
+  Future<Post> getPost({required String postId}) async {
+    try {
+      final user = await cachedCloudUser;
+      final doc = await _post(
+        neighborhoodId: user!.neighborhoodId!,
+        postId: postId,
+      ).get();
+      return Post.fromDocument(doc);
+    } catch (e) {
+      throw CouldNotGetPostException();
+    }
+  }
+
+  @override
+  Future<void> deletePost({required String postId}) async {
+    try {
+      final user = await currentCloudUser;
+      return _post(neighborhoodId: user!.neighborhoodId!, postId: postId)
+          .delete();
+    } catch (e) {
+      throw CouldNotDeletePostException();
     }
   }
 

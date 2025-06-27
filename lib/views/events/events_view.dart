@@ -12,7 +12,7 @@ class EventsView extends HookWidget {
   final CloudUser cloudUser;
   @override
   Widget build(BuildContext context) {
-    //get all events
+    //get upcoming events
     final stream = useMemoized(() => context.watch<AppBloc>().events);
     final snapshot = useStream(stream);
     //check if snapshot is null

@@ -4,6 +4,7 @@ import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:vecinapp/utilities/entities/latlng.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
+import 'package:vecinapp/utilities/entities/post.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 
@@ -99,4 +100,19 @@ abstract class CloudProvider {
   });
 
   Future<Event> getEvent({required String eventId});
+
+  // POSTS
+  Stream<Iterable<Post>> neighborhoodPosts({
+    required String neighborhoodId,
+  });
+
+  Future<Post> createNewPost({
+    required String? text,
+  });
+
+  Future<void> deletePost({
+    required String postId,
+  });
+
+  Future<Post> getPost({required String postId});
 }
