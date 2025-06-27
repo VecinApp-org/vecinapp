@@ -25,13 +25,16 @@ class EventsView extends HookWidget {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Próximos Eventos'),
-        ),
-        floatingActionButton: Visibility(
-          visible: cloudUser.isNeighborhoodAdmin,
-          child: FloatingActionButton(
-              onPressed: () =>
-                  context.read<AppBloc>().add(AppEventGoToEditEventView()),
-              child: const Icon(Icons.add)),
+          actions: [
+            Visibility(
+              visible: cloudUser.isNeighborhoodAdmin,
+              child: IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () =>
+                    context.read<AppBloc>().add(AppEventGoToEditEventView()),
+              ),
+            )
+          ],
         ),
         body: (events.isEmpty)
             ? const Center(child: Text('No hay eventos'))

@@ -25,14 +25,19 @@ class RulebooksView extends HookWidget {
     final list = rulebooks.data!.toList();
     list.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     return Scaffold(
-      appBar: AppBar(title: const Text('Recursos')),
-      floatingActionButton: Visibility(
-        visible: cloudUser.isNeighborhoodAdmin,
-        child: FloatingActionButton(
-          onPressed: () =>
-              context.read<AppBloc>().add(const AppEventGoToEditRulebookView()),
-          child: const Icon(Icons.add),
-        ),
+      appBar: AppBar(
+        title: const Text('Recursos'),
+        actions: [
+          Visibility(
+            visible: cloudUser.isNeighborhoodAdmin,
+            child: IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () => context
+                  .read<AppBloc>()
+                  .add(const AppEventGoToEditRulebookView()),
+            ),
+          )
+        ],
       ),
       body: SingleChildScrollView(child: RulebookListView(rulebooks: list)),
     );

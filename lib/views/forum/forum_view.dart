@@ -25,15 +25,16 @@ class ForumView extends HookWidget {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text(
-            'Foro',
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            context.read<AppBloc>().add(const AppEventGoToCreatePostView());
-          },
-          child: const Icon(Icons.add),
+          title: Text('Foro'),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  context
+                      .read<AppBloc>()
+                      .add(const AppEventGoToCreatePostView());
+                },
+                icon: const Icon(Icons.add))
+          ],
         ),
         body: (posts.isEmpty)
             ? const Center(child: Text('No hay eventos'))
