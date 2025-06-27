@@ -32,11 +32,7 @@ class NeighborhoodView extends HookWidget {
           labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
           onDestinationSelected: (int index) async {
             currentPageIndex.value = index;
-            await pageController.animateToPage(
-              index,
-              duration: kThemeAnimationDuration,
-              curve: Curves.easeInOut,
-            );
+            pageController.jumpToPage(index);
           },
           selectedIndex: currentPageIndex.value,
           destinations: const [
@@ -72,8 +68,9 @@ class NeighborhoodView extends HookWidget {
           ],
         ),
         body: PageView(
+          physics: const NeverScrollableScrollPhysics(),
           controller: pageController,
-          allowImplicitScrolling: true,
+          //allowImplicitScrolling: true,
           onPageChanged: (index) {
             currentPageIndex.value = index;
           },
