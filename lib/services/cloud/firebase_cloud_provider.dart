@@ -422,6 +422,14 @@ class FirebaseCloudProvider implements CloudProvider {
   }
 
   @override
+  Future<CloudUser?> userFromId({required String userId}) async {
+    final doc = await _users.doc(userId).get();
+    if (!doc.exists) return null;
+    if (doc.data() == null) return null;
+    return CloudUser.fromFirebase(doc: doc);
+  }
+
+  @override
   Future<void> createCloudUser({
     required String displayName,
   }) async {

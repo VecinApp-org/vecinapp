@@ -14,14 +14,17 @@ class CreatePostView extends HookWidget {
     return DocView(
         title: null,
         text: null,
-        appBarTitle: 'Crear Evento',
+        appBarTitle: 'Crear Publicación',
         appBarActions: [],
         appBarBackAction: () =>
             context.read<AppBloc>().add(const AppEventGoToPostsView()),
         more: [
           TextField(
             controller: textController,
-            decoration: const InputDecoration(labelText: 'Contenido'),
+            decoration: const InputDecoration(hintText: 'Escribe aquí...'),
+            autofocus: true,
+            maxLines: 10,
+            minLines: 3,
           ),
           FilledButton(
             onPressed: () {

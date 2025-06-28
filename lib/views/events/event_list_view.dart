@@ -22,7 +22,10 @@ class EventListView extends StatelessWidget {
       itemBuilder: (context, index) {
         final event = events.elementAt(index);
         return Card(
+          margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
           child: ListTile(
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             onTap: () {
               context.read<AppBloc>().add(
                     AppEventGoToEventDetailsView(
@@ -37,19 +40,22 @@ class EventListView extends StatelessWidget {
               softWrap: true,
               overflow: TextOverflow.ellipsis,
             ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '📅  ${formatEventDateTime(event.dateStart, endTime: event.dateEnd)}',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  '📍  ${event.placeName}',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '📅  ${formatEventDateTime(event.dateStart, endTime: event.dateEnd)}',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    '📍  ${event.placeName}',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
             ),
           ),
         );

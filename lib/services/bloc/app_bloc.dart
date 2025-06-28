@@ -1195,6 +1195,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
   }
 
+  Future<CloudUser?> userFromId(String userId) async {
+    if (userId.isEmpty) {
+      return null;
+    }
+    try {
+      return await _cloudProvider.userFromId(userId: userId);
+    } catch (e) {
+      return null;
+    }
+  }
+
   Stream<bool> get userVerificationStream async* {
     final user = _authProvider.currentUser!;
     if (user.isEmailVerified) yield true;

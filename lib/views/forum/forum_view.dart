@@ -17,7 +17,7 @@ class ForumView extends HookWidget {
     final snapshot = useStream(stream);
     //check if snapshot is null
     if (snapshot.data == null) {
-      return const Center(child: CircularProgressIndicator());
+      return Container();
     }
     final posts = snapshot.data!.toList();
     //sort posts

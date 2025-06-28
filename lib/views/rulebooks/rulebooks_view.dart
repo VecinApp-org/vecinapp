@@ -15,7 +15,7 @@ class RulebooksView extends HookWidget {
     final rulebooks = useStream(stream);
 
     if (rulebooks.data == null) {
-      return const Center(child: CircularProgressIndicator());
+      return Container();
     }
 
     if (rulebooks.data!.isEmpty) {

@@ -47,6 +47,8 @@ abstract class CloudProvider {
     required String householdId,
   });
 
+  Future<CloudUser?> userFromId({required String userId});
+
   Future<Household> otherHousehold({required String householdId});
 
   // RULEBOOKS
