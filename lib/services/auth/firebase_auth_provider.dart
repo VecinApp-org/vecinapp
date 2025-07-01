@@ -7,13 +7,21 @@ import 'package:vecinapp/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuth, FirebaseAuthException;
 
+import 'package:firebase_app_check/firebase_app_check.dart';
+
 import 'dart:developer' as devtools show log;
 
 class FirebaseAuthProvider implements AuthProvider {
   @override
   Future<void> initialize() async {
+    // Initialize Firebase
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
+    // Initialize FirebaseAppCheck
+    await FirebaseAppCheck.instance.activate(
+      androidProvider: AndroidProvider.playIntegrity,
+      appleProvider: AppleProvider.appAttest,
+    );
   }
 
   @override
