@@ -22,6 +22,7 @@ class ForumView extends HookWidget {
     final posts = snapshot.data!.toList();
     //sort posts
     posts.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    //gather data
 
     return Scaffold(
         appBar: AppBar(
@@ -37,7 +38,7 @@ class ForumView extends HookWidget {
           ],
         ),
         body: (posts.isEmpty)
-            ? const Center(child: Text('No hay eventos'))
+            ? const Center(child: Text('No hay publicaciones'))
             : ListView(
                 shrinkWrap: true,
                 children: [PostsListView(posts: posts)],

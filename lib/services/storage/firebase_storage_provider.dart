@@ -9,10 +9,12 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class FirebaseStorageProvider implements StorageProvider {
   late final Directory _cacheDir;
+  late final FirebaseStorage _storage;
 
   @override
-  Future<void> initialize() async {
-    _cacheDir = await getApplicationDocumentsDirectory();
+  Future initialize() async {
+    _cacheDir = await getTemporaryDirectory();
+    _storage = FirebaseStorage.instance;
   }
 
   @override
@@ -22,42 +24,30 @@ class FirebaseStorageProvider implements StorageProvider {
   }) async {
     // check if the image is too large
     const int maxSizeInBytes = 6 * 1024 * 1024;
-    if (image.lengthSync() > maxSizeInBytes) {
+    if (await image.length() > maxSizeInBytes) {
       throw ImageTooLargeStorageException();
     }
     try {
       // compress the image
       devtools.log('Compressing image...');
-      final compressedImage = await FlutterImageCompress.compressWithFile(
-        image.path,
-        minWidth: 200,
-        minHeight: 200,
-      );
-      // check if the image is compressed
-      if (compressedImage == null) {
-        devtools.log('Failed to compress image...');
-        throw CouldNotUploadImageStorageException();
-      }
-      // create a temporary file
-      final tempDir = await getTemporaryDirectory();
-      final tempFile = File('${tempDir.path}/temp_image');
-      await tempFile.writeAsBytes(compressedImage);
+      final compressedBytes = await _compressImage(image);
+
       // upload the image to Firebase Storage
       devtools.log('Uploading image...');
-      final downloadUrl = await FirebaseStorage.instance
-          .ref('user/$userId')
-          .child('profile_image')
-          .putFile(tempFile)
-          .then((value) => value.ref.getDownloadURL());
-      // delete the temporary file
-      await tempFile.delete();
-      // save the image to the cache directory
-      devtools.log('Saving image to cache directory...');
-      final cacheDir = await getApplicationDocumentsDirectory();
-      final cacheFile = File('${cacheDir.path}/$userId/profile_image');
-      cacheFile.createSync(recursive: true);
-      cacheFile.writeAsBytesSync(compressedImage);
-      // return the download URL
+      final filePath = 'user/$userId/profile_image';
+      final storageRef = _storage.ref(filePath);
+
+      // Set content type for proper display in browsers and for Firebase Rules
+      final metadata = SettableMetadata(contentType: 'image/jpeg');
+
+      final uploadTask = storageRef.putData(compressedBytes, metadata);
+      final snapshot = await uploadTask.whenComplete(() => {});
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+      // 4. Update local cache asynchronously and efficiently
+      devtools.log('Updating local cache...');
+      await _updateCache(userId: userId, imageBytes: compressedBytes);
+
       return downloadUrl;
     } on FirebaseException catch (e) {
       switch (e.code) {
@@ -76,64 +66,133 @@ class FirebaseStorageProvider implements StorageProvider {
 
   @override
   Future<Uint8List?> getProfileImage({required String userId}) async {
-    // create a cache directory
+    devtools.log('$userId getProfileImage...');
     final cacheFile = File('${_cacheDir.path}/$userId/profile_image');
+    late final bool cacheExists;
+    // read the image from the cache
+    try {
+      cacheExists = cacheFile.existsSync();
+      if (cacheExists) {
+        final lastModified = cacheFile.lastModifiedSync();
+        if (lastModified
+            .isAfter(DateTime.now().subtract(const Duration(minutes: 1)))) {
+          devtools.log('$userId Fresh. Read image from local cache.');
+          return await cacheFile.readAsBytes();
+        }
+      }
+    } catch (_) {}
 
-    // check if the file exists
-    if (cacheFile.existsSync()) {
-      // return the cached image
-      return cacheFile.readAsBytes();
-    }
-    late final Uint8List? imageBytes;
+    // read the image from Firebase Storage
     try {
       final filePath = 'user/$userId/profile_image';
-      //check if the image exists in Firebase Storage
-      final storageRef = FirebaseStorage.instance.ref(filePath);
-      final listResult = await storageRef.list();
-      if (listResult.items.isNotEmpty) {
-        // return the image from Firebase Storage
-        imageBytes = await FirebaseStorage.instance.ref(filePath).getData();
-      } else {
+      return await _storage.ref(filePath).getData().then((file) async {
+        if (file != null) {
+          cacheFile.createSync(recursive: true);
+          await cacheFile
+              .writeAsBytes(file)
+              .then((file) => file.setLastModifiedSync(DateTime.now()));
+        }
+        devtools.log('$userId Read image from Firebase Storage.');
+        return file;
+      });
+    } on FirebaseException catch (e) {
+      if (e.code == 'object-not-found') {
+        if (cacheExists) {
+          devtools.log('$userId deleted image from local cache...');
+          cacheFile.deleteSync();
+        }
+        devtools.log('$userId Image did not exist in Storage...');
         return null;
       }
-    } catch (e) {
+      // return the image from the cache
+      if (cacheExists) {
+        devtools.log('Reading image from local cache after Firebase error...');
+        return await cacheFile.readAsBytes();
+      }
+      return null;
+    } catch (_) {
+      if (cacheExists) {
+        devtools.log('Reading image from local cache after error...');
+        return await cacheFile.readAsBytes();
+      }
       return null;
     }
-    if (imageBytes == null) {
-      return null;
-    }
-    // save the image to the cache directory
-    cacheFile.createSync(recursive: true);
-    cacheFile.writeAsBytesSync(imageBytes);
-    return imageBytes;
   }
 
   @override
   Future<void> deleteProfileImage({required String userId}) async {
-    // delete the image from Firebase Storage
+    final filePath = 'user/$userId/profile_image';
+    final storageRef = _storage.ref(filePath);
+
     try {
-      final filePath = 'user/$userId/profile_image';
-      await FirebaseStorage.instance.ref(filePath).delete();
+      // 1. Attempt to delete the remote file from Firebase Storage.
+      devtools.log('Attempting to delete image from Firebase Storage...');
+      await storageRef.delete();
+      devtools.log('Remote image deleted successfully.');
     } on FirebaseException catch (e) {
-      switch (e.code) {
-        case 'object-not-found':
-          return;
-        default:
-          throw CouldNotDeleteImageStorageException();
+      // If the file doesn't exist, it's a success from the user's perspective.
+      // The goal is for the image to be gone, and it already is.
+      if (e.code == 'object-not-found') {
+        devtools.log('Image did not exist in Storage. No action needed.');
+      } else {
+        // This indicates a more serious problem, like a permissions error.
+        devtools.log('Firebase error during deletion: ${e.message}');
+        throw CouldNotDeleteImageStorageException();
       }
     } catch (e) {
+      devtools.log('An unexpected error occurred during remote deletion: $e');
       throw GenericStorageException();
     }
-    // delete the image from the cache directory
+
+    // 2. Attempt to delete the local file from the cache.
+    // This is done in a separate try-catch because failing to delete the
+    // cached file should not prevent the overall operation from succeeding.
+    await _deleteFromCache(userId: userId);
+  }
+
+  /// Helper function to remove an image from the local cache.
+  Future<void> _deleteFromCache({required String userId}) async {
+    final cacheFile = File('${_cacheDir.path}/$userId/profile_image');
     try {
-      final cacheDir = await getApplicationDocumentsDirectory();
-      final cacheFile = File('${cacheDir.path}/$userId/profile_image');
-      if (cacheFile.existsSync()) {
+      if (await cacheFile.exists()) {
+        devtools.log('Deleting image from local cache...');
         await cacheFile.delete();
+        devtools.log('Local cache deleted successfully.');
       }
-    } catch (_) {
-      // ignore
+    } catch (e) {
+      // Log the error, but don't re-throw it.
+      // The remote deletion was the most critical part.
+      devtools.log('Failed to delete from local cache: $e');
     }
-    devtools.log('Profile image deleted');
+  }
+
+  // Helper function for compression logic
+  Future<Uint8List> _compressImage(File file) async {
+    devtools.log('Compressing image...');
+    final result = await FlutterImageCompress.compressWithFile(
+      file.absolute.path,
+      minWidth: 512,
+      minHeight: 512,
+      quality: 85, // Adjust quality for a good balance
+    );
+
+    if (result == null) {
+      devtools.log('Image compression failed.');
+      throw Exception('Failed to compress image.'); // Custom internal exception
+    }
+    return result;
+  }
+
+  // Helper function for updating the cache
+  Future<void> _updateCache(
+      {required String userId, required Uint8List imageBytes}) async {
+    final cacheFile = File('${_cacheDir.path}/$userId/profile_image');
+    try {
+      await cacheFile.create(recursive: true);
+      await cacheFile.writeAsBytes(imageBytes);
+    } catch (e) {
+      devtools.log("Failed to update local cache: $e");
+      // Don't throw here, failing to cache shouldn't fail the whole upload
+    }
   }
 }
