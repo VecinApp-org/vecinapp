@@ -334,7 +334,7 @@ class FirebaseCloudProvider implements CloudProvider {
     return _posts(neighborhoodId: neighborhoodId).snapshots().map(
       (post) {
         return post.docs.map((doc) {
-          return Post.fromSnapshot(doc);
+          return Post.fromSnapshot(snapshot: doc);
         });
       },
     );
@@ -353,7 +353,6 @@ class FirebaseCloudProvider implements CloudProvider {
       final doc = await _posts(neighborhoodId: user!.neighborhoodId!).add({
         postCreatorIdFieldName: authuser!.uid,
         postTextFieldName: text,
-        postCreatorNameFieldName: user.displayName,
         postTimeCreatedFieldName: DateTime.now(),
       }).then((doc) => doc.get().then((doc) => Post.fromDocument(doc)));
       devtools.log(doc.toString());

@@ -5,57 +5,41 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 
 class ProfilePicture extends StatelessWidget {
-  const ProfilePicture({super.key, this.radius = 40, this.id = '', this.image});
+  const ProfilePicture({super.key, this.radius = 40, this.id, this.image});
 
   final Uint8List? image;
   final double radius;
-  final String id;
+  final String? id;
 
   @override
   Widget build(BuildContext context) {
-    if (image != null) {
-      return CircleAvatar(
-        radius: radius,
-        foregroundImage: Image.memory(image!).image,
-      );
-    }
-    if (id.isEmpty) {
-      return CircleAvatar(
-        radius: radius,
-        backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-        foregroundColor: Theme.of(context).colorScheme.onSurface,
-        child: Icon(
-          Icons.person_2_rounded,
-          size: radius * 1.5,
-        ),
-      );
-    }
     final profilePicture = context.watch<AppBloc>().profilePicture(userId: id);
     return FutureBuilder(
       future: profilePicture,
       builder: (context, snapshot) {
-        if (snapshot.data != null) {
-          return CircleAvatar(
-            radius: radius,
-            foregroundImage: Image.memory(snapshot.data!).image,
-          );
+        late final ImageProvider<Object>? imageData;
+        if (image != null) {
+          imageData = Image.memory(image!).image;
         } else {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return CircleAvatar(
-              radius: radius,
-              foregroundColor: Theme.of(context).colorScheme.onSurface,
-              backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-              child: Icon(
-                Icons.person_2_rounded,
-                size: radius * 1.5,
-              ),
-            );
+          if (snapshot.hasData) {
+            imageData = Image.memory(snapshot.data!).image;
+          } else {
+            imageData = null;
           }
-          return CircleAvatar(
-            radius: radius,
-            backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-          );
         }
+
+        return CircleAvatar(
+          radius: radius,
+          foregroundImage: imageData,
+          backgroundColor:
+              Theme.of(context).colorScheme.surfaceContainerHighest,
+          foregroundColor: Theme.of(context).colorScheme.onSurface,
+          child: Icon(
+            Icons.person_2_rounded,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            size: radius * 1.5,
+          ),
+        );
       },
     );
   }

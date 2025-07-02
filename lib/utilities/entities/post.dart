@@ -7,29 +7,37 @@ class Post {
   final String id;
   final String text;
   final String authorId;
-  final String authorName;
   final DateTime timestamp;
+  final int likeCount;
+  final int commentCount;
 
   const Post({
     required this.id,
     required this.text,
     required this.authorId,
-    required this.authorName,
     required this.timestamp,
+    required this.likeCount,
+    required this.commentCount,
   });
 
-  Post.fromSnapshot(QueryDocumentSnapshot<Map<String, dynamic>> snapshot)
-      : id = snapshot.id,
-        text = snapshot.data()[postTextFieldName] as String,
-        authorId = snapshot.data()[postCreatorIdFieldName] as String,
-        authorName = snapshot.data()[postCreatorNameFieldName] as String,
-        timestamp =
-            snapshot.data()[postTimeCreatedFieldName].toDate() as DateTime;
+  factory Post.fromSnapshot(
+      {required QueryDocumentSnapshot<Map<String?, dynamic>> snapshot}) {
+    final data = snapshot.data();
+    return Post(
+      id: snapshot.id,
+      authorId: data[postCreatorIdFieldName] as String,
+      text: data[postTextFieldName] as String,
+      timestamp: data[postTimeCreatedFieldName].toDate() as DateTime,
+      likeCount: data[postLikesFieldName] ?? 0,
+      commentCount: data[postCommentsCountFieldName] ?? 0,
+    );
+  }
 
   Post.fromDocument(DocumentSnapshot<Map<String, dynamic>> doc)
       : id = doc.id,
         text = doc[postTextFieldName] as String,
         authorId = doc[postCreatorIdFieldName] as String,
-        authorName = doc[postCreatorNameFieldName] as String,
-        timestamp = doc[postTimeCreatedFieldName].toDate() as DateTime;
+        timestamp = doc[postTimeCreatedFieldName].toDate() as DateTime,
+        likeCount = doc[postLikesFieldName] as int,
+        commentCount = doc[postCommentsCountFieldName] as int;
 }

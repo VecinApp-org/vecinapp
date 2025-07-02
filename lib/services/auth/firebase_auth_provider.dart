@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:vecinapp/utilities/entities/auth_user.dart';
 import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
@@ -19,8 +20,9 @@ class FirebaseAuthProvider implements AuthProvider {
         options: DefaultFirebaseOptions.currentPlatform);
     // Initialize FirebaseAppCheck
     await FirebaseAppCheck.instance.activate(
-      androidProvider: AndroidProvider.playIntegrity,
-      appleProvider: AppleProvider.appAttest,
+      androidProvider:
+          kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
+      appleProvider: kDebugMode ? AppleProvider.debug : AppleProvider.appAttest,
     );
   }
 

@@ -48,10 +48,11 @@ const eventLocationFieldName = 'place_geopoint';
 // posts
 const postsCollectionName = 'posts';
 const postCreatorIdFieldName = 'creator_id';
-const postCreatorNameFieldName = 'creator_name';
 const postTextFieldName = 'text';
 const postTimeCreatedFieldName = 'time_created';
 const postImageUrlFieldName = 'image_url';
+const postLikesFieldName = 'likes';
+const postCommentsCountFieldName = 'comments';
 
 // comments
 const commentsCollectionName = 'comments';

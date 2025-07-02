@@ -75,7 +75,7 @@ class FirebaseStorageProvider implements StorageProvider {
       if (cacheExists) {
         final lastModified = cacheFile.lastModifiedSync();
         if (lastModified
-            .isAfter(DateTime.now().subtract(const Duration(minutes: 1)))) {
+            .isAfter(DateTime.now().subtract(const Duration(minutes: 10)))) {
           devtools.log('$userId Fresh. Read image from local cache.');
           return await cacheFile.readAsBytes();
         }

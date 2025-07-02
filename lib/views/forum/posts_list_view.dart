@@ -22,15 +22,6 @@ class PostsListView extends HookWidget {
     Map<String, Uint8List?> profilePictures = {};
     Map<String, CloudUser?> users = {};
     for (String authorId in authorIds) {
-      // load profile pictures
-      final future = useMemoized(
-          () => context.watch<AppBloc>().profilePicture(userId: authorId));
-      final result = useFuture(future);
-      if (result.hasData) {
-        profilePictures[authorId] = result.data;
-      } else {
-        profilePictures[authorId] = null;
-      }
       // load users
       final futureUser =
           useMemoized(() => context.watch<AppBloc>().userFromId(authorId));
@@ -39,6 +30,15 @@ class PostsListView extends HookWidget {
         users[authorId] = resultUser.data as CloudUser;
       } else {
         users[authorId] = null;
+      }
+      // load profile pictures
+      final future = useMemoized(
+          () => context.watch<AppBloc>().profilePicture(userId: authorId));
+      final result = useFuture(future);
+      if (result.hasData) {
+        profilePictures[authorId] = result.data;
+      } else {
+        profilePictures[authorId] = null;
       }
     }
     return ListView.builder(
@@ -72,7 +72,10 @@ class PostsListView extends HookWidget {
                     padding: const EdgeInsets.only(top: 8.0, left: 0.0),
                     child: Text(post.text),
                   ),
-                  PostCardFooter(),
+                  PostCardFooter(
+                    likesCount: post.likeCount,
+                    commentsCount: post.commentCount,
+                  ),
                 ],
               ),
             ));
