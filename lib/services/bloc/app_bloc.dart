@@ -40,17 +40,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         )) {
     //initialize
     on<AppEventInitialize>((event, emit) async {
+      devtools.log('AppEventInitialize');
       add(AppEventReset());
     });
 
     on<AppEventReset>((event, emit) async {
       devtools.log('AppEventReset');
       try {
-        //Start loading
-        emit(const AppStateUnInitalized(
-          isLoading: false,
-        ));
-
         //Get AuthUser
         final user = _authProvider.currentUser;
 
@@ -1082,6 +1078,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         household: household,
       ));
     });
+
     on<AppEventGoToCreatePostView>((event, emit) async {
       emit(AppStateCreatingPost(
         isLoading: false,
@@ -1184,14 +1181,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   //Public methods
-  Future<Uint8List?> profilePicture({required String? userId}) async {
+  Stream<Uint8List?> profilePicture({required String? userId}) async* {
     if (userId == null || userId.isEmpty) {
-      return null;
+      yield null;
     }
     try {
-      return await _storageProvider.getProfileImage(userId: userId);
+      yield* _storageProvider.getProfileImage(userId: userId!);
     } catch (e) {
-      return null;
+      yield null;
     }
   }
 

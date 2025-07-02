@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:vecinapp/extensions/formatting/format_event_date_time.dart';
 import 'package:vecinapp/services/storage/storage_exceptions.dart';
 import 'package:vecinapp/services/storage/storage_provider.dart';
 import 'dart:developer' as devtools show log;
@@ -65,7 +66,7 @@ class FirebaseStorageProvider implements StorageProvider {
   }
 
   @override
-  Future<Uint8List?> getProfileImage({required String userId}) async {
+  Stream<Uint8List?> getProfileImage({required String userId}) async* {
     devtools.log('$userId getProfileImage...');
     final cacheFile = File('${_cacheDir.path}/$userId/profile_image');
     late final bool cacheExists;
@@ -73,11 +74,14 @@ class FirebaseStorageProvider implements StorageProvider {
     try {
       cacheExists = cacheFile.existsSync();
       if (cacheExists) {
+        yield cacheFile.readAsBytesSync();
         final lastModified = cacheFile.lastModifiedSync();
         if (lastModified
             .isAfter(DateTime.now().subtract(const Duration(minutes: 10)))) {
-          devtools.log('$userId Fresh. Read image from local cache.');
-          return await cacheFile.readAsBytes();
+          devtools.log(
+              '$userId Fresh. Refreshing ${lastModified.add(const Duration(minutes: 10))}');
+          yield await cacheFile.readAsBytes();
+          return;
         }
       }
     } catch (_) {}
@@ -85,7 +89,7 @@ class FirebaseStorageProvider implements StorageProvider {
     // read the image from Firebase Storage
     try {
       final filePath = 'user/$userId/profile_image';
-      return await _storage.ref(filePath).getData().then((file) async {
+      yield await _storage.ref(filePath).getData().then((file) async {
         if (file != null) {
           cacheFile.createSync(recursive: true);
           await cacheFile
@@ -95,6 +99,7 @@ class FirebaseStorageProvider implements StorageProvider {
         devtools.log('$userId Read image from Firebase Storage.');
         return file;
       });
+      return;
     } on FirebaseException catch (e) {
       if (e.code == 'object-not-found') {
         if (cacheExists) {
@@ -102,20 +107,21 @@ class FirebaseStorageProvider implements StorageProvider {
           cacheFile.deleteSync();
         }
         devtools.log('$userId Image did not exist in Storage...');
-        return null;
+        yield null;
+        return;
       }
       // return the image from the cache
       if (cacheExists) {
         devtools.log('Reading image from local cache after Firebase error...');
-        return await cacheFile.readAsBytes();
+        yield await cacheFile.readAsBytes();
       }
-      return null;
+      yield null;
     } catch (_) {
       if (cacheExists) {
         devtools.log('Reading image from local cache after error...');
-        return await cacheFile.readAsBytes();
+        yield await cacheFile.readAsBytes();
       }
-      return null;
+      yield null;
     }
   }
 

@@ -17,14 +17,15 @@ class PostsListView extends HookWidget {
   @override
   Widget build(BuildContext context) {
     devtools.log('PostsListView.build');
-    final List<String> authorIds =
-        posts.map((post) => post.authorId).toSet().toList();
+    final Set<String> authorIds = posts.map((post) => post.authorId).toSet();
     Map<String, Uint8List?> profilePictures = {};
     Map<String, CloudUser?> users = {};
     for (String authorId in authorIds) {
       // load users
       final futureUser =
           useMemoized(() => context.watch<AppBloc>().userFromId(authorId));
+      final futureImage = useMemoized(
+          () => context.watch<AppBloc>().profilePicture(userId: authorId));
       final resultUser = useFuture(futureUser);
       if (resultUser.hasData) {
         users[authorId] = resultUser.data as CloudUser;
@@ -32,11 +33,9 @@ class PostsListView extends HookWidget {
         users[authorId] = null;
       }
       // load profile pictures
-      final future = useMemoized(
-          () => context.watch<AppBloc>().profilePicture(userId: authorId));
-      final result = useFuture(future);
-      if (result.hasData) {
-        profilePictures[authorId] = result.data;
+      final resultimage = useStream(futureImage);
+      if (resultimage.hasData) {
+        profilePictures[authorId] = resultimage.data;
       } else {
         profilePictures[authorId] = null;
       }
@@ -47,6 +46,15 @@ class PostsListView extends HookWidget {
       itemCount: posts.length,
       itemBuilder: (context, index) {
         final post = posts.elementAt(index);
+
+        if (users[post.authorId] == null) {
+          return Card(
+            child: SizedBox(
+              height: 100,
+            ),
+          );
+        }
+
         return Card(
             margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
             child: ListTile(

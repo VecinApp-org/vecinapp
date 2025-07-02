@@ -12,7 +12,7 @@ abstract class StorageProvider {
 
   Future<void> initialize();
 
-  Future<Uint8List?> getProfileImage({required String userId});
+  Stream<Uint8List?> getProfileImage({required String userId});
 
   Future<void> deleteProfileImage({required String userId});
 }
