@@ -771,6 +771,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             exception: e,
             isLoading: false,
           ));
+          return;
         }
 
         emit(AppStateViewingProfile(

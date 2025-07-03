@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
@@ -7,13 +8,15 @@ import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/widgets/centered_view.dart';
 import 'package:vecinapp/utilities/widgets/profile_picture.dart';
 
-class NoNeighborhoodView extends StatelessWidget {
+class NoNeighborhoodView extends HookWidget {
   const NoNeighborhoodView(
       {super.key, required this.cloudUser, required this.household});
   final CloudUser cloudUser;
   final Household household;
   @override
   Widget build(BuildContext context) {
+    final image = useMemoized(
+        () => context.watch<AppBloc>().profilePicture(userId: cloudUser.id));
     return Scaffold(
       appBar: AppBar(
         actions: <Widget>[
@@ -25,7 +28,7 @@ class NoNeighborhoodView extends StatelessWidget {
                       .add(const AppEventGoToProfileView()),
                   child: ProfilePicture(
                     radius: 16,
-                    id: cloudUser.id,
+                    image: useStream(image).data,
                   )))
         ],
       ),

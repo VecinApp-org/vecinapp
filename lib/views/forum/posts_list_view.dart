@@ -24,8 +24,6 @@ class PostsListView extends HookWidget {
       // load users
       final futureUser =
           useMemoized(() => context.watch<AppBloc>().userFromId(authorId));
-      final futureImage = useMemoized(
-          () => context.watch<AppBloc>().profilePicture(userId: authorId));
       final resultUser = useFuture(futureUser);
       if (resultUser.hasData) {
         users[authorId] = resultUser.data as CloudUser;
@@ -33,6 +31,8 @@ class PostsListView extends HookWidget {
         users[authorId] = null;
       }
       // load profile pictures
+      final futureImage = useMemoized(
+          () => context.watch<AppBloc>().profilePicture(userId: authorId));
       final resultimage = useStream(futureImage);
       if (resultimage.hasData) {
         profilePictures[authorId] = resultimage.data;
@@ -57,35 +57,31 @@ class PostsListView extends HookWidget {
 
         return Card(
             margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-            child: ListTile(
-              contentPadding: const EdgeInsets.only(
-                left: 16,
-                right: 16,
-                top: 8,
-              ),
-              title: Row(
-                children: [
-                  ProfilePicture(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ListTile(
+                  leading: ProfilePicture(
                     radius: 16,
                     image: profilePictures[post.authorId],
                   ),
-                  const SizedBox(width: 8),
-                  Text(users[post.authorId]?.displayName ?? ''),
-                ],
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0, left: 0.0),
-                    child: Text(post.text),
+                  title: Text(
+                    users[post.authorId]?.displayName ?? '',
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  PostCardFooter(
-                    likesCount: post.likeCount,
-                    commentsCount: post.commentCount,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    post.text,
+                    textAlign: TextAlign.left,
                   ),
-                ],
-              ),
+                ),
+                PostCardFooter(
+                  likesCount: post.likeCount,
+                  commentsCount: post.commentCount,
+                ),
+              ],
             ));
       },
     );

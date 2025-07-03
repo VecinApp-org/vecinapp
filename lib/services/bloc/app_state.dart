@@ -225,7 +225,7 @@ class AppStateViewingProfile extends AppState with EquatableMixin {
   }
 }
 
-class AppStateViewingHousehold extends AppState {
+class AppStateViewingHousehold extends AppState with EquatableMixin {
   const AppStateViewingHousehold({
     required bool isLoading,
     required exception,
@@ -235,6 +235,9 @@ class AppStateViewingHousehold extends AppState {
           exception: exception,
           household: household,
         );
+
+  @override
+  List<Object?> get props => [exception, isLoading, household];
 }
 
 class AppStateViewingNeighborhoodDetails extends AppState with EquatableMixin {

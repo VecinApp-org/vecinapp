@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:vecinapp/extensions/formatting/format_event_date_time.dart';
 import 'package:vecinapp/services/storage/storage_exceptions.dart';
 import 'package:vecinapp/services/storage/storage_provider.dart';
 import 'dart:developer' as devtools show log;
@@ -67,60 +66,47 @@ class FirebaseStorageProvider implements StorageProvider {
 
   @override
   Stream<Uint8List?> getProfileImage({required String userId}) async* {
-    devtools.log('$userId getProfileImage...');
+    devtools.log('getProfileImage...');
     final cacheFile = File('${_cacheDir.path}/$userId/profile_image');
-    late final bool cacheExists;
     // read the image from the cache
     try {
-      cacheExists = cacheFile.existsSync();
-      if (cacheExists) {
-        yield cacheFile.readAsBytesSync();
-        final lastModified = cacheFile.lastModifiedSync();
-        if (lastModified
-            .isAfter(DateTime.now().subtract(const Duration(minutes: 10)))) {
-          devtools.log(
-              '$userId Fresh. Refreshing ${lastModified.add(const Duration(minutes: 10))}');
-          yield await cacheFile.readAsBytes();
-          return;
-        }
+      yield await cacheFile.readAsBytes();
+      final lastModified = await cacheFile.lastModified();
+      // if the image is less than 10 minutes old, dont update
+      if (lastModified
+          .isAfter(DateTime.now().subtract(const Duration(minutes: 10)))) {
+        devtools.log('Read image from local cache.');
+        return;
       }
-    } catch (_) {}
+    } catch (_) {
+      yield null;
+    }
 
     // read the image from Firebase Storage
     try {
       final filePath = 'user/$userId/profile_image';
       yield await _storage.ref(filePath).getData().then((file) async {
         if (file != null) {
-          cacheFile.createSync(recursive: true);
+          await cacheFile.create(recursive: true);
           await cacheFile
               .writeAsBytes(file)
-              .then((file) => file.setLastModifiedSync(DateTime.now()));
+              .then((file) async => await file.setLastModified(DateTime.now()));
         }
-        devtools.log('$userId Read image from Firebase Storage.');
+        devtools.log('Read image from Firebase Storage.');
         return file;
       });
       return;
     } on FirebaseException catch (e) {
+      // If the file doesn't exist in Storage, delete it from the cache and return null.
       if (e.code == 'object-not-found') {
-        if (cacheExists) {
-          devtools.log('$userId deleted image from local cache...');
-          cacheFile.deleteSync();
+        if (await cacheFile.exists()) {
+          await cacheFile.delete();
+          yield null;
+          devtools.log('Deleted image from local cache.');
         }
-        devtools.log('$userId Image did not exist in Storage...');
-        yield null;
-        return;
       }
-      // return the image from the cache
-      if (cacheExists) {
-        devtools.log('Reading image from local cache after Firebase error...');
-        yield await cacheFile.readAsBytes();
-      }
-      yield null;
     } catch (_) {
-      if (cacheExists) {
-        devtools.log('Reading image from local cache after error...');
-        yield await cacheFile.readAsBytes();
-      }
+      devtools.log('Failed to read image from Firebase Storage.');
       yield null;
     }
   }
@@ -132,16 +118,12 @@ class FirebaseStorageProvider implements StorageProvider {
 
     try {
       // 1. Attempt to delete the remote file from Firebase Storage.
-      devtools.log('Attempting to delete image from Firebase Storage...');
       await storageRef.delete();
-      devtools.log('Remote image deleted successfully.');
+      // wait 2 seconds
+      await Future.delayed(const Duration(seconds: 2));
     } on FirebaseException catch (e) {
       // If the file doesn't exist, it's a success from the user's perspective.
-      // The goal is for the image to be gone, and it already is.
-      if (e.code == 'object-not-found') {
-        devtools.log('Image did not exist in Storage. No action needed.');
-      } else {
-        // This indicates a more serious problem, like a permissions error.
+      if (e.code != 'object-not-found') {
         devtools.log('Firebase error during deletion: ${e.message}');
         throw CouldNotDeleteImageStorageException();
       }
@@ -149,11 +131,17 @@ class FirebaseStorageProvider implements StorageProvider {
       devtools.log('An unexpected error occurred during remote deletion: $e');
       throw GenericStorageException();
     }
-
     // 2. Attempt to delete the local file from the cache.
     // This is done in a separate try-catch because failing to delete the
     // cached file should not prevent the overall operation from succeeding.
-    await _deleteFromCache(userId: userId);
+    try {
+      await _deleteFromCache(userId: userId);
+    } catch (e) {
+      // Log the error, but don't re-throw it.
+      // The remote deletion was the most critical part.
+      devtools.log('Failed to delete from local cache: $e');
+    }
+    return;
   }
 
   /// Helper function to remove an image from the local cache.
