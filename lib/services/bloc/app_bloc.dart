@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:bloc/bloc.dart';
 import 'package:vecinapp/extensions/geometry/is_point_in_polygon.dart';
 import 'package:vecinapp/extensions/geometry/point.dart';
@@ -166,7 +165,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
       } catch (e) {
         emit(AppStateError(
-          exception: e,
+          exception: e as Exception,
           isLoading: false,
         ));
       }
@@ -713,10 +712,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       //upload image
       try {
         final File image = File(event.imagePath);
-        await _storageProvider.uploadProfileImage(
+        final imageUrl = await _storageProvider.uploadProfileImage(
           image: image,
           userId: user.uid!,
         );
+        //update user's photo url
+        await _cloudProvider.updateUserPhotoUrl(photoUrl: imageUrl);
       } catch (e) {
         emit(AppStateViewingProfile(
           cloudUser: cloudUser,
@@ -728,8 +729,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
         return;
       }
+      final newCloudUser = await _cloudProvider.currentCloudUser;
       emit(AppStateViewingProfile(
-        cloudUser: cloudUser,
+        cloudUser: newCloudUser!,
         household: household,
         neighborhood: neighborhood,
         user: user,
@@ -762,6 +764,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
         try {
           await _storageProvider.deleteProfileImage(userId: user.uid!);
+          await _cloudProvider.updateUserPhotoUrl(photoUrl: '');
         } catch (e) {
           emit(AppStateViewingProfile(
             cloudUser: cloudUser,
@@ -1182,16 +1185,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   //Public methods
-  Stream<Uint8List?> profilePicture({required String? userId}) async* {
-    if (userId == null || userId.isEmpty) {
-      yield null;
-    }
-    try {
-      yield* _storageProvider.getProfileImage(userId: userId!);
-    } catch (e) {
-      yield null;
-    }
-  }
 
   Future<CloudUser?> userFromId(String userId) async {
     if (userId.isEmpty) {

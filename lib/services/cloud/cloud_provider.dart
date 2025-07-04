@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/event.dart';
@@ -10,7 +11,7 @@ import 'package:vecinapp/utilities/entities/address.dart';
 
 @immutable
 abstract class CloudProvider {
-  Future<void> initialize({required authProvider});
+  Future<void> initialize({required AuthProvider authProvider});
 
   Future<CloudUser?> get currentCloudUser;
   Future<CloudUser?> get cachedCloudUser;
@@ -40,7 +41,7 @@ abstract class CloudProvider {
   });
 
   Future<void> updateUserPhotoUrl({
-    required String? photoUrl,
+    required String photoUrl,
   });
 
   Stream<Iterable<CloudUser>> householdNeighbors({

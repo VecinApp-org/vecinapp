@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
@@ -11,8 +10,6 @@ abstract class StorageProvider {
   });
 
   Future<void> initialize();
-
-  Stream<Uint8List?> getProfileImage({required String userId});
 
   Future<void> deleteProfileImage({required String userId});
 }

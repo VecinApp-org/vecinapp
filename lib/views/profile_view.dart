@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -38,12 +37,6 @@ class ProfileView extends HookWidget {
     } else {
       neighborhoodName = '${neighborhood!.neighborhoodName} ';
     }
-    final bool isloading = context.watch<AppBloc>().state.isLoading;
-    final Stream<Uint8List?> profilePicture = useMemoized(
-        () => context.watch<AppBloc>().profilePicture(userId: cloudUser.id),
-        [isloading]);
-
-    final image = useStream(profilePicture).data;
 
     return Scaffold(
       appBar: AppBar(
@@ -62,12 +55,12 @@ class ProfileView extends HookWidget {
                   PopupMenuItem(
                     value: 'imagen',
                     onTap: () => {
-                      if (image == null)
+                      if (cloudUser.photoUrl == '')
                         {updatePicture(context: context)}
                       else
                         {editOrDeleteProfilePicture(context: context)}
                     },
-                    child: (image == null)
+                    child: (cloudUser.photoUrl == '')
                         ? const Text('Agregar foto de perfil')
                         : const Text('Editar foto de perfil'),
                   ),
@@ -87,7 +80,7 @@ class ProfileView extends HookWidget {
         children: [
           Center(
             child: ProfilePicture(
-              image: image,
+              imageUrl: cloudUser.photoUrl,
               radius: 60.0,
             ),
           ),

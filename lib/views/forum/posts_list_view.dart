@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -18,7 +16,6 @@ class PostsListView extends HookWidget {
   Widget build(BuildContext context) {
     devtools.log('PostsListView.build');
     final Set<String> authorIds = posts.map((post) => post.authorId).toSet();
-    Map<String, Uint8List?> profilePictures = {};
     Map<String, CloudUser?> users = {};
     for (String authorId in authorIds) {
       // load users
@@ -29,15 +26,6 @@ class PostsListView extends HookWidget {
         users[authorId] = resultUser.data as CloudUser;
       } else {
         users[authorId] = null;
-      }
-      // load profile pictures
-      final futureImage = useMemoized(
-          () => context.watch<AppBloc>().profilePicture(userId: authorId));
-      final resultimage = useStream(futureImage);
-      if (resultimage.hasData) {
-        profilePictures[authorId] = resultimage.data;
-      } else {
-        profilePictures[authorId] = null;
       }
     }
     return ListView.builder(
@@ -63,7 +51,7 @@ class PostsListView extends HookWidget {
                 ListTile(
                   leading: ProfilePicture(
                     radius: 16,
-                    image: profilePictures[post.authorId],
+                    imageUrl: users[post.authorId]?.photoUrl,
                   ),
                   title: Text(
                     users[post.authorId]?.displayName ?? '',

@@ -39,7 +39,7 @@ class AppStateUnInitalized extends AppState {
 
 class AppStateError extends AppState with EquatableMixin {
   const AppStateError({
-    required exception,
+    required Exception? exception,
     required bool isLoading,
   }) : super(
           isLoading: isLoading,
@@ -65,7 +65,7 @@ class AppStateWelcomeViewing extends AppState with EquatableMixin {
 
 class AppStateRegistering extends AppState with EquatableMixin {
   const AppStateRegistering({
-    required exception,
+    required Exception? exception,
     required bool isLoading,
   }) : super(
           isLoading: isLoading,
@@ -91,7 +91,7 @@ class AppStateNeedsVerification extends AppState with EquatableMixin {
 
 class AppStateLoggingIn extends AppState with EquatableMixin {
   const AppStateLoggingIn({
-    required exception,
+    required Exception? exception,
     required bool isLoading,
     String? loadingText,
   }) : super(
@@ -107,7 +107,7 @@ class AppStateResettingPassword extends AppState with EquatableMixin {
   final bool hasSentEmail;
   final String? email;
   const AppStateResettingPassword({
-    required exception,
+    required Exception? exception,
     required this.hasSentEmail,
     required bool isLoading,
     this.email,
@@ -181,7 +181,7 @@ class AppStateWelcomeToNeighborhood extends AppState with EquatableMixin {
 //MAIN APP STATES
 class AppStateViewingNeighborhood extends AppState with EquatableMixin {
   const AppStateViewingNeighborhood({
-    required exception,
+    required Exception? exception,
     required bool isLoading,
     required CloudUser cloudUser,
     required Household household,

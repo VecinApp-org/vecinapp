@@ -44,10 +44,6 @@ class FirebaseStorageProvider implements StorageProvider {
       final snapshot = await uploadTask.whenComplete(() => {});
       final downloadUrl = await snapshot.ref.getDownloadURL();
 
-      // 4. Update local cache asynchronously and efficiently
-      devtools.log('Updating local cache...');
-      await _updateCache(userId: userId, imageBytes: compressedBytes);
-
       return downloadUrl;
     } on FirebaseException catch (e) {
       switch (e.code) {
@@ -61,53 +57,6 @@ class FirebaseStorageProvider implements StorageProvider {
     } on Exception catch (e) {
       devtools.log(e.toString() + e.hashCode.toString());
       throw GenericStorageException();
-    }
-  }
-
-  @override
-  Stream<Uint8List?> getProfileImage({required String userId}) async* {
-    devtools.log('getProfileImage...');
-    final cacheFile = File('${_cacheDir.path}/$userId/profile_image');
-    // read the image from the cache
-    try {
-      yield await cacheFile.readAsBytes();
-      final lastModified = await cacheFile.lastModified();
-      // if the image is less than 10 minutes old, dont update
-      if (lastModified
-          .isAfter(DateTime.now().subtract(const Duration(minutes: 10)))) {
-        devtools.log('Read image from local cache.');
-        return;
-      }
-    } catch (_) {
-      yield null;
-    }
-
-    // read the image from Firebase Storage
-    try {
-      final filePath = 'user/$userId/profile_image';
-      yield await _storage.ref(filePath).getData().then((file) async {
-        if (file != null) {
-          await cacheFile.create(recursive: true);
-          await cacheFile
-              .writeAsBytes(file)
-              .then((file) async => await file.setLastModified(DateTime.now()));
-        }
-        devtools.log('Read image from Firebase Storage.');
-        return file;
-      });
-      return;
-    } on FirebaseException catch (e) {
-      // If the file doesn't exist in Storage, delete it from the cache and return null.
-      if (e.code == 'object-not-found') {
-        if (await cacheFile.exists()) {
-          await cacheFile.delete();
-          yield null;
-          devtools.log('Deleted image from local cache.');
-        }
-      }
-    } catch (_) {
-      devtools.log('Failed to read image from Firebase Storage.');
-      yield null;
     }
   }
 
@@ -175,18 +124,5 @@ class FirebaseStorageProvider implements StorageProvider {
       throw Exception('Failed to compress image.'); // Custom internal exception
     }
     return result;
-  }
-
-  // Helper function for updating the cache
-  Future<void> _updateCache(
-      {required String userId, required Uint8List imageBytes}) async {
-    final cacheFile = File('${_cacheDir.path}/$userId/profile_image');
-    try {
-      await cacheFile.create(recursive: true);
-      await cacheFile.writeAsBytes(imageBytes);
-    } catch (e) {
-      devtools.log("Failed to update local cache: $e");
-      // Don't throw here, failing to cache shouldn't fail the whole upload
-    }
   }
 }

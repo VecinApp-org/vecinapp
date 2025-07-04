@@ -15,8 +15,6 @@ class NoNeighborhoodView extends HookWidget {
   final Household household;
   @override
   Widget build(BuildContext context) {
-    final image = useMemoized(
-        () => context.watch<AppBloc>().profilePicture(userId: cloudUser.id));
     return Scaffold(
       appBar: AppBar(
         actions: <Widget>[
@@ -28,7 +26,7 @@ class NoNeighborhoodView extends HookWidget {
                       .add(const AppEventGoToProfileView()),
                   child: ProfilePicture(
                     radius: 16,
-                    image: useStream(image).data,
+                    imageUrl: cloudUser.photoUrl,
                   )))
         ],
       ),
