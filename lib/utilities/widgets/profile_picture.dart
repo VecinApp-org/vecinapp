@@ -9,30 +9,17 @@ class ProfilePicture extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (imageUrl == null || imageUrl!.isEmpty) {
-      return CircleAvatar(
-        radius: radius,
-        backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
-        foregroundColor: Theme.of(context).colorScheme.onSurface,
-        child: Icon(
-          Icons.person_2_rounded,
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          size: radius * 1.5,
-        ),
-      );
-    }
     return CachedNetworkImage(
       imageUrl: imageUrl ?? '',
       width: radius * 2,
       height: radius * 2,
       errorWidget: (context, url, error) => CircleAvatar(
         radius: radius,
-        backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
-        foregroundColor: Theme.of(context).colorScheme.onSurface,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: Icon(
-          Icons.error,
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          size: radius * 1.5,
+          Icons.person_2_rounded,
+          color: Theme.of(context).colorScheme.surfaceContainerLowest,
+          size: radius * 1.3,
         ),
       ),
       imageBuilder: (context, imageProvider) => CircleAvatar(

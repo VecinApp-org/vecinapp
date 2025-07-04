@@ -776,9 +776,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           ));
           return;
         }
-
+        final newCloudUser = await _cloudProvider.currentCloudUser;
         emit(AppStateViewingProfile(
-          cloudUser: cloudUser,
+          cloudUser: newCloudUser!,
           household: household,
           neighborhood: neighborhood,
           user: user,
