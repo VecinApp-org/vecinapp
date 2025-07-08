@@ -331,13 +331,43 @@ class FirebaseCloudProvider implements CloudProvider {
 
   @override
   Stream<Iterable<Post>> neighborhoodPosts({required String neighborhoodId}) {
-    return _posts(neighborhoodId: neighborhoodId).snapshots().map(
+    return _posts(neighborhoodId: neighborhoodId)
+        .limit(10)
+        .orderBy(postTimeCreatedFieldName, descending: true)
+        .snapshots()
+        .map(
       (post) {
         return post.docs.map((doc) {
           return Post.fromSnapshot(snapshot: doc);
         });
       },
     );
+  }
+
+  @override
+  Future<void> likePost({required String postId}) async {
+    try {
+      final user = await currentCloudUser;
+      await _post(
+        neighborhoodId: user!.neighborhoodId!,
+        postId: postId,
+      ).update({
+        postLikesFieldName: FieldValue.arrayUnion([user.id]),
+      });
+    } catch (_) {}
+  }
+
+  @override
+  Future<void> unlikePost({required String postId}) async {
+    try {
+      final user = await currentCloudUser;
+      await _post(
+        neighborhoodId: user!.neighborhoodId!,
+        postId: postId,
+      ).update({
+        postLikesFieldName: FieldValue.arrayRemove([user.id]),
+      });
+    } catch (_) {}
   }
 
   @override

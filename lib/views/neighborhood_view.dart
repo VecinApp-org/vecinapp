@@ -75,7 +75,7 @@ class NeighborhoodView extends HookWidget {
             currentPageIndex.value = index;
           },
           children: [
-            ForumView(cloudUser: cloudUser),
+            ForumView(),
             EventsView(cloudUser: cloudUser),
             ReportsView(),
             RulebooksView(cloudUser: cloudUser),

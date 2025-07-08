@@ -8,7 +8,7 @@ class Post {
   final String text;
   final String authorId;
   final DateTime timestamp;
-  final int? likeCount;
+  final Set<String>? likes;
   final int? commentCount;
 
   const Post({
@@ -16,19 +16,20 @@ class Post {
     required this.text,
     required this.authorId,
     required this.timestamp,
-    required this.likeCount,
+    required this.likes,
     required this.commentCount,
   });
 
   factory Post.fromSnapshot(
       {required QueryDocumentSnapshot<Map<String?, dynamic>> snapshot}) {
     final data = snapshot.data();
+
     return Post(
       id: snapshot.id,
       authorId: data[postCreatorIdFieldName] as String,
       text: data[postTextFieldName] as String,
       timestamp: data[postTimeCreatedFieldName].toDate() as DateTime,
-      likeCount: data[postLikesFieldName] ?? 0,
+      likes: Set<String>.from(data[postLikesFieldName] ?? []),
       commentCount: data[postCommentsCountFieldName] ?? 0,
     );
   }
@@ -40,11 +41,11 @@ class Post {
         text: data[postTextFieldName] as String,
         authorId: data[postCreatorIdFieldName] as String,
         timestamp: data[postTimeCreatedFieldName].toDate() as DateTime,
-        likeCount: data[postLikesFieldName] ?? 0,
+        likes: data[postLikesFieldName],
         commentCount: data[postCommentsCountFieldName] ?? 0);
   }
 
   @override
   String toString() =>
-      'Post(id: $id, authorId: $authorId, timestamp: $timestamp, likeCount: $likeCount, commentCount: $commentCount, text: $text)';
+      'Post(id: $id, authorId: $authorId, timestamp: $timestamp, likeCount: ${likes?.length}, commentCount: $commentCount, text: $text)';
 }

@@ -1124,6 +1124,38 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         household: household,
       ));
     });
+
+    on<AppEventLikePost>(
+      (event, emit) async {
+        //validate access
+        if (!await _isValidNeighborhoodAccess()) {
+          add(const AppEventReset());
+          return;
+        }
+        //like post
+        try {
+          await _cloudProvider.likePost(postId: event.postId);
+        } on Exception catch (_) {
+          return;
+        }
+      },
+    );
+
+    on<AppEventUnlikePost>(
+      (event, emit) async {
+        //validate access
+        if (!await _isValidNeighborhoodAccess()) {
+          add(const AppEventReset());
+          return;
+        }
+        //unlike post
+        try {
+          await _cloudProvider.unlikePost(postId: event.postId);
+        } on Exception catch (_) {
+          return;
+        }
+      },
+    );
   }
 
   //Private methods

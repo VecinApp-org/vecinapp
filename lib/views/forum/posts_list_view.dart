@@ -2,19 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
+import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/post.dart';
 import 'package:vecinapp/utilities/widgets/profile_picture.dart';
-import 'package:vecinapp/views/forum/post_card_footer.dart';
 import 'dart:developer' as devtools show log; // ignore: unused_import
 
 class PostsListView extends HookWidget {
-  const PostsListView({super.key, required this.posts});
+  const PostsListView({
+    super.key,
+    required this.posts,
+  });
   final List<Post> posts;
 
   @override
   Widget build(BuildContext context) {
-    devtools.log('PostsListView.build');
+    final userId = context.watch<AppBloc>().state.cloudUser!.id;
     final Set<String> authorIds = posts.map((post) => post.authorId).toSet();
     Map<String, CloudUser?> users = {};
     for (String authorId in authorIds) {
@@ -77,12 +80,57 @@ class PostsListView extends HookWidget {
                   ),
                 ),
                 PostCardFooter(
-                  likesCount: post.likeCount,
-                  commentsCount: post.commentCount,
+                  post: post,
+                  userId: userId,
                 ),
               ],
             ));
       },
+    );
+  }
+}
+
+class PostCardFooter extends StatelessWidget {
+  const PostCardFooter({super.key, required this.post, required this.userId});
+
+  final Post post;
+  final String userId;
+
+  @override
+  Widget build(BuildContext context) {
+    final likes = post.likes?.length ?? 0;
+    final isLiked = post.likes?.contains(userId) ?? false;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.chat_bubble_outline),
+          ),
+          Text('${post.commentCount}',
+              style: Theme.of(context).textTheme.bodySmall),
+          IconButton(
+            onPressed: () {
+              if (isLiked) {
+                context
+                    .read<AppBloc>()
+                    .add(AppEventUnlikePost(postId: post.id));
+              } else {
+                context.read<AppBloc>().add(AppEventLikePost(postId: post.id));
+              }
+            },
+            icon: (!isLiked)
+                ? const Icon(Icons.favorite_border)
+                : const Icon(
+                    Icons.favorite,
+                    color: Colors.red,
+                  ),
+          ),
+          Text('$likes', style: Theme.of(context).textTheme.bodySmall),
+        ],
+      ),
     );
   }
 }

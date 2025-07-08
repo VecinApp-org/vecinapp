@@ -268,3 +268,13 @@ class AppEventDeletePost extends AppEvent {
   final Post post;
   const AppEventDeletePost({required this.post});
 }
+
+class AppEventLikePost extends AppEvent {
+  final String postId;
+  const AppEventLikePost({required this.postId});
+}
+
+class AppEventUnlikePost extends AppEvent {
+  final String postId;
+  const AppEventUnlikePost({required this.postId});
+}

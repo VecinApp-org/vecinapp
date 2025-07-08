@@ -4,12 +4,10 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'dart:developer' as devtools show log; // ignore: unused_import
-import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/views/forum/posts_list_view.dart';
 
 class ForumView extends HookWidget {
-  const ForumView({super.key, required, required this.cloudUser});
-  final CloudUser cloudUser;
+  const ForumView({super.key});
   @override
   Widget build(BuildContext context) {
     //get posts

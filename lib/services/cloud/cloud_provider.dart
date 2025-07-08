@@ -118,4 +118,12 @@ abstract class CloudProvider {
   });
 
   Future<Post> getPost({required String postId});
+
+  Future<void> likePost({
+    required String postId,
+  });
+
+  Future<void> unlikePost({
+    required String postId,
+  });
 }
