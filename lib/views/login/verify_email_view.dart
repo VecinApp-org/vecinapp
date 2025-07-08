@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
+import 'package:vecinapp/utilities/dialogs/show_confirmation_dialog.dart';
 import 'package:vecinapp/utilities/widgets/centered_view.dart';
 
 class VerifyEmailView extends StatelessWidget {
@@ -9,6 +10,30 @@ class VerifyEmailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => CenteredView(
+        appbar: AppBar(
+          title: const Text('Verificar correo'),
+          actions: [
+            PopupMenuButton(itemBuilder: (context) {
+              return [
+                PopupMenuItem(
+                  value: 'Cerrar sesión',
+                  onTap: () async {
+                    final confirmLogout = await showConfirmationDialog(
+                      context: context,
+                      text: '¿Quieres salir de tu cuenta?',
+                    );
+                    if (confirmLogout == true && context.mounted) {
+                      context.read<AppBloc>().add(
+                            const AppEventLogOut(),
+                          );
+                    }
+                  },
+                  child: const Text('Cerrar sesión'),
+                ),
+              ];
+            })
+          ],
+        ),
         children: [
           Text('Verifica tu correo',
               style: Theme.of(context).textTheme.headlineMedium),
@@ -27,12 +52,6 @@ class VerifyEmailView extends StatelessWidget {
                   .read<AppBloc>()
                   .add(const AppEventSendEmailVerification()),
               child: const Text('Enviar otro correo')),
-          TextButton(
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            onPressed: () =>
-                context.read<AppBloc>().add(const AppEventLogOut()),
-            child: const Text('Salir'),
-          )
         ],
       );
 }

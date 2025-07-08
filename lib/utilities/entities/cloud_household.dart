@@ -52,4 +52,7 @@ class Household {
       longitude: data[householdLocationFieldName].longitude as double,
     );
   }
+  @override
+  String toString() =>
+      'Household(id: $id fullAddress: $fullAddress street: $street number: $number interior: $interior neighborhood: $neighborhood country: $country latitude: $latitude longitude: $longitude neighborhoodId: $neighborhoodId)';
 }

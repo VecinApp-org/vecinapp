@@ -23,6 +23,45 @@ class SettingsView extends HookWidget {
                 );
           },
         ),
+        actions: [
+          PopupMenuButton(itemBuilder: (context) {
+            return [
+              PopupMenuItem(
+                value: 'Cerrar sesión',
+                onTap: () async {
+                  final confirmLogout = await showConfirmationDialog(
+                    context: context,
+                    text: '¿Quieres salir de tu cuenta?',
+                  );
+                  if (confirmLogout == true && context.mounted) {
+                    context.read<AppBloc>().add(
+                          const AppEventLogOut(),
+                        );
+                  }
+                },
+                child: Text('Cerrar sesión'),
+              ),
+              PopupMenuItem(
+                value: 'Eliminar cuenta',
+                onTap: () async {
+                  final confirmDeleteAccout = await showConfirmationDialog(
+                    context: context,
+                    isDestructive: true,
+                    title: 'Eliminar cuenta',
+                    text: 'Esta acción es irreversible.',
+                    confirmText: 'Eliminar todos mis datos',
+                  );
+                  if (confirmDeleteAccout == true && context.mounted) {
+                    context.read<AppBloc>().add(
+                          const AppEventGoToDeleteAccountView(),
+                        );
+                  }
+                },
+                child: Text('Eliminar cuenta'),
+              ),
+            ];
+          })
+        ],
       ),
       body: ListView(
         children: [
@@ -48,46 +87,6 @@ class SettingsView extends HookWidget {
               selected: <ThemeMode>{controller.themeMode},
             ),
           ),
-          Divider(
-            thickness: 8,
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
-          ),
-          TextButton(
-            onPressed: () async {
-              final confirmLogout = await showConfirmationDialog(
-                context: context,
-                text: '¿Quieres salir de tu cuenta?',
-              );
-              if (confirmLogout == true && context.mounted) {
-                context.read<AppBloc>().add(
-                      const AppEventLogOut(),
-                    );
-              }
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Cerrar sesión'),
-          ),
-          TextButton(
-            onPressed: () async {
-              final confirmDeleteAccout = await showConfirmationDialog(
-                context: context,
-                isDestructive: true,
-                title: 'Eliminar cuenta',
-                text: 'Esta acción es irreversible.',
-                confirmText: 'Eliminar todos mis datos',
-              );
-              if (confirmDeleteAccout == true && context.mounted) {
-                context.read<AppBloc>().add(
-                      const AppEventGoToDeleteAccountView(),
-                    );
-              }
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-            ),
-            child: const Text('Eliminar cuenta'),
-          ),
-          const SizedBox(height: 34),
         ],
       ),
     );

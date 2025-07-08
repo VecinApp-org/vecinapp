@@ -36,4 +36,8 @@ class Neighborhood {
         municipality: doc[neighborhoodMunicipalityFieldName] as String,
         polygon: polygon);
   }
+
+  @override
+  String toString() =>
+      'Neighborhood(id: $id, neighborhoodName: $neighborhoodName, country: $country, state: $state, municipality: $municipality, polygon: $polygon)';
 }

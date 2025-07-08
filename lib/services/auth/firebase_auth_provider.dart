@@ -176,6 +176,7 @@ class FirebaseAuthProvider implements AuthProvider {
 
     try {
       await user.reload();
+      await user.getIdToken(true);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'network-request-failed') {
         throw NetworkRequestFailedAuthException();

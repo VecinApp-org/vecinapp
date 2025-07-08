@@ -85,6 +85,6 @@ class CloudUser {
 
   @override
   String toString() {
-    return 'CloudUser(displayName: $displayName, homeId: $householdId, neighborhoodId: $neighborhoodId)';
+    return 'CloudUser(displayName: $displayName, homeId: $householdId, neighborhoodId: $neighborhoodId photoUrl: $photoUrl, isNeighborhoodAdmin: $isNeighborhoodAdmin, isSuperAdmin: $isSuperAdmin)';
   }
 }

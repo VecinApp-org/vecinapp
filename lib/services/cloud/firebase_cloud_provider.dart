@@ -397,9 +397,12 @@ class FirebaseCloudProvider implements CloudProvider {
     if (user == null) return null;
 
     if (user.uid!.isEmpty) return null;
-
-    final cloudUser = await _users.doc(user.uid).get();
-
+    final DocumentSnapshot<Map<String, dynamic>> cloudUser;
+    try {
+      cloudUser = await _users.doc(user.uid).get();
+    } catch (e) {
+      return null;
+    }
     if (!cloudUser.exists) return null;
 
     if (cloudUser.data() == null) return null;

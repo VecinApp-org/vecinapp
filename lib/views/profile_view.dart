@@ -55,14 +55,16 @@ class ProfileView extends HookWidget {
                   PopupMenuItem(
                     value: 'imagen',
                     onTap: () => {
-                      if (cloudUser.photoUrl == '')
+                      if (cloudUser.photoUrl == '' ||
+                          cloudUser.photoUrl == null)
                         {updatePicture(context: context)}
                       else
                         {editOrDeleteProfilePicture(context: context)}
                     },
-                    child: (cloudUser.photoUrl == '')
-                        ? const Text('Agregar foto de perfil')
-                        : const Text('Editar foto de perfil'),
+                    child:
+                        (cloudUser.photoUrl == '' || cloudUser.photoUrl == null)
+                            ? const Text('Agregar foto de perfil')
+                            : const Text('Editar foto de perfil'),
                   ),
                   PopupMenuItem(
                     value: 'nombre',

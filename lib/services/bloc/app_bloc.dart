@@ -47,10 +47,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       devtools.log('AppEventReset');
       try {
         //Get AuthUser
-        final user = _authProvider.currentUser;
-
+        final authUser = _authProvider.currentUser;
+        devtools.log('Bloc AuthUser: ${authUser.toString()}');
         //check if user is not logged in
-        if (user == null) {
+        if (authUser == null) {
+          devtools.log('User is not logged in');
           emit(
             const AppStateWelcomeViewing(
               exception: null,
@@ -61,7 +62,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         }
 
         //check if user is not verified
-        if (!user.isEmailVerified) {
+        if (!authUser.isEmailVerified) {
+          devtools.log('User is not verified');
           emit(AppStateNeedsVerification(
             exception: null,
             isLoading: false,
@@ -71,9 +73,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
         //Get CloudUser
         final cloudUser = await _cloudProvider.currentCloudUser;
-
+        devtools.log('CloudUser: ${cloudUser.toString()}');
         //check if CloudUser does not exist
-        if (cloudUser == null) {
+        if (cloudUser == null || cloudUser.displayName == '') {
+          devtools.log('CloudUser does not exist');
           emit(const AppStateCreatingCloudUser(
             isLoading: false,
             exception: null,
@@ -82,7 +85,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         }
 
         //check if CloudUser is not the same as AuthUser, this should never happen
-        assert(user.uid == cloudUser.id);
+        assert(authUser.uid == cloudUser.id);
 
         //check if CloudUser is in a Household
         if (cloudUser.householdId == null) {
@@ -96,7 +99,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
         //get Household
         final household = await _cloudProvider.currentHousehold;
-
+        devtools.log('Household: ${household.toString()}');
         //check if Household does not exist, this would mean the Household was deleted
         if (household == null) {
           devtools.log('Household does not exist');
@@ -113,6 +116,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
         //check if user has a neighborhood
         if (cloudUser.neighborhoodId == null) {
+          devtools.log('CloudUser has no neighborhood');
           emit(AppStateNoNeighborhood(
             isLoading: false,
             exception: null,
@@ -124,7 +128,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
         //get Neighborhood
         final neighborhood = await _cloudProvider.currentNeighborhood;
-
+        devtools.log('Neighborhood: ${neighborhood.toString()}');
         //check if Neighborhood does not exist, this would mean the neighborhood was deleted
         if (neighborhood == null) {
           await _cloudProvider.exitNeighborhood();
@@ -145,6 +149,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         //this would mean the neighborhood area was edited and the household no longer belongs to the neighborhood.
         final point = Point(x: household.latitude, y: household.longitude);
         if (Poly.isPointInPolygon(point, neighborhood.polygon) == false) {
+          devtools.log('Household is not in the neighborhood area');
           await _cloudProvider.exitNeighborhood();
           emit(AppStateNoNeighborhood(
             isLoading: false,
@@ -156,6 +161,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         }
 
         //emit success
+        devtools.log('Welcome!');
         emit(AppStateViewingNeighborhood(
           cloudUser: cloudUser,
           exception: null,
@@ -344,6 +350,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           exception: e,
           isLoading: false,
         ));
+        return;
       }
       add(AppEventReset());
     });

@@ -71,10 +71,6 @@ class HouseholdView extends HookWidget {
               ],
             ),
           ),
-          Divider(
-            thickness: 8,
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
-          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(

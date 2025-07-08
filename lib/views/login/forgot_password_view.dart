@@ -89,7 +89,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                   //cancel button
                   TextButton(
                     onPressed: () {
-                      context.read<AppBloc>().add(const AppEventLogOut());
+                      context.read<AppBloc>().add(const AppEventGoToLogin());
                     },
                     child: const Text('Regresar'),
                   ),
