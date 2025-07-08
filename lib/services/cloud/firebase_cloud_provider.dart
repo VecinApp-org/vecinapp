@@ -354,7 +354,7 @@ class FirebaseCloudProvider implements CloudProvider {
         postCreatorIdFieldName: authuser!.uid,
         postTextFieldName: text,
         postTimeCreatedFieldName: DateTime.now(),
-      }).then((doc) => doc.get().then((doc) => Post.fromDocument(doc)));
+      }).then((doc) => doc.get().then((doc) => Post.fromDocument(doc: doc)));
       devtools.log(doc.toString());
       devtools.log('The post was created');
       return doc;
@@ -372,7 +372,7 @@ class FirebaseCloudProvider implements CloudProvider {
         neighborhoodId: user!.neighborhoodId!,
         postId: postId,
       ).get();
-      return Post.fromDocument(doc);
+      return Post.fromDocument(doc: doc);
     } catch (e) {
       throw CouldNotGetPostException();
     }

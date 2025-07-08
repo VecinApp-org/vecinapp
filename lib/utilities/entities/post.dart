@@ -8,8 +8,8 @@ class Post {
   final String text;
   final String authorId;
   final DateTime timestamp;
-  final int likeCount;
-  final int commentCount;
+  final int? likeCount;
+  final int? commentCount;
 
   const Post({
     required this.id,
@@ -33,11 +33,18 @@ class Post {
     );
   }
 
-  Post.fromDocument(DocumentSnapshot<Map<String, dynamic>> doc)
-      : id = doc.id,
-        text = doc[postTextFieldName] as String,
-        authorId = doc[postCreatorIdFieldName] as String,
-        timestamp = doc[postTimeCreatedFieldName].toDate() as DateTime,
-        likeCount = doc[postLikesFieldName] as int,
-        commentCount = doc[postCommentsCountFieldName] as int;
+  factory Post.fromDocument({required DocumentSnapshot doc}) {
+    final data = doc.data() as Map<String?, dynamic>;
+    return Post(
+        id: doc.id,
+        text: data[postTextFieldName] as String,
+        authorId: data[postCreatorIdFieldName] as String,
+        timestamp: data[postTimeCreatedFieldName].toDate() as DateTime,
+        likeCount: data[postLikesFieldName] ?? 0,
+        commentCount: data[postCommentsCountFieldName] ?? 0);
+  }
+
+  @override
+  String toString() =>
+      'Post(id: $id, authorId: $authorId, timestamp: $timestamp, likeCount: $likeCount, commentCount: $commentCount, text: $text)';
 }

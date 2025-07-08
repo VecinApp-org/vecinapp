@@ -25,7 +25,18 @@ class PostsListView extends HookWidget {
       if (resultUser.hasData) {
         users[authorId] = resultUser.data as CloudUser;
       } else {
-        users[authorId] = null;
+        if (resultUser.connectionState == ConnectionState.done) {
+          users[authorId] = CloudUser(
+              id: authorId,
+              displayName: '[Usuario no existe]',
+              householdId: null,
+              neighborhoodId: null,
+              photoUrl: null,
+              isNeighborhoodAdmin: false,
+              isSuperAdmin: false);
+        } else {
+          users[authorId] = null;
+        }
       }
     }
     return ListView.builder(
@@ -54,7 +65,7 @@ class PostsListView extends HookWidget {
                     imageUrl: users[post.authorId]?.photoUrl,
                   ),
                   title: Text(
-                    users[post.authorId]?.displayName ?? '',
+                    users[post.authorId]?.displayName ?? '[Usuario no existe]',
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
