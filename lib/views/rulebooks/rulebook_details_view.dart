@@ -20,7 +20,7 @@ class RulebookDetailsView extends HookWidget {
     return DocView(
       title: rulebook.title,
       text: rulebook.text,
-      more: null,
+      children: null,
       appBarBackAction: () =>
           context.read<AppBloc>().add(const AppEventGoToRulebooksView()),
       appBarActions: [

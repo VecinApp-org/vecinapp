@@ -133,8 +133,7 @@ class EventDateInvalidCloudException extends CloudException {
 
 // Posts
 class CouldNotCreatePostException extends CloudException {
-  const CouldNotCreatePostException()
-      : super(message: 'No se pudo crear la publicación');
+  const CouldNotCreatePostException() : super(message: 'Inténtalo de nuevo');
 }
 
 class CouldNotGetPostException extends CloudException {

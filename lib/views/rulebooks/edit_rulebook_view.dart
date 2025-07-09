@@ -28,7 +28,7 @@ class EditRulebookView extends HookWidget {
       appBarBackAction: () =>
           context.read<AppBloc>().add(const AppEventGoToRulebooksView()),
       appBarActions: null,
-      more: [
+      children: [
         TextField(
           controller: titleController,
           autofocus: true,

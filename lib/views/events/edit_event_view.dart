@@ -53,7 +53,7 @@ class EditEventView extends HookWidget {
       appBarBackAction: () =>
           context.read<AppBloc>().add(const AppEventGoToEventsView()),
       appBarActions: null,
-      more: [
+      children: [
         TextField(
           controller: titleController,
           autofocus: true,

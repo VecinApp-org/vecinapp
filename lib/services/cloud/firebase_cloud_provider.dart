@@ -371,7 +371,7 @@ class FirebaseCloudProvider implements CloudProvider {
   }
 
   @override
-  Future<Post> createNewPost({required String? text}) async {
+  Future<void> createNewPost({required String? text}) async {
     // check required fields
     if (text == null || text.isEmpty) {
       throw ChannelErrorCloudException();
@@ -380,15 +380,17 @@ class FirebaseCloudProvider implements CloudProvider {
     try {
       final user = await currentCloudUser;
       final authuser = _authProvider.currentUser;
-      final doc = await _posts(neighborhoodId: user!.neighborhoodId!).add({
+      await _posts(neighborhoodId: user!.neighborhoodId!).add({
         postCreatorIdFieldName: authuser!.uid,
         postTextFieldName: text,
         postTimeCreatedFieldName: DateTime.now(),
-      }).then((doc) => doc.get().then((doc) => Post.fromDocument(doc: doc)));
-      devtools.log(doc.toString());
+      }).timeout(Duration(seconds: 5));
       devtools.log('The post was created');
-      return doc;
+      return;
     } catch (e) {
+      if (e is FirebaseException) {
+        devtools.log(e.code);
+      }
       devtools.log(e.toString());
       throw CouldNotCreatePostException();
     }

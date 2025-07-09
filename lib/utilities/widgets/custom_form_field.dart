@@ -13,6 +13,9 @@ class CustomFormField extends StatelessWidget {
     this.onSaved,
     this.enableSuggestions = true,
     this.keyboardType,
+    this.maxLength,
+    this.maxLines,
+    this.minLines,
   });
 
   final bool autofocus;
@@ -25,12 +28,18 @@ class CustomFormField extends StatelessWidget {
   final Function(String?)? onSaved;
   final bool enableSuggestions;
   final TextInputType? keyboardType;
+  final int? maxLength;
+  final int? maxLines;
+  final int? minLines;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
+        maxLength: maxLength,
+        maxLines: maxLines,
+        minLines: minLines,
         obscureText: obscureText,
         validator: validator,
         autofocus: autofocus,

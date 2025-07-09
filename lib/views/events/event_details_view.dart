@@ -41,7 +41,7 @@ class EventDetailsView extends HookWidget {
           ),
         )
       ],
-      more: [
+      children: [
         const SizedBox(height: 8),
         Text(
           '📅  ${DateFormat.EEEE().add_d().add_MMMM().add_jm().format(event.dateStart)}',

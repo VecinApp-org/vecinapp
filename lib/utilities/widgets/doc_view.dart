@@ -8,14 +8,14 @@ class DocView extends StatelessWidget {
     required this.text,
     required this.appBarBackAction,
     required this.appBarActions,
-    required this.more,
+    required this.children,
   });
   final String? appBarTitle;
   final String? title;
   final String? text;
   final VoidCallback? appBarBackAction;
   final List<Widget>? appBarActions;
-  final List<Widget>? more;
+  final List<Widget>? children;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,7 @@ class DocView extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),
-            if (more != null) ...more!,
+            if (children != null) ...children!,
           ],
         ),
       ),

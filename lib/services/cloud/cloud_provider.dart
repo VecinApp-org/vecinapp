@@ -109,7 +109,7 @@ abstract class CloudProvider {
     required String neighborhoodId,
   });
 
-  Future<Post> createNewPost({
+  Future<void> createNewPost({
     required String? text,
   });
 

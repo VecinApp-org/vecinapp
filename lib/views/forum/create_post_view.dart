@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
+import 'package:vecinapp/utilities/widgets/custom_form_field.dart';
 import 'package:vecinapp/utilities/widgets/doc_view.dart';
 
 class CreatePostView extends HookWidget {
@@ -10,6 +11,7 @@ class CreatePostView extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final formKey = useMemoized(() => GlobalKey<FormState>());
     final textController = useTextEditingController();
     return DocView(
         title: null,
@@ -18,21 +20,37 @@ class CreatePostView extends HookWidget {
         appBarActions: [],
         appBarBackAction: () =>
             context.read<AppBloc>().add(const AppEventGoToPostsView()),
-        more: [
-          TextField(
-            controller: textController,
-            decoration: const InputDecoration(hintText: 'Escribe aquí...'),
-            autofocus: true,
-            maxLines: 10,
-            minLines: 3,
-          ),
-          FilledButton(
-            onPressed: () {
-              context
-                  .read<AppBloc>()
-                  .add(AppEventCreatePost(text: textController.text));
-            },
-            child: const Text('Crear'),
+        children: [
+          Form(
+            key: formKey,
+            child: Column(children: [
+              CustomFormField(
+                hintText: 'Escribe aquí.',
+                autofocus: true,
+                maxLength: 10000,
+                minLines: 3,
+                onSaved: (value) {
+                  textController.text = value ?? '';
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Este campo es obligatorio.';
+                  }
+                  return null;
+                },
+              ),
+              FilledButton(
+                onPressed: () {
+                  formKey.currentState!.save();
+                  if (formKey.currentState!.validate()) {
+                    context
+                        .read<AppBloc>()
+                        .add(AppEventCreatePost(text: textController.text));
+                  }
+                },
+                child: const Text('Publicar'),
+              ),
+            ]),
           ),
         ]);
   }
