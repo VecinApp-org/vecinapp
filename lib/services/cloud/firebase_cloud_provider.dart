@@ -384,7 +384,7 @@ class FirebaseCloudProvider implements CloudProvider {
         postCreatorIdFieldName: authuser!.uid,
         postTextFieldName: text,
         postTimeCreatedFieldName: DateTime.now(),
-      }).timeout(Duration(seconds: 5));
+      }).timeout(Duration(seconds: 15));
       devtools.log('The post was created');
       return;
     } catch (e) {

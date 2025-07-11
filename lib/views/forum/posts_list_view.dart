@@ -5,6 +5,7 @@ import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/post.dart';
+import 'package:vecinapp/utilities/widgets/expandable_text.dart';
 import 'package:vecinapp/utilities/widgets/profile_picture.dart';
 import 'dart:developer' as devtools show log; // ignore: unused_import
 
@@ -43,12 +44,10 @@ class PostsListView extends HookWidget {
       }
     }
     return ListView.builder(
-      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: posts.length,
       itemBuilder: (context, index) {
         final post = posts.elementAt(index);
-
         if (users[post.authorId] == null) {
           return Card(
             child: SizedBox(
@@ -74,9 +73,8 @@ class PostsListView extends HookWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    post.text,
-                    textAlign: TextAlign.left,
+                  child: ExpandableText(
+                    text: post.text,
                   ),
                 ),
                 PostCardFooter(

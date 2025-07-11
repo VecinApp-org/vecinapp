@@ -37,9 +37,6 @@ class ForumView extends HookWidget {
         ),
         body: (posts.isEmpty)
             ? const Center(child: Text('No hay publicaciones'))
-            : ListView(
-                shrinkWrap: true,
-                children: [PostsListView(posts: posts)],
-              ));
+            : PostsListView(posts: posts));
   }
 }
