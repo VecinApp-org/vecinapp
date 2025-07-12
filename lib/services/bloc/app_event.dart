@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
-import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:vecinapp/utilities/entities/latlng.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/utilities/entities/post.dart';
@@ -201,23 +200,9 @@ class AppEventDeleteRulebook extends AppEvent {
   const AppEventDeleteRulebook();
 }
 
-// EVENT ROUTING EVENTS
-class AppEventGoToEventsView extends AppEvent {
-  const AppEventGoToEventsView();
-}
-
-class AppEventGoToEditEventView extends AppEvent {
-  final Event? event;
-  const AppEventGoToEditEventView({this.event});
-}
-
-class AppEventGoToEventDetailsView extends AppEvent {
-  final Event event;
-  const AppEventGoToEventDetailsView({required this.event});
-}
-
 // EVENT EVENTS
 class AppEventCreateOrUpdateEvent extends AppEvent {
+  final String? eventId;
   final String? title;
   final String? text;
   final DateTime? dateStart;
@@ -225,6 +210,7 @@ class AppEventCreateOrUpdateEvent extends AppEvent {
   final String? placeName;
   final LatLng? location;
   const AppEventCreateOrUpdateEvent({
+    required this.eventId,
     required this.title,
     required this.text,
     required this.dateStart,
@@ -235,7 +221,8 @@ class AppEventCreateOrUpdateEvent extends AppEvent {
 }
 
 class AppEventDeleteEvent extends AppEvent {
-  const AppEventDeleteEvent();
+  final String eventId;
+  const AppEventDeleteEvent({required this.eventId});
 }
 
 // POSTS ROUTING EVENTS

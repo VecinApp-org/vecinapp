@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/extensions/formatting/format_event_date_time.dart';
-import 'package:vecinapp/services/bloc/app_bloc.dart';
-import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/entities/event.dart';
+import 'package:vecinapp/utilities/widgets/custom_card.dart';
+import 'package:vecinapp/views/events/event_details_view.dart';
 
 class EventListView extends StatelessWidget {
   final List<Event> events;
@@ -21,17 +20,14 @@ class EventListView extends StatelessWidget {
       itemCount: events.length,
       itemBuilder: (context, index) {
         final event = events.elementAt(index);
-        return Card(
-          margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        return CustomCard(
           child: ListTile(
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             onTap: () {
-              context.read<AppBloc>().add(
-                    AppEventGoToEventDetailsView(
-                      event: event,
-                    ),
-                  );
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return EventDetailsView(event: event);
+              }));
             },
             title: Text(
               event.title,

@@ -14,80 +14,82 @@ class SettingsView extends HookWidget {
   @override
   Widget build(BuildContext context) {
     useListenable(controller);
-    return Scaffold(
-      appBar: AppBar(
-        leading: BackButton(
-          onPressed: () {
-            context.read<AppBloc>().add(
-                  const AppEventGoToProfileView(),
-                );
-          },
-        ),
-        actions: [
-          PopupMenuButton(itemBuilder: (context) {
-            return [
-              PopupMenuItem(
-                value: 'Cerrar sesión',
-                onTap: () async {
-                  final confirmLogout = await showConfirmationDialog(
-                    context: context,
-                    text: '¿Quieres salir de tu cuenta?',
+    return PopScope(
+      child: Scaffold(
+        appBar: AppBar(
+          leading: BackButton(
+            onPressed: () {
+              context.read<AppBloc>().add(
+                    const AppEventGoToProfileView(),
                   );
-                  if (confirmLogout == true && context.mounted) {
-                    context.read<AppBloc>().add(
-                          const AppEventLogOut(),
-                        );
-                  }
-                },
-                child: Text('Cerrar sesión'),
-              ),
-              PopupMenuItem(
-                value: 'Eliminar cuenta',
-                onTap: () async {
-                  final confirmDeleteAccout = await showConfirmationDialog(
-                    context: context,
-                    isDestructive: true,
-                    title: 'Eliminar cuenta',
-                    text: 'Esta acción es irreversible.',
-                    confirmText: 'Eliminar todos mis datos',
-                  );
-                  if (confirmDeleteAccout == true && context.mounted) {
-                    context.read<AppBloc>().add(
-                          const AppEventGoToDeleteAccountView(),
-                        );
-                  }
-                },
-                child: Text('Eliminar cuenta'),
-              ),
-            ];
-          })
-        ],
-      ),
-      body: ListView(
-        children: [
-          ListTile(
-            title: const Text('Tema'),
-            trailing: SegmentedButton(
-              onSelectionChanged: (selection) =>
-                  controller.updateThemeMode(selection.first),
-              segments: [
-                ButtonSegment(
-                  value: ThemeMode.system,
-                  icon: Icon(Icons.phone_android),
-                ),
-                ButtonSegment(
-                  value: ThemeMode.light,
-                  icon: Icon(Icons.light_mode),
-                ),
-                ButtonSegment(
-                  value: ThemeMode.dark,
-                  icon: Icon(Icons.dark_mode),
-                ),
-              ],
-              selected: <ThemeMode>{controller.themeMode},
-            ),
+            },
           ),
-        ],
+          actions: [
+            PopupMenuButton(itemBuilder: (context) {
+              return [
+                PopupMenuItem(
+                  value: 'Cerrar sesión',
+                  onTap: () async {
+                    final confirmLogout = await showConfirmationDialog(
+                      context: context,
+                      text: '¿Quieres salir de tu cuenta?',
+                    );
+                    if (confirmLogout == true && context.mounted) {
+                      context.read<AppBloc>().add(
+                            const AppEventLogOut(),
+                          );
+                    }
+                  },
+                  child: Text('Cerrar sesión'),
+                ),
+                PopupMenuItem(
+                  value: 'Eliminar cuenta',
+                  onTap: () async {
+                    final confirmDeleteAccout = await showConfirmationDialog(
+                      context: context,
+                      isDestructive: true,
+                      title: 'Eliminar cuenta',
+                      text: 'Esta acción es irreversible.',
+                      confirmText: 'Eliminar todos mis datos',
+                    );
+                    if (confirmDeleteAccout == true && context.mounted) {
+                      context.read<AppBloc>().add(
+                            const AppEventGoToDeleteAccountView(),
+                          );
+                    }
+                  },
+                  child: Text('Eliminar cuenta'),
+                ),
+              ];
+            })
+          ],
+        ),
+        body: ListView(
+          children: [
+            ListTile(
+              title: const Text('Tema'),
+              trailing: SegmentedButton(
+                onSelectionChanged: (selection) =>
+                    controller.updateThemeMode(selection.first),
+                segments: [
+                  ButtonSegment(
+                    value: ThemeMode.system,
+                    icon: Icon(Icons.phone_android),
+                  ),
+                  ButtonSegment(
+                    value: ThemeMode.light,
+                    icon: Icon(Icons.light_mode),
+                  ),
+                  ButtonSegment(
+                    value: ThemeMode.dark,
+                    icon: Icon(Icons.dark_mode),
+                  ),
+                ],
+                selected: <ThemeMode>{controller.themeMode},
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
-import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
+import 'package:vecinapp/views/events/edit_event_view.dart';
 import 'package:vecinapp/views/events/event_list_view.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'dart:developer' as devtools show log; // ignore: unused_import
@@ -30,8 +30,9 @@ class EventsView extends HookWidget {
               visible: cloudUser.isNeighborhoodAdmin,
               child: IconButton(
                 icon: const Icon(Icons.add),
-                onPressed: () =>
-                    context.read<AppBloc>().add(AppEventGoToEditEventView()),
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const EditEventView(),
+                )),
               ),
             )
           ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vecinapp/utilities/widgets/custom_card.dart';
 
 class DocView extends StatelessWidget {
   const DocView({
@@ -27,29 +28,28 @@ class DocView extends StatelessWidget {
         ),
         actions: appBarActions,
       ),
-      body: Card(
-        margin: const EdgeInsets.all(8),
-        child: ListView(
-          padding: const EdgeInsets.all(13),
-          children: [
-            if (title != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: Text(
-                  title!,
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-              ),
-            if (text != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: Text(
-                  text ?? '',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ),
-            if (children != null) ...children!,
-          ],
+      body: SingleChildScrollView(
+        child: CustomCard(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (title != null)
+                  Text(
+                    title!,
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                if (text != null)
+                  Text(
+                    text ?? '',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                if (children != null) ...children!,
+              ],
+            ),
+          ),
         ),
       ),
     );

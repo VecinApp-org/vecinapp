@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart' show immutable;
 import 'package:vecinapp/utilities/entities/auth_user.dart';
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
-import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/utilities/entities/post.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
@@ -328,12 +327,14 @@ class AppStateViewingRulebookDetails extends AppState with EquatableMixin {
 class AppStateViewingEvents extends AppState with EquatableMixin {
   const AppStateViewingEvents({
     required bool isLoading,
+    required loadingText,
     required exception,
     required cloudUser,
     required neighborhood,
     required household,
   }) : super(
             isLoading: isLoading,
+            loadingText: loadingText,
             exception: exception,
             cloudUser: cloudUser,
             neighborhood: neighborhood,
@@ -341,32 +342,7 @@ class AppStateViewingEvents extends AppState with EquatableMixin {
 
   @override
   List<Object?> get props =>
-      [exception, isLoading, cloudUser, neighborhood, household];
-}
-
-class AppStateEditingEvent extends AppState with EquatableMixin {
-  final Event? event;
-  const AppStateEditingEvent({
-    this.event,
-    required bool isLoading,
-    required exception,
-  }) : super(isLoading: isLoading, exception: exception);
-
-  @override
-  List<Object?> get props => [exception, isLoading, event];
-}
-
-class AppStateViewingEventDetails extends AppState with EquatableMixin {
-  final Event event;
-  const AppStateViewingEventDetails({
-    required this.event,
-    required cloudUser,
-    required isLoading,
-    required exception,
-  }) : super(isLoading: isLoading, exception: exception, cloudUser: cloudUser);
-
-  @override
-  List<Object?> get props => [exception, isLoading, cloudUser, event];
+      [exception, isLoading, cloudUser, neighborhood, household, loadingText];
 }
 
 //POST STATES
@@ -441,34 +417,10 @@ extension GetRulebook on AppState {
   }
 }
 
-extension GetEvent on AppState {
-  Event? get event {
-    if (this is AppStateEditingEvent) {
-      return (this as AppStateEditingEvent).event;
-    }
-    if (this is AppStateViewingEventDetails) {
-      return (this as AppStateViewingEventDetails).event;
-    }
-    return null;
-  }
-}
-
 extension GetAddresses on AppState {
   List<Address>? get addresses {
     if (this is AppStateConfirmingHomeAddress) {
       return (this as AppStateConfirmingHomeAddress).addresses;
-    }
-    return null;
-  }
-}
-
-extension GetPost on AppState {
-  Post? get post {
-    if (this is AppStateEditingPost) {
-      return (this as AppStateEditingPost).post;
-    }
-    if (this is AppStateViewingPostDetails) {
-      return (this as AppStateViewingPostDetails).post;
     }
     return null;
   }

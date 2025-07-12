@@ -46,7 +46,10 @@ class VecinApp extends StatelessWidget {
               theme: lightTheme,
               darkTheme: darkTheme,
               themeMode: settingsController.themeMode,
-              home: const AppBlocRouter(),
+              home: PopScope(
+                canPop: false,
+                child: const AppBlocRouter(),
+              ),
             );
           }),
     );

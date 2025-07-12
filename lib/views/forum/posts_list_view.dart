@@ -5,6 +5,7 @@ import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/post.dart';
+import 'package:vecinapp/utilities/widgets/custom_card.dart';
 import 'package:vecinapp/utilities/widgets/expandable_text.dart';
 import 'package:vecinapp/utilities/widgets/profile_picture.dart';
 import 'dart:developer' as devtools show log; // ignore: unused_import
@@ -49,40 +50,35 @@ class PostsListView extends HookWidget {
       itemBuilder: (context, index) {
         final post = posts.elementAt(index);
         if (users[post.authorId] == null) {
-          return Card(
-            child: SizedBox(
-              height: 100,
-            ),
-          );
+          return CustomCard();
         }
 
-        return Card(
-            margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        return CustomCard(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ListTile(
-                  leading: ProfilePicture(
-                    radius: 16,
-                    imageUrl: users[post.authorId]?.photoUrl,
-                  ),
-                  title: Text(
-                    users[post.authorId]?.displayName ?? '[Usuario no existe]',
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: ExpandableText(
-                    text: post.text,
-                  ),
-                ),
-                PostCardFooter(
-                  post: post,
-                  userId: userId,
-                ),
-              ],
-            ));
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListTile(
+              leading: ProfilePicture(
+                radius: 16,
+                imageUrl: users[post.authorId]?.photoUrl,
+              ),
+              title: Text(
+                users[post.authorId]?.displayName ?? '[Usuario no existe]',
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: ExpandableText(
+                text: post.text,
+              ),
+            ),
+            PostCardFooter(
+              post: post,
+              userId: userId,
+            ),
+          ],
+        ));
       },
     );
   }

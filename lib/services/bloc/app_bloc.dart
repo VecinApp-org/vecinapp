@@ -6,6 +6,7 @@ import 'package:vecinapp/services/auth/auth_exceptions.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
 import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
+import 'package:vecinapp/services/bloc/loading_messages_constants.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
@@ -936,38 +937,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
     });
 
-    //Event Routing
-    on<AppEventGoToEventsView>((event, emit) async {
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      final neighborhood = await _cloudProvider.cachedNeighborhood;
-      final household = await _cloudProvider.cachedHousehold;
-      emit(AppStateViewingEvents(
-        isLoading: false,
-        exception: null,
-        cloudUser: cloudUser,
-        neighborhood: neighborhood,
-        household: household,
-      ));
-    });
-
-    on<AppEventGoToEditEventView>((event, emit) async {
-      emit(AppStateEditingEvent(
-        event: event.event,
-        isLoading: false,
-        exception: null,
-      ));
-    });
-
-    on<AppEventGoToEventDetailsView>((event, emit) async {
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      emit(AppStateViewingEventDetails(
-        event: event.event,
-        isLoading: false,
-        exception: null,
-        cloudUser: cloudUser!,
-      ));
-    });
-
     //Event Events
     on<AppEventCreateOrUpdateEvent>((event, emit) async {
       //validate access
@@ -975,18 +944,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         add(const AppEventReset());
         return;
       }
-      //enable loading indicator
-      emit(AppStateEditingEvent(
-        event: state.event,
-        isLoading: true,
-        exception: null,
-      ));
       //check if event is provided
-      late Event newEvent;
-      if (state.event != null) {
+      if (event.eventId != null) {
+        //enable loading indicator
+        emit(AppStateViewingEvents(
+          cloudUser: state.cloudUser!,
+          neighborhood: state.neighborhood!,
+          household: state.household!,
+          isLoading: true,
+          loadingText: loadingTextEventEditing,
+          exception: null,
+        ));
         try {
           //update existing event
-          final eventId = state.event!.id;
+          final eventId = event.eventId!;
           await _cloudProvider.updateEvent(
             eventId: eventId,
             title: event.title,
@@ -996,20 +967,30 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             placeName: event.placeName,
             location: event.location,
           );
-          newEvent = await _cloudProvider.getEvent(eventId: eventId);
         } catch (e) {
           //inform user of error
-          emit(AppStateEditingEvent(
-            event: state.event,
+          emit(AppStateViewingEvents(
+            cloudUser: state.cloudUser!,
+            neighborhood: state.neighborhood!,
+            household: state.household!,
             isLoading: false,
+            loadingText: null,
             exception: e,
           ));
           return;
         }
       } else {
+        emit(AppStateViewingEvents(
+          cloudUser: state.cloudUser!,
+          neighborhood: state.neighborhood!,
+          household: state.household!,
+          isLoading: true,
+          loadingText: loadingTextEventCreation,
+          exception: null,
+        ));
         //create new event
         try {
-          newEvent = await _cloudProvider.createNewEvent(
+          await _cloudProvider.createNewEvent(
             title: event.title,
             text: event.text,
             dateStart: event.dateStart,
@@ -1019,60 +1000,61 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           );
         } catch (e) {
           //inform user of error
-          emit(AppStateEditingEvent(
-            event: null,
+          emit(AppStateViewingEvents(
+            cloudUser: state.cloudUser!,
+            neighborhood: state.neighborhood!,
+            household: state.household!,
             isLoading: false,
+            loadingText: null,
             exception: e,
           ));
           return;
         }
       }
       //Send user to event details view
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      emit(AppStateViewingEventDetails(
-        event: newEvent,
-        cloudUser: cloudUser!,
+      emit(AppStateViewingEvents(
+        neighborhood: state.neighborhood!,
+        household: state.household!,
+        cloudUser: state.cloudUser!,
         isLoading: false,
+        loadingText: loadingTextEventEditSuccess,
         exception: null,
       ));
     });
 
     on<AppEventDeleteEvent>((event, emit) async {
-      //validate access
-      if (!await _isValidNeighborhoodAccess()) {
-        add(const AppEventReset());
-        return;
-      }
       //enable loading indicator
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      final neighborhood = await _cloudProvider.cachedNeighborhood;
-      final household = await _cloudProvider.cachedHousehold;
-      emit(AppStateViewingEventDetails(
-        event: state.event!,
+      emit(AppStateViewingEvents(
+        neighborhood: state.neighborhood!,
+        household: state.household!,
         isLoading: true,
+        loadingText: loadingTextDefault,
         exception: null,
-        cloudUser: cloudUser!,
+        cloudUser: state.cloudUser!,
       ));
       try {
         await _cloudProvider.deleteEvent(
-          eventId: state.event!.id,
+          eventId: event.eventId,
         );
       } on Exception catch (e) {
-        emit(AppStateViewingEventDetails(
-          event: state.event!,
-          cloudUser: cloudUser,
+        emit(AppStateViewingEvents(
+          neighborhood: state.neighborhood!,
+          household: state.household!,
+          cloudUser: state.cloudUser!,
           isLoading: false,
+          loadingText: null,
           exception: e,
         ));
         return;
       }
       //Send user to rulebooks view
-      emit(AppStateViewingNeighborhood(
-        neighborhood: neighborhood!,
+      emit(AppStateViewingEvents(
+        neighborhood: state.neighborhood!,
         isLoading: false,
+        loadingText: loadingTextEventDeleteSuccess,
         exception: null,
-        cloudUser: cloudUser,
-        household: household!,
+        cloudUser: state.cloudUser!,
+        household: state.household!,
       ));
     });
 
