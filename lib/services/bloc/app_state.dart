@@ -4,7 +4,6 @@ import 'package:vecinapp/utilities/entities/auth_user.dart';
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
-import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 
 @immutable
@@ -179,8 +178,8 @@ class AppStateWelcomeToNeighborhood extends AppState with EquatableMixin {
 //MAIN APP STATES
 class AppStateViewingNeighborhood extends AppState with EquatableMixin {
   const AppStateViewingNeighborhood({
-    required Exception? exception,
     required bool isLoading,
+    required exception,
     required String? loadingText,
     required CloudUser cloudUser,
     required Household household,
@@ -280,85 +279,7 @@ class AppStateDeletingAccount extends AppState with EquatableMixin {
   List<Object?> get props => [exception, isLoading, loadingText];
 }
 
-//RULEBOOK STATES
-class AppStateViewingRulebooks extends AppState with EquatableMixin {
-  const AppStateViewingRulebooks(
-      {required bool isLoading,
-      required exception,
-      required cloudUser,
-      required neighborhood,
-      required household})
-      : super(
-            isLoading: isLoading,
-            exception: exception,
-            cloudUser: cloudUser,
-            neighborhood: neighborhood,
-            household: household);
-
-  @override
-  List<Object?> get props =>
-      [exception, isLoading, cloudUser, neighborhood, household];
-}
-
-class AppStateEditingRulebook extends AppState with EquatableMixin {
-  final Rulebook? rulebook;
-  const AppStateEditingRulebook({
-    this.rulebook,
-    required bool isLoading,
-    required exception,
-  }) : super(isLoading: isLoading, exception: exception);
-
-  @override
-  List<Object?> get props => [exception, isLoading, rulebook];
-}
-
-class AppStateViewingRulebookDetails extends AppState with EquatableMixin {
-  final Rulebook rulebook;
-  const AppStateViewingRulebookDetails({
-    required this.rulebook,
-    required cloudUser,
-    required isLoading,
-    required exception,
-  }) : super(isLoading: isLoading, exception: exception, cloudUser: cloudUser);
-
-  @override
-  List<Object?> get props => [exception, isLoading, cloudUser, rulebook];
-}
-
-//EVENT STATES
-class AppStateViewingEvents extends AppState with EquatableMixin {
-  const AppStateViewingEvents({
-    required bool isLoading,
-    required loadingText,
-    required exception,
-    required cloudUser,
-    required neighborhood,
-    required household,
-  }) : super(
-            isLoading: isLoading,
-            loadingText: loadingText,
-            exception: exception,
-            cloudUser: cloudUser,
-            neighborhood: neighborhood,
-            household: household);
-
-  @override
-  List<Object?> get props =>
-      [exception, isLoading, cloudUser, neighborhood, household, loadingText];
-}
-
 //EXTENSIONS
-extension GetRulebook on AppState {
-  Rulebook? get rulebook {
-    if (this is AppStateEditingRulebook) {
-      return (this as AppStateEditingRulebook).rulebook;
-    }
-    if (this is AppStateViewingRulebookDetails) {
-      return (this as AppStateViewingRulebookDetails).rulebook;
-    }
-    return null;
-  }
-}
 
 extension GetAddresses on AppState {
   List<Address>? get addresses {

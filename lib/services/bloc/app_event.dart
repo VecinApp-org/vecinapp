@@ -3,7 +3,6 @@ import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/latlng.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/utilities/entities/post.dart';
-import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 
 @immutable
@@ -171,33 +170,21 @@ class AppEventUpdateProfilePhoto extends AppEvent {
   const AppEventUpdateProfilePhoto({required this.imagePath});
 }
 
-// RULEBOOK ROUTING EVENTS
-class AppEventGoToRulebooksView extends AppEvent {
-  const AppEventGoToRulebooksView();
-}
-
-class AppEventGoToEditRulebookView extends AppEvent {
-  final Rulebook? rulebook;
-  const AppEventGoToEditRulebookView({this.rulebook});
-}
-
-class AppEventGoToRulebookDetailsView extends AppEvent {
-  final Rulebook rulebook;
-  const AppEventGoToRulebookDetailsView({required this.rulebook});
-}
-
 // RULEBOOK EVENTS
 class AppEventCreateOrUpdateRulebook extends AppEvent {
   final String title;
   final String text;
+  final String? rulebookId;
   const AppEventCreateOrUpdateRulebook({
     required this.title,
     required this.text,
+    required this.rulebookId,
   });
 }
 
 class AppEventDeleteRulebook extends AppEvent {
-  const AppEventDeleteRulebook();
+  final String rulebookId;
+  const AppEventDeleteRulebook({required this.rulebookId});
 }
 
 // EVENT EVENTS

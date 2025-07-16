@@ -799,38 +799,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       },
     );
 
-    //Rulebook Routing
-    on<AppEventGoToRulebooksView>((event, emit) async {
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      final neighborhood = await _cloudProvider.cachedNeighborhood;
-      final household = await _cloudProvider.cachedHousehold;
-      emit(AppStateViewingRulebooks(
-        isLoading: false,
-        exception: null,
-        cloudUser: cloudUser,
-        neighborhood: neighborhood,
-        household: household,
-      ));
-    });
-
-    on<AppEventGoToEditRulebookView>((event, emit) async {
-      emit(AppStateEditingRulebook(
-        rulebook: event.rulebook,
-        isLoading: false,
-        exception: null,
-      ));
-    });
-
-    on<AppEventGoToRulebookDetailsView>((event, emit) async {
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      emit(AppStateViewingRulebookDetails(
-        rulebook: event.rulebook,
-        isLoading: false,
-        exception: null,
-        cloudUser: cloudUser!,
-      ));
-    });
-
     //Rulebook Events
     on<AppEventCreateOrUpdateRulebook>((event, emit) async {
       //validate access
@@ -839,29 +807,35 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //enable loading indicator
-      emit(AppStateEditingRulebook(
-        rulebook: state.rulebook,
+      emit(AppStateViewingNeighborhood(
+        neighborhood: state.neighborhood!,
+        cloudUser: state.cloudUser!,
+        household: state.household!,
         isLoading: true,
+        loadingText: loadingTextRulebookCreation,
         exception: null,
       ));
+      final cloudUser = await _cloudProvider.cachedCloudUser;
+      final household = await _cloudProvider.cachedHousehold;
+      final neighborhood = await _cloudProvider.cachedNeighborhood;
       //check if rulebook is provided
-      late Rulebook newRulebook;
-      if (state.rulebook != null) {
+      final rulebookId = event.rulebookId;
+      if (rulebookId != null) {
         try {
           //update existing rulebook
-          final rulebookId = state.rulebook!.id;
           await _cloudProvider.updateRulebook(
             rulebookId: rulebookId,
             title: event.title,
             text: event.text,
           );
-          newRulebook =
-              await _cloudProvider.getRulebook(rulebookId: rulebookId);
         } catch (e) {
           //inform user of error
-          emit(AppStateEditingRulebook(
-            rulebook: state.rulebook,
+          emit(AppStateViewingNeighborhood(
+            neighborhood: neighborhood!,
+            cloudUser: cloudUser!,
+            household: household!,
             isLoading: false,
+            loadingText: null,
             exception: e,
           ));
           return;
@@ -869,26 +843,30 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       } else {
         //create new rulebook
         try {
-          newRulebook = await _cloudProvider.createNewRulebook(
+          await _cloudProvider.createNewRulebook(
             title: event.title,
             text: event.text,
           );
         } catch (e) {
           //inform user of error
-          emit(AppStateEditingRulebook(
-            rulebook: null,
+          emit(AppStateViewingNeighborhood(
+            neighborhood: neighborhood!,
+            cloudUser: cloudUser!,
+            household: household!,
             isLoading: false,
+            loadingText: null,
             exception: e,
           ));
           return;
         }
       }
       //Send user to rulebook details view
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      emit(AppStateViewingRulebookDetails(
-        rulebook: newRulebook,
+      emit(AppStateViewingNeighborhood(
+        neighborhood: neighborhood!,
+        household: household!,
         cloudUser: cloudUser!,
         isLoading: false,
+        loadingText: loadingTextRulebookCreationSuccess,
         exception: null,
       ));
     });
@@ -900,43 +878,51 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //enable loading indicator
+
+      emit(AppStateViewingNeighborhood(
+        neighborhood: state.neighborhood!,
+        household: state.household!,
+        cloudUser: state.cloudUser!,
+        isLoading: true,
+        loadingText: loadingTextRulebookDeletion,
+        exception: null,
+      ));
       final cloudUser = await _cloudProvider.cachedCloudUser;
       final neighborhood = await _cloudProvider.cachedNeighborhood;
-      emit(AppStateViewingRulebookDetails(
-        rulebook: state.rulebook!,
-        isLoading: true,
-        exception: null,
-        cloudUser: cloudUser!,
-      ));
+      final household = await _cloudProvider.cachedHousehold;
       try {
         await _cloudProvider.deleteRulebook(
-          rulebookId: state.rulebook!.id,
+          rulebookId: event.rulebookId,
         );
       } on CloudException catch (e) {
-        emit(AppStateViewingRulebookDetails(
-          rulebook: state.rulebook!,
-          cloudUser: cloudUser,
+        emit(AppStateViewingNeighborhood(
+          neighborhood: neighborhood!,
+          cloudUser: cloudUser!,
+          household: household!,
           isLoading: false,
+          loadingText: null,
           exception: e,
         ));
         return;
       } on Exception catch (e) {
-        emit(AppStateViewingRulebookDetails(
-          rulebook: state.rulebook!,
-          cloudUser: cloudUser,
+        emit(AppStateViewingNeighborhood(
+          neighborhood: neighborhood!,
+          household: household!,
+          cloudUser: cloudUser!,
           isLoading: false,
+          loadingText: null,
           exception: e,
         ));
         return;
       }
       //Send user to rulebooks view
-      final household = await _cloudProvider.cachedHousehold;
-      emit(AppStateViewingRulebooks(
-        neighborhood: neighborhood,
+      emit(AppStateViewingNeighborhood(
+        neighborhood: neighborhood!,
+        cloudUser: cloudUser!,
+        household: household!,
         isLoading: false,
+        loadingText: loadingTextRulebookDeletionSuccess,
         exception: null,
-        cloudUser: cloudUser,
-        household: household,
       ));
     });
 
@@ -950,7 +936,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       //check if event is provided
       if (event.eventId != null) {
         //enable loading indicator
-        emit(AppStateViewingEvents(
+        emit(AppStateViewingNeighborhood(
           cloudUser: state.cloudUser!,
           neighborhood: state.neighborhood!,
           household: state.household!,
@@ -972,7 +958,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           );
         } catch (e) {
           //inform user of error
-          emit(AppStateViewingEvents(
+          emit(AppStateViewingNeighborhood(
             cloudUser: state.cloudUser!,
             neighborhood: state.neighborhood!,
             household: state.household!,
@@ -983,7 +969,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           return;
         }
       } else {
-        emit(AppStateViewingEvents(
+        emit(AppStateViewingNeighborhood(
           cloudUser: state.cloudUser!,
           neighborhood: state.neighborhood!,
           household: state.household!,
@@ -1003,7 +989,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           );
         } catch (e) {
           //inform user of error
-          emit(AppStateViewingEvents(
+          emit(AppStateViewingNeighborhood(
             cloudUser: state.cloudUser!,
             neighborhood: state.neighborhood!,
             household: state.household!,
@@ -1014,20 +1000,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           return;
         }
       }
-      //Send user to event details view
-      emit(AppStateViewingEvents(
+      //emit success
+      emit(AppStateViewingNeighborhood(
         neighborhood: state.neighborhood!,
-        household: state.household!,
-        cloudUser: state.cloudUser!,
         isLoading: false,
         loadingText: loadingTextEventEditSuccess,
         exception: null,
+        cloudUser: state.cloudUser!,
+        household: state.household!,
       ));
     });
 
     on<AppEventDeleteEvent>((event, emit) async {
       //enable loading indicator
-      emit(AppStateViewingEvents(
+      emit(AppStateViewingNeighborhood(
         neighborhood: state.neighborhood!,
         household: state.household!,
         isLoading: true,
@@ -1040,7 +1026,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           eventId: event.eventId,
         );
       } on Exception catch (e) {
-        emit(AppStateViewingEvents(
+        emit(AppStateViewingNeighborhood(
           neighborhood: state.neighborhood!,
           household: state.household!,
           cloudUser: state.cloudUser!,
@@ -1051,7 +1037,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //Send user to rulebooks view
-      emit(AppStateViewingEvents(
+      emit(AppStateViewingNeighborhood(
         neighborhood: state.neighborhood!,
         isLoading: false,
         loadingText: loadingTextEventDeleteSuccess,

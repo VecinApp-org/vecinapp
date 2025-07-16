@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
-import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
+import 'package:vecinapp/views/rulebooks/edit_rulebook_view.dart';
 import 'package:vecinapp/views/rulebooks/rulebook_list_view.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -14,15 +14,7 @@ class RulebooksView extends HookWidget {
     final stream = useMemoized(() => context.watch<AppBloc>().rulebooks);
     final rulebooks = useStream(stream);
 
-    if (rulebooks.data == null) {
-      return Container();
-    }
-
-    if (rulebooks.data!.isEmpty) {
-      return const Center(child: Text('No hay recursos'));
-    }
-
-    final list = rulebooks.data!.toList();
+    final list = rulebooks.data?.toList() ?? [];
     list.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     return Scaffold(
       appBar: AppBar(
@@ -31,15 +23,20 @@ class RulebooksView extends HookWidget {
           Visibility(
             visible: cloudUser.isNeighborhoodAdmin,
             child: IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () => context
-                  .read<AppBloc>()
-                  .add(const AppEventGoToEditRulebookView()),
-            ),
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const EditRulebookView(),
+                  ));
+                }),
           )
         ],
       ),
-      body: SingleChildScrollView(child: RulebookListView(rulebooks: list)),
+      body: (rulebooks.data == null)
+          ? Container()
+          : (rulebooks.data!.isEmpty)
+              ? const Center(child: Text('No hay recursos'))
+              : RulebookListView(rulebooks: list),
     );
   }
 }

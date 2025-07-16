@@ -15,33 +15,29 @@ class EventsView extends HookWidget {
     //get upcoming events
     final stream = useMemoized(() => context.watch<AppBloc>().events);
     final snapshot = useStream(stream);
-    //check if snapshot is null
-    if (snapshot.data == null) {
-      return Container();
-    }
-    final events = snapshot.data!.toList();
+    final events = snapshot.data?.toList() ?? [];
     //sort events
     events.sort((a, b) => a.dateStart.compareTo(b.dateStart));
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Próximos Eventos'),
-          actions: [
-            Visibility(
-              visible: cloudUser.isNeighborhoodAdmin,
-              child: IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const EditEventView(),
-                )),
-              ),
-            )
-          ],
-        ),
-        body: (events.isEmpty)
-            ? const Center(child: Text('No hay eventos'))
-            : ListView(
-                shrinkWrap: true,
-                children: [EventListView(events: events)],
-              ));
+      appBar: AppBar(
+        title: const Text('Próximos Eventos'),
+        actions: [
+          Visibility(
+            visible: cloudUser.isNeighborhoodAdmin,
+            child: IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const EditEventView(),
+              )),
+            ),
+          )
+        ],
+      ),
+      body: (snapshot.data == null)
+          ? Container()
+          : (events.isEmpty)
+              ? const Center(child: Text('No hay eventos'))
+              : EventListView(events: events),
+    );
   }
 }

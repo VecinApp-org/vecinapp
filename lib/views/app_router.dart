@@ -24,8 +24,6 @@ import 'package:vecinapp/views/login/verify_email_view.dart';
 import 'package:vecinapp/views/neighborhood_details_view.dart';
 import 'package:vecinapp/views/neighborhood_view.dart';
 import 'package:vecinapp/views/profile_view.dart';
-import 'package:vecinapp/views/rulebooks/edit_rulebook_view.dart';
-import 'package:vecinapp/views/rulebooks/rulebook_details_view.dart';
 import 'package:vecinapp/views/settings_view.dart';
 import 'dart:developer' as devtools show log; // ignore: unused_import
 
@@ -107,24 +105,6 @@ class AppBlocRouter extends StatelessWidget {
           return NeighborhoodDetailsView(neighborhood: state.neighborhood!);
         } else if (state is AppStateViewingSettings) {
           return SettingsView();
-        } else if (state is AppStateViewingRulebooks) {
-          return NeighborhoodView(
-              cloudUser: state.cloudUser!,
-              neighborhood: state.neighborhood!,
-              household: state.household!,
-              selectedIndex: NeighborhoodPageIndex.rulebooks);
-        } else if (state is AppStateEditingRulebook) {
-          return EditRulebookView(rulebook: state.rulebook);
-        } else if (state is AppStateViewingRulebookDetails) {
-          return RulebookDetailsView(
-              rulebook: state.rulebook, cloudUser: state.cloudUser!);
-        } else if (state is AppStateViewingEvents) {
-          return NeighborhoodView(
-            cloudUser: state.cloudUser!,
-            neighborhood: state.neighborhood!,
-            household: state.household!,
-            selectedIndex: NeighborhoodPageIndex.events,
-          );
         } else if (state is AppStateDeletingAccount) {
           return const DeleteAccountView();
         } else if (state is AppStateCreatingCloudUser) {

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vecinapp/services/bloc/app_bloc.dart';
-import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/widgets/custom_card.dart';
+import 'package:vecinapp/views/rulebooks/rulebook_details_view.dart';
 
 class RulebookListView extends StatelessWidget {
   final List<Rulebook> rulebooks;
@@ -15,8 +13,11 @@ class RulebookListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (rulebooks.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    rulebooks.sort((a, b) => a.title.compareTo(b.title));
     return ListView.builder(
-        physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         itemCount: rulebooks.length,
         itemBuilder: (context, index) {
@@ -25,11 +26,9 @@ class RulebookListView extends StatelessWidget {
             child: ListTile(
               leading: const Icon(Icons.library_books_outlined),
               onTap: () {
-                context.read<AppBloc>().add(
-                      AppEventGoToRulebookDetailsView(
-                        rulebook: rulebook,
-                      ),
-                    );
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => RulebookDetailsView(rulebook: rulebook),
+                ));
               },
               title: Text(
                 rulebook.title,

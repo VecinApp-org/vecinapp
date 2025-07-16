@@ -15,7 +15,6 @@ class EventListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: events.length,
       itemBuilder: (context, index) {

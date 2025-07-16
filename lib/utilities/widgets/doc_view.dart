@@ -7,46 +7,46 @@ class DocView extends StatelessWidget {
     this.appBarTitle,
     required this.title,
     required this.text,
-    this.appBarBackAction,
     required this.appBarActions,
-    required this.children,
+    this.child,
   });
   final String? appBarTitle;
   final String? title;
   final String? text;
-  final VoidCallback? appBarBackAction;
   final List<Widget>? appBarActions;
-  final List<Widget>? children;
+  final Widget? child;
 
   @override
   Widget build(BuildContext context) {
+    final titlee = title ?? '';
+    final textt = text ?? '';
+    final children = child ?? Container();
     return Scaffold(
       appBar: AppBar(
         title: Text(appBarTitle ?? ''),
-        leading: BackButton(
-          onPressed: appBarBackAction,
-        ),
         actions: appBarActions,
       ),
       body: SingleChildScrollView(
         child: CustomCard(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+          child: ListTile(
+            //contentPadding:
+            //  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            title: (titlee.isNotEmpty)
+                ? Text(
+                    titlee,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  )
+                : null,
+            subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 8,
               children: [
-                if (title != null)
+                if (textt.isNotEmpty)
                   Text(
-                    title!,
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                if (text != null)
-                  Text(
-                    text ?? '',
+                    textt,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
-                if (children != null) ...children!,
+                children,
               ],
             ),
           ),

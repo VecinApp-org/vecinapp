@@ -13,11 +13,7 @@ class ForumView extends HookWidget {
     //get posts
     final stream = useMemoized(() => context.watch<AppBloc>().posts);
     final snapshot = useStream(stream);
-    //check if snapshot is null
-    if (snapshot.data == null) {
-      return Container();
-    }
-    final posts = snapshot.data!.toList();
+    final posts = snapshot.data?.toList() ?? [];
     //sort posts
     posts.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     //gather data
@@ -34,8 +30,10 @@ class ForumView extends HookWidget {
                 icon: const Icon(Icons.add))
           ],
         ),
-        body: (posts.isEmpty)
-            ? const Center(child: Text('No hay publicaciones'))
-            : PostsListView(posts: posts));
+        body: (snapshot.data == null)
+            ? Container()
+            : (snapshot.data!.isEmpty)
+                ? const Center(child: Text('No hay publicaciones'))
+                : PostsListView(posts: posts));
   }
 }

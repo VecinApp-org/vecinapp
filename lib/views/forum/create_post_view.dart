@@ -16,19 +16,19 @@ class CreatePostView extends HookWidget {
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final textController = useTextEditingController();
     return BlocListener<AppBloc, AppState>(
-      listener: (context, state) {
-        final loadingText = state.loadingText;
-        final isLoading = state.isLoading;
-        if (loadingText == loadingTextPostCreationSuccess && !isLoading) {
-          Navigator.of(context).pop(true);
-        }
-      },
-      child: DocView(
+        listener: (context, state) {
+          final loadingText = state.loadingText;
+          final isLoading = state.isLoading;
+          if (loadingText == loadingTextPostCreationSuccess && !isLoading) {
+            Navigator.of(context).pop(true);
+          }
+        },
+        child: DocView(
           title: null,
           text: null,
           appBarTitle: 'Crear Publicación',
           appBarActions: [],
-          children: [
+          child: Column(children: [
             Form(
               key: formKey,
               child: Column(children: [
@@ -61,6 +61,6 @@ class CreatePostView extends HookWidget {
               ]),
             ),
           ]),
-    );
+        ));
   }
 }
