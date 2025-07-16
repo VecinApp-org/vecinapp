@@ -14,7 +14,7 @@ class CustomFormField extends StatelessWidget {
     this.enableSuggestions = true,
     this.keyboardType,
     this.maxLength,
-    this.maxLines,
+    this.maxLines = 1,
     this.minLines,
   });
 

@@ -37,6 +37,7 @@ class CreatePostView extends HookWidget {
                   autofocus: true,
                   maxLength: 10000,
                   minLines: 3,
+                  maxLines: null,
                   onSaved: (value) {
                     textController.text = value ?? '';
                   },
