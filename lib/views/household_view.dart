@@ -26,10 +26,6 @@ class HouseholdView extends HookWidget {
         '${household.neighborhood}, ${household.postalCode}, ${household.municipality}, ${household.state}, ${household.country}';
     return Scaffold(
       appBar: AppBar(
-        leading: BackButton(
-          onPressed: () =>
-              context.read<AppBloc>().add(const AppEventGoToProfileView()),
-        ),
         actions: [
           PopupMenuButton<AddressActions>(
             onSelected: (value) {

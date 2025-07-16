@@ -225,36 +225,6 @@ class AppStateViewingProfile extends AppState with EquatableMixin {
   }
 }
 
-class AppStateViewingHousehold extends AppState with EquatableMixin {
-  const AppStateViewingHousehold({
-    required bool isLoading,
-    required exception,
-    required Household household,
-  }) : super(
-          isLoading: isLoading,
-          exception: exception,
-          household: household,
-        );
-
-  @override
-  List<Object?> get props => [exception, isLoading, household];
-}
-
-class AppStateViewingNeighborhoodDetails extends AppState with EquatableMixin {
-  const AppStateViewingNeighborhoodDetails({
-    required bool isLoading,
-    required exception,
-    required Neighborhood neighborhood,
-  }) : super(
-          isLoading: isLoading,
-          exception: exception,
-          neighborhood: neighborhood,
-        );
-
-  @override
-  List<Object?> get props => [exception, isLoading, neighborhood];
-}
-
 class AppStateViewingSettings extends AppState with EquatableMixin {
   const AppStateViewingSettings({
     required bool isLoading,

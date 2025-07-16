@@ -1,7 +1,5 @@
 import 'package:flutter/foundation.dart' show immutable;
-import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/latlng.dart';
-import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/utilities/entities/post.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 
@@ -132,24 +130,8 @@ class AppEventUpdateUserDisplayName extends AppEvent {
 }
 
 //NEIGHBORHOOD ROUTING EVENTS
-class AppEventGoToNeighborhoodView extends AppEvent {
-  const AppEventGoToNeighborhoodView();
-}
-
 class AppEventGoToProfileView extends AppEvent {
   const AppEventGoToProfileView();
-}
-
-class AppEventGoToHouseholdView extends AppEvent {
-  final Household household;
-  const AppEventGoToHouseholdView({
-    required this.household,
-  });
-}
-
-class AppEventGoToNeighborhoodDetailsView extends AppEvent {
-  final Neighborhood neighborhood;
-  const AppEventGoToNeighborhoodDetailsView({required this.neighborhood});
 }
 
 class AppEventGoToSettingsView extends AppEvent {
@@ -213,7 +195,6 @@ class AppEventDeleteEvent extends AppEvent {
 }
 
 // POSTS EVENTS
-
 class AppEventCreatePost extends AppEvent {
   final String text;
   const AppEventCreatePost({required this.text});
@@ -225,8 +206,8 @@ class AppEventUpdatePost extends AppEvent {
 }
 
 class AppEventDeletePost extends AppEvent {
-  final Post post;
-  const AppEventDeletePost({required this.post});
+  final String postId;
+  const AppEventDeletePost({required this.postId});
 }
 
 class AppEventLikePost extends AppEvent {

@@ -392,20 +392,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     //Neighborhood Routing
-    on<AppEventGoToNeighborhoodView>((event, emit) async {
-      final neighborhood = await _cloudProvider.cachedNeighborhood;
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      final household = await _cloudProvider.cachedHousehold;
-      emit(AppStateViewingNeighborhood(
-        cloudUser: cloudUser!,
-        isLoading: false,
-        exception: null,
-        loadingText: null,
-        neighborhood: neighborhood!,
-        household: household!,
-      ));
-    });
-
     on<AppEventGoToProfileView>((event, emit) async {
       final user = _authProvider.currentUser;
       final cloudUser = await _cloudProvider.currentCloudUser;
@@ -416,22 +402,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         neighborhood: neighborhood,
         household: household,
         user: user!,
-        isLoading: false,
-        exception: null,
-      ));
-    });
-
-    on<AppEventGoToHouseholdView>((event, emit) async {
-      emit(AppStateViewingHousehold(
-        household: event.household,
-        isLoading: false,
-        exception: null,
-      ));
-    });
-
-    on<AppEventGoToNeighborhoodDetailsView>((event, emit) async {
-      emit(AppStateViewingNeighborhoodDetails(
-        neighborhood: event.neighborhood,
         isLoading: false,
         exception: null,
       ));

@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vecinapp/services/bloc/app_bloc.dart';
-import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
 
 class NeighborhoodDetailsView extends StatelessWidget {
@@ -13,10 +10,6 @@ class NeighborhoodDetailsView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(neighborhood.neighborhoodName),
-        leading: BackButton(
-          onPressed: () =>
-              context.read<AppBloc>().add(const AppEventGoToProfileView()),
-        ),
       ),
       body: ListView(
           children: neighborhood.polygon

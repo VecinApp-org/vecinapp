@@ -15,13 +15,11 @@ import 'package:vecinapp/views/cloud_login/select_address_view.dart';
 import 'package:vecinapp/views/cloud_login/no_neighborhood_view.dart';
 import 'package:vecinapp/views/cloud_login/register_cloud_user_view.dart';
 import 'package:vecinapp/views/delete_account_view.dart';
-import 'package:vecinapp/views/household_view.dart';
 import 'package:vecinapp/views/login/welcome_view.dart';
 import 'package:vecinapp/views/login/forgot_password_view.dart';
 import 'package:vecinapp/views/login/login_view.dart';
 import 'package:vecinapp/views/login/register_view.dart';
 import 'package:vecinapp/views/login/verify_email_view.dart';
-import 'package:vecinapp/views/neighborhood_details_view.dart';
 import 'package:vecinapp/views/neighborhood_view.dart';
 import 'package:vecinapp/views/profile_view.dart';
 import 'package:vecinapp/views/settings_view.dart';
@@ -99,10 +97,6 @@ class AppBlocRouter extends StatelessWidget {
                 household: state.household!,
                 selectedIndex: NeighborhoodPageIndex.profile);
           }
-        } else if (state is AppStateViewingHousehold) {
-          return HouseholdView(household: state.household!);
-        } else if (state is AppStateViewingNeighborhoodDetails) {
-          return NeighborhoodDetailsView(neighborhood: state.neighborhood!);
         } else if (state is AppStateViewingSettings) {
           return SettingsView();
         } else if (state is AppStateDeletingAccount) {

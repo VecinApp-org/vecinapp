@@ -10,6 +10,9 @@ import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/utilities/widgets/profile_picture.dart';
+import 'package:vecinapp/views/household_view.dart';
+import 'package:vecinapp/views/neighborhood_details_view.dart';
+import 'package:vecinapp/views/settings_view.dart';
 
 class ProfileView extends HookWidget {
   const ProfileView(
@@ -101,9 +104,9 @@ class ProfileView extends HookWidget {
                 if (household == null) {
                   return;
                 } else {
-                  context
-                      .read<AppBloc>()
-                      .add(AppEventGoToHouseholdView(household: household!));
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => HouseholdView(household: household!),
+                  ));
                 }
               },
             ),
@@ -118,9 +121,11 @@ class ProfileView extends HookWidget {
                   if (neighborhood == null) {
                     return;
                   } else {
-                    context.read<AppBloc>().add(
-                        AppEventGoToNeighborhoodDetailsView(
-                            neighborhood: neighborhood!));
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => NeighborhoodDetailsView(
+                        neighborhood: neighborhood!,
+                      ),
+                    ));
                   }
                 }),
           ),
@@ -129,7 +134,9 @@ class ProfileView extends HookWidget {
             title: const Text('Configuración'),
             trailing: const Icon(Icons.arrow_right),
             onTap: () {
-              context.read<AppBloc>().add(AppEventGoToSettingsView());
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => SettingsView(),
+              ));
             },
           ),
         ],
