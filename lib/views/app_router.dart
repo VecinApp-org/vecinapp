@@ -15,7 +15,6 @@ import 'package:vecinapp/views/cloud_login/select_address_view.dart';
 import 'package:vecinapp/views/cloud_login/no_neighborhood_view.dart';
 import 'package:vecinapp/views/cloud_login/register_cloud_user_view.dart';
 import 'package:vecinapp/views/delete_account_view.dart';
-import 'package:vecinapp/views/forum/create_post_view.dart';
 import 'package:vecinapp/views/household_view.dart';
 import 'package:vecinapp/views/login/welcome_view.dart';
 import 'package:vecinapp/views/login/forgot_password_view.dart';
@@ -50,8 +49,8 @@ class AppBlocRouter extends StatelessWidget {
         // show error dialog
         final exception = state.exception;
         if (exception != null) {
-          devtools.log(exception.toString());
-          devtools.log(exception.hashCode.toString());
+          devtools.log(
+              'State exception: ${exception.toString()} + ${exception.hashCode.toString()}');
           String message = 'Error mitológico';
           if (exception is AuthException) {
             message = exception.message;
@@ -126,15 +125,6 @@ class AppBlocRouter extends StatelessWidget {
             household: state.household!,
             selectedIndex: NeighborhoodPageIndex.events,
           );
-        } else if (state is AppStateViewingPosts) {
-          return NeighborhoodView(
-            cloudUser: state.cloudUser!,
-            neighborhood: state.neighborhood!,
-            household: state.household!,
-            selectedIndex: NeighborhoodPageIndex.forum,
-          );
-        } else if (state is AppStateCreatingPost) {
-          return const CreatePostView();
         } else if (state is AppStateDeletingAccount) {
           return const DeleteAccountView();
         } else if (state is AppStateCreatingCloudUser) {

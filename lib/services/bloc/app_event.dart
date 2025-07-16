@@ -225,20 +225,6 @@ class AppEventDeleteEvent extends AppEvent {
   const AppEventDeleteEvent({required this.eventId});
 }
 
-// POSTS ROUTING EVENTS
-class AppEventGoToPostsView extends AppEvent {
-  const AppEventGoToPostsView();
-}
-
-class AppEventGoToPostDetailsView extends AppEvent {
-  final Post post;
-  const AppEventGoToPostDetailsView({required this.post});
-}
-
-class AppEventGoToCreatePostView extends AppEvent {
-  const AppEventGoToCreatePostView();
-}
-
 // POSTS EVENTS
 
 class AppEventCreatePost extends AppEvent {

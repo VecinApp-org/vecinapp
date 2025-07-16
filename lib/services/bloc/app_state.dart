@@ -4,7 +4,6 @@ import 'package:vecinapp/utilities/entities/auth_user.dart';
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
-import 'package:vecinapp/utilities/entities/post.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 
@@ -182,11 +181,13 @@ class AppStateViewingNeighborhood extends AppState with EquatableMixin {
   const AppStateViewingNeighborhood({
     required Exception? exception,
     required bool isLoading,
+    required String? loadingText,
     required CloudUser cloudUser,
     required Household household,
     required Neighborhood neighborhood,
   }) : super(
           isLoading: isLoading,
+          loadingText: loadingText,
           exception: exception,
           cloudUser: cloudUser,
           neighborhood: neighborhood,
@@ -194,7 +195,8 @@ class AppStateViewingNeighborhood extends AppState with EquatableMixin {
         );
 
   @override
-  List<Object?> get props => [exception, isLoading];
+  List<Object?> get props =>
+      [exception, isLoading, loadingText, cloudUser, neighborhood, household];
 }
 
 class AppStateViewingProfile extends AppState with EquatableMixin {
@@ -343,65 +345,6 @@ class AppStateViewingEvents extends AppState with EquatableMixin {
   @override
   List<Object?> get props =>
       [exception, isLoading, cloudUser, neighborhood, household, loadingText];
-}
-
-//POST STATES
-class AppStateViewingPosts extends AppState with EquatableMixin {
-  const AppStateViewingPosts({
-    required bool isLoading,
-    required exception,
-    required cloudUser,
-    required neighborhood,
-    required household,
-  }) : super(
-            isLoading: isLoading,
-            exception: exception,
-            cloudUser: cloudUser,
-            neighborhood: neighborhood,
-            household: household);
-
-  @override
-  List<Object?> get props =>
-      [exception, isLoading, cloudUser, neighborhood, household];
-}
-
-class AppStateCreatingPost extends AppState with EquatableMixin {
-  const AppStateCreatingPost({
-    required bool isLoading,
-    required exception,
-  }) : super(isLoading: isLoading, exception: exception);
-
-  @override
-  List<Object?> get props => [isLoading, exception];
-}
-
-class AppStateEditingPost extends AppState with EquatableMixin {
-  final Post post;
-  const AppStateEditingPost({
-    required this.post,
-    required bool isLoading,
-    required exception,
-  }) : super(isLoading: isLoading, exception: exception);
-
-  @override
-  List<Object?> get props => [post, isLoading, exception];
-}
-
-class AppStateViewingPostDetails extends AppState with EquatableMixin {
-  final Post post;
-  const AppStateViewingPostDetails({
-    required this.post,
-    required cloudUser,
-    required isLoading,
-    required exception,
-  }) : super(
-          isLoading: isLoading,
-          exception: exception,
-          cloudUser: cloudUser,
-        );
-
-  @override
-  List<Object?> get props => [post, cloudUser, isLoading, exception];
 }
 
 //EXTENSIONS

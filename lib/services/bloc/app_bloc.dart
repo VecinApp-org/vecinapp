@@ -167,6 +167,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           cloudUser: cloudUser,
           exception: null,
           isLoading: false,
+          loadingText: null,
           neighborhood: neighborhood,
           household: household,
         ));
@@ -179,7 +180,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     //Authentication Routing
-
     on<AppEventGoToWelcomeView>((event, emit) async {
       emit(const AppStateWelcomeViewing(
         exception: null,
@@ -400,6 +400,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         cloudUser: cloudUser!,
         isLoading: false,
         exception: null,
+        loadingText: null,
         neighborhood: neighborhood!,
         household: household!,
       ));
@@ -576,6 +577,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         emit(AppStateViewingNeighborhood(
           cloudUser: updatedCloudUser,
           isLoading: false,
+          loadingText: null,
           exception: null,
           neighborhood: neighborhood!,
           household: household!,
@@ -624,6 +626,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(AppStateViewingNeighborhood(
         cloudUser: updatedCloudUser!,
         isLoading: false,
+        loadingText: null,
         exception: null,
         neighborhood: neighborhood!,
         household: household!,
@@ -1058,27 +1061,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
     });
 
-    //Posts Routing
-    on<AppEventGoToPostsView>((event, emit) async {
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      final neighborhood = await _cloudProvider.cachedNeighborhood;
-      final household = await _cloudProvider.cachedHousehold;
-      emit(AppStateViewingPosts(
-        isLoading: false,
-        exception: null,
-        cloudUser: cloudUser,
-        neighborhood: neighborhood,
-        household: household,
-      ));
-    });
-
-    on<AppEventGoToCreatePostView>((event, emit) async {
-      emit(AppStateCreatingPost(
-        isLoading: false,
-        exception: null,
-      ));
-    });
-
     //Posts Events
     on<AppEventCreatePost>((event, emit) async {
       //validate access
@@ -1086,21 +1068,37 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         add(const AppEventReset());
         return;
       }
+      //get credentials
+      final cloudUser = await _cloudProvider.cachedCloudUser;
+      final neighborhood = await _cloudProvider.cachedNeighborhood;
+      final household = await _cloudProvider.cachedHousehold;
       //enable loading indicator
-      emit(AppStateCreatingPost(isLoading: true, exception: null));
+      emit(AppStateViewingNeighborhood(
+        cloudUser: cloudUser!,
+        neighborhood: neighborhood!,
+        household: household!,
+        isLoading: true,
+        loadingText: loadingTextPostCreation,
+        exception: null,
+      ));
       //create post
       try {
         await _cloudProvider.createNewPost(text: event.text);
       } on Exception catch (e) {
-        emit(AppStateCreatingPost(isLoading: false, exception: e));
+        emit(AppStateViewingNeighborhood(
+          cloudUser: cloudUser,
+          neighborhood: neighborhood,
+          household: household,
+          isLoading: false,
+          loadingText: null,
+          exception: e,
+        ));
         return;
       }
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      final neighborhood = await _cloudProvider.cachedNeighborhood;
-      final household = await _cloudProvider.cachedHousehold;
-      emit(AppStateViewingPosts(
+      emit(AppStateViewingNeighborhood(
         isLoading: false,
         exception: null,
+        loadingText: loadingTextPostCreationSuccess,
         cloudUser: cloudUser,
         neighborhood: neighborhood,
         household: household,
@@ -1206,7 +1204,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   //Public methods
-
   Future<CloudUser?> userFromId(String userId) async {
     if (userId.isEmpty) {
       return null;

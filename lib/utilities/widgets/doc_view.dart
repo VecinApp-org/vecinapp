@@ -7,7 +7,7 @@ class DocView extends StatelessWidget {
     this.appBarTitle,
     required this.title,
     required this.text,
-    required this.appBarBackAction,
+    this.appBarBackAction,
     required this.appBarActions,
     required this.children,
   });

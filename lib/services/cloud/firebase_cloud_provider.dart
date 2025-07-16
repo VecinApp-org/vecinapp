@@ -380,18 +380,14 @@ class FirebaseCloudProvider implements CloudProvider {
     try {
       final user = await currentCloudUser;
       final authuser = _authProvider.currentUser;
-      await _posts(neighborhoodId: user!.neighborhoodId!).add({
+      final ref = _posts(neighborhoodId: user!.neighborhoodId!);
+      await ref.add({
         postCreatorIdFieldName: authuser!.uid,
         postTextFieldName: text,
         postTimeCreatedFieldName: DateTime.now(),
-      }).timeout(Duration(seconds: 15));
-      devtools.log('The post was created');
+      });
       return;
     } catch (e) {
-      if (e is FirebaseException) {
-        devtools.log(e.code);
-      }
-      devtools.log(e.toString());
       throw CouldNotCreatePostException();
     }
   }

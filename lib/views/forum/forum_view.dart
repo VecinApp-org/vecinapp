@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
-import 'package:vecinapp/services/bloc/app_event.dart';
+import 'package:vecinapp/views/forum/create_post_view.dart';
 import 'dart:developer' as devtools show log; // ignore: unused_import
 import 'package:vecinapp/views/forum/posts_list_view.dart';
 
@@ -21,16 +21,15 @@ class ForumView extends HookWidget {
     //sort posts
     posts.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     //gather data
-
     return Scaffold(
         appBar: AppBar(
           title: Text('Foro'),
           actions: [
             IconButton(
                 onPressed: () {
-                  context
-                      .read<AppBloc>()
-                      .add(const AppEventGoToCreatePostView());
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const CreatePostView(),
+                  ));
                 },
                 icon: const Icon(Icons.add))
           ],
