@@ -31,7 +31,7 @@ class _DeleteAccountViewState extends State<DeleteAccountView> {
   Widget build(BuildContext context) {
     return BlocListener<AppBloc, AppState>(
       listener: (context, state) {
-        if (state.user == null) {
+        if (!state.isLoading && state.user == null) {
           Navigator.of(context).popUntil((route) => route.isFirst);
         }
       },

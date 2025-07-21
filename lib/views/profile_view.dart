@@ -43,13 +43,6 @@ class ProfileView extends HookWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: (neighborhood == null)
-            ? BackButton(
-                onPressed: () => context
-                    .read<AppBloc>()
-                    .add(const AppEventGoToNoNeighborhoodView()),
-              )
-            : null,
         actions: [
           PopupMenuButton(
               icon: const Icon(Icons.edit),

@@ -24,8 +24,7 @@ class EventDetailsView extends HookWidget {
     return BlocListener<AppBloc, AppState>(
         listener: (context, state) {
           final shouldPop = state.loadingText == loadingTextEventDeleteSuccess;
-          final isLoading = state.isLoading;
-          if (shouldPop && !isLoading) {
+          if (shouldPop && !state.isLoading) {
             Navigator.of(context).pop();
           }
         },
@@ -41,14 +40,10 @@ class EventDetailsView extends HookWidget {
             Visibility(
               visible: isAdmin,
               child: EditOrDeletePopupMenuIcon(
-                editAction: () async {
-                  final didUpdate =
-                      await Navigator.of(context).push(MaterialPageRoute(
+                editAction: () {
+                  Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => EditEventView(event: event),
                   ));
-                  if (didUpdate && context.mounted) {
-                    Navigator.of(context).pop();
-                  }
                 },
                 deleteAction: () => context
                     .read<AppBloc>()

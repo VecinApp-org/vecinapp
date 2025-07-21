@@ -40,16 +40,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         )) {
     //initialize
     on<AppEventInitialize>((event, emit) async {
-      devtools.log('AppEventInitialize');
       add(AppEventReset());
     });
 
     on<AppEventReset>((event, emit) async {
-      devtools.log('AppEventReset');
       try {
         //Get AuthUser
         final authUser = _authProvider.currentUser;
-        devtools.log('Bloc AuthUser: ${authUser.toString()}');
         //check if user is not logged in
         if (authUser == null) {
           devtools.log('User is not logged in');
@@ -74,7 +71,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
         //Get CloudUser
         final cloudUser = await _cloudProvider.currentCloudUser;
-        devtools.log('CloudUser: ${cloudUser.toString()}');
         //check if CloudUser does not exist
         if (cloudUser == null || cloudUser.displayName == '') {
           devtools.log('CloudUser does not exist');
@@ -100,7 +96,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
         //get Household
         final household = await _cloudProvider.currentHousehold;
-        devtools.log('Household: ${household.toString()}');
         //check if Household does not exist, this would mean the Household was deleted
         if (household == null) {
           devtools.log('Household does not exist');
@@ -120,6 +115,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           devtools.log('CloudUser has no neighborhood');
           emit(AppStateNoNeighborhood(
             isLoading: false,
+            loadingText: null,
             exception: null,
             cloudUser: cloudUser,
             household: household,
@@ -129,12 +125,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
         //get Neighborhood
         final neighborhood = await _cloudProvider.currentNeighborhood;
-        devtools.log('Neighborhood: ${neighborhood.toString()}');
         //check if Neighborhood does not exist, this would mean the neighborhood was deleted
         if (neighborhood == null) {
           await _cloudProvider.exitNeighborhood();
           emit(AppStateNoNeighborhood(
             isLoading: false,
+            loadingText: null,
             exception: null,
             cloudUser: cloudUser,
             household: household,
@@ -154,6 +150,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           await _cloudProvider.exitNeighborhood();
           emit(AppStateNoNeighborhood(
             isLoading: false,
+            loadingText: null,
             exception: null,
             cloudUser: cloudUser,
             household: household,
@@ -162,7 +159,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         }
 
         //emit success
-        devtools.log('Welcome!');
         emit(AppStateViewingNeighborhood(
           cloudUser: cloudUser,
           exception: null,
@@ -207,15 +203,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(const AppStateLoggingIn(
         exception: null,
         isLoading: false,
-      ));
-    });
-
-    on<AppEventGoToNoNeighborhoodView>((event, emit) async {
-      emit(AppStateNoNeighborhood(
-        exception: null,
-        isLoading: false,
-        cloudUser: state.cloudUser!,
-        household: state.household!,
       ));
     });
 
@@ -364,13 +351,29 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
 
       //show loading
-      emit(const AppStateDeletingAccount(
-        isLoading: true,
-        exception: null,
-        loadingText: 'Eliminando cuenta...',
-      ));
+      if (state is AppStateViewingNeighborhood) {
+        emit(AppStateViewingNeighborhood(
+          isLoading: true,
+          exception: null,
+          loadingText: null,
+          cloudUser: state.cloudUser!,
+          household: state.household!,
+          neighborhood: state.neighborhood!,
+        ));
+      } else if (state is AppStateNoNeighborhood) {
+        emit(AppStateNoNeighborhood(
+          isLoading: true,
+          exception: null,
+          loadingText: null,
+          cloudUser: state.cloudUser!,
+          household: state.household!,
+        ));
+      }
 
       //delete account
+      final cloudUser = await _cloudProvider.currentCloudUser;
+      final household = await _cloudProvider.currentHousehold;
+      final neighborhood = await _cloudProvider.currentNeighborhood;
       try {
         final user = _authProvider.currentUser;
         final cloudUser = await _cloudProvider.currentCloudUser;
@@ -382,43 +385,27 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         await _cloudProvider.deleteCloudUser();
         await _authProvider.deleteAccount();
       } catch (e) {
-        emit(AppStateDeletingAccount(
-          isLoading: false,
-          exception: e,
-        ));
+        if (state is AppStateViewingNeighborhood) {
+          emit(AppStateViewingNeighborhood(
+            isLoading: false,
+            exception: e,
+            loadingText: null,
+            cloudUser: cloudUser!,
+            household: household!,
+            neighborhood: neighborhood!,
+          ));
+        } else if (state is AppStateNoNeighborhood) {
+          emit(AppStateNoNeighborhood(
+            isLoading: false,
+            exception: e,
+            loadingText: null,
+            cloudUser: cloudUser!,
+            household: household!,
+          ));
+        }
         return;
       }
       add(const AppEventReset());
-    });
-
-    //Neighborhood Routing
-    on<AppEventGoToProfileView>((event, emit) async {
-      final user = _authProvider.currentUser;
-      final cloudUser = await _cloudProvider.currentCloudUser;
-      final household = await _cloudProvider.currentHousehold;
-      final neighborhood = await _cloudProvider.currentNeighborhood;
-      emit(AppStateViewingProfile(
-        cloudUser: cloudUser!,
-        neighborhood: neighborhood,
-        household: household,
-        user: user!,
-        isLoading: false,
-        exception: null,
-      ));
-    });
-
-    on<AppEventGoToSettingsView>((event, emit) async {
-      emit(const AppStateViewingSettings(
-        isLoading: false,
-        exception: null,
-      ));
-    });
-
-    on<AppEventGoToDeleteAccountView>((event, emit) async {
-      emit(const AppStateDeletingAccount(
-        isLoading: false,
-        exception: null,
-      ));
     });
 
     //Cloud User Events
@@ -556,6 +543,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         //Send No Neighborhood (this view should try to find a neighborhood for the user's home)
         emit(AppStateNoNeighborhood(
           isLoading: false,
+          loadingText: null,
           exception: null,
           cloudUser: updatedCloudUser,
           household: household!,
@@ -572,6 +560,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       //enable loading indicator
       emit(AppStateNoNeighborhood(
         isLoading: true,
+        loadingText: 'Buscando vecindad',
         exception: null,
         cloudUser: state.cloudUser!,
         household: state.household!,
@@ -583,6 +572,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         //inform user of error
         emit(AppStateNoNeighborhood(
           isLoading: false,
+          loadingText: null,
           exception: null,
           cloudUser: state.cloudUser!,
           household: state.household!,
@@ -609,11 +599,53 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         add(const AppEventReset());
         return;
       }
+      //start loading indicator
+      if (state is AppStateViewingNeighborhood) {
+        emit(AppStateViewingNeighborhood(
+          cloudUser: state.cloudUser!,
+          isLoading: true,
+          loadingText: null,
+          exception: null,
+          neighborhood: state.neighborhood!,
+          household: state.household!,
+        ));
+      } else if (state is AppStateNoNeighborhood) {
+        emit(AppStateNoNeighborhood(
+          isLoading: true,
+          loadingText: null,
+          exception: null,
+          cloudUser: state.cloudUser!,
+          household: state.household!,
+        ));
+      }
+
       //exit household
+      final cloudUser = await _cloudProvider.currentCloudUser;
+      final household = await _cloudProvider.currentHousehold;
+      final neighborhood = await _cloudProvider.currentNeighborhood;
       try {
         await _cloudProvider.exitHousehold();
-      } catch (_) {
-        add(AppEventReset());
+      } catch (e) {
+        if (state is AppStateViewingNeighborhood) {
+          emit(AppStateViewingNeighborhood(
+            cloudUser: cloudUser!,
+            isLoading: false,
+            loadingText: null,
+            exception: e,
+            neighborhood: neighborhood!,
+            household: household!,
+          ));
+          return;
+        } else if (state is AppStateNoNeighborhood) {
+          emit(AppStateNoNeighborhood(
+            isLoading: false,
+            loadingText: null,
+            exception: e,
+            cloudUser: cloudUser!,
+            household: household!,
+          ));
+          return;
+        }
       }
       add(AppEventReset());
     });
@@ -625,19 +657,27 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //start loading
-      final user = _authProvider.currentUser;
+      if (state is AppStateNoNeighborhood) {
+        emit(AppStateNoNeighborhood(
+          isLoading: true,
+          loadingText: null,
+          exception: null,
+          cloudUser: state.cloudUser!,
+          household: state.household!,
+        ));
+      } else if (state is AppStateViewingNeighborhood) {
+        emit(AppStateViewingNeighborhood(
+          cloudUser: state.cloudUser!,
+          isLoading: true,
+          loadingText: null,
+          exception: null,
+          neighborhood: state.neighborhood!,
+          household: state.household!,
+        ));
+      }
       final cloudUser = await _cloudProvider.currentCloudUser;
       final household = state.household;
       final neighborhood = state.neighborhood;
-      emit(AppStateViewingProfile(
-        cloudUser: cloudUser!,
-        household: household,
-        neighborhood: neighborhood,
-        user: user!,
-        exception: null,
-        isLoading: true,
-      ));
-
       //update display name
       try {
         await _cloudProvider.updateUserDisplayName(
@@ -645,27 +685,48 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
       } catch (e) {
         //notify user of error
-        emit(AppStateViewingProfile(
-          cloudUser: cloudUser,
-          household: household,
-          neighborhood: neighborhood,
-          user: user,
-          exception: e,
-          isLoading: false,
-        ));
+        if (state is AppStateNoNeighborhood) {
+          emit(AppStateNoNeighborhood(
+            isLoading: false,
+            loadingText: null,
+            exception: e,
+            cloudUser: cloudUser!,
+            household: household!,
+          ));
+          return;
+        } else if (state is AppStateViewingNeighborhood) {
+          emit(AppStateViewingNeighborhood(
+            cloudUser: cloudUser!,
+            isLoading: false,
+            loadingText: null,
+            exception: e,
+            neighborhood: neighborhood!,
+            household: household!,
+          ));
+          return;
+        }
         return;
       }
       //notify user of success
       final updatedUser = await _cloudProvider.currentCloudUser;
-
-      emit(AppStateViewingProfile(
-        cloudUser: updatedUser!,
-        household: household,
-        neighborhood: neighborhood,
-        user: user,
-        exception: null,
-        isLoading: false,
-      ));
+      if (state is AppStateNoNeighborhood) {
+        emit(AppStateNoNeighborhood(
+          isLoading: false,
+          loadingText: null,
+          exception: null,
+          cloudUser: updatedUser!,
+          household: household!,
+        ));
+      } else if (state is AppStateViewingNeighborhood) {
+        emit(AppStateViewingNeighborhood(
+          cloudUser: updatedUser!,
+          isLoading: false,
+          loadingText: null,
+          exception: null,
+          neighborhood: neighborhood!,
+          household: household!,
+        ));
+      }
     });
 
     //Storage events
@@ -676,19 +737,28 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //start loading
-      final user = _authProvider.currentUser;
+      if (state is AppStateNoNeighborhood) {
+        emit(AppStateNoNeighborhood(
+          isLoading: true,
+          loadingText: null,
+          exception: null,
+          cloudUser: state.cloudUser!,
+          household: state.household!,
+        ));
+      } else if (state is AppStateViewingNeighborhood) {
+        emit(AppStateViewingNeighborhood(
+          cloudUser: state.cloudUser!,
+          isLoading: true,
+          loadingText: null,
+          exception: null,
+          neighborhood: state.neighborhood!,
+          household: state.household!,
+        ));
+      }
+      final user = _authProvider.currentUser!;
       final cloudUser = await _cloudProvider.cachedCloudUser;
       final household = state.household;
       final neighborhood = state.neighborhood;
-      emit(AppStateViewingProfile(
-        cloudUser: cloudUser!,
-        household: household,
-        neighborhood: neighborhood,
-        user: user!,
-        exception: null,
-        isLoading: true,
-        loadingText: 'Subiendo imagen...',
-      ));
 
       //upload image
       try {
@@ -700,25 +770,47 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         //update user's photo url
         await _cloudProvider.updateUserPhotoUrl(photoUrl: imageUrl);
       } catch (e) {
-        emit(AppStateViewingProfile(
-          cloudUser: cloudUser,
-          household: household,
-          neighborhood: neighborhood,
-          user: user,
-          exception: e,
-          isLoading: false,
-        ));
+        if (state is AppStateNoNeighborhood) {
+          emit(AppStateNoNeighborhood(
+            isLoading: false,
+            loadingText: null,
+            exception: e,
+            cloudUser: cloudUser!,
+            household: household!,
+          ));
+          return;
+        } else if (state is AppStateViewingNeighborhood) {
+          emit(AppStateViewingNeighborhood(
+            cloudUser: cloudUser!,
+            isLoading: false,
+            loadingText: null,
+            exception: e,
+            neighborhood: neighborhood!,
+            household: household!,
+          ));
+          return;
+        }
         return;
       }
       final newCloudUser = await _cloudProvider.currentCloudUser;
-      emit(AppStateViewingProfile(
-        cloudUser: newCloudUser!,
-        household: household,
-        neighborhood: neighborhood,
-        user: user,
-        exception: null,
-        isLoading: false,
-      ));
+      if (state is AppStateNoNeighborhood) {
+        emit(AppStateNoNeighborhood(
+          isLoading: false,
+          loadingText: null,
+          exception: null,
+          cloudUser: newCloudUser!,
+          household: household!,
+        ));
+      } else if (state is AppStateViewingNeighborhood) {
+        emit(AppStateViewingNeighborhood(
+          cloudUser: newCloudUser!,
+          isLoading: false,
+          loadingText: null,
+          exception: null,
+          neighborhood: neighborhood!,
+          household: household!,
+        ));
+      }
     });
 
     on<AppEventDeleteProfilePhoto>(
@@ -729,43 +821,75 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           return;
         }
         //start loading
+        if (state is AppStateNoNeighborhood) {
+          emit(AppStateNoNeighborhood(
+            isLoading: true,
+            loadingText: null,
+            exception: null,
+            cloudUser: state.cloudUser!,
+            household: state.household!,
+          ));
+        } else if (state is AppStateViewingNeighborhood) {
+          emit(AppStateViewingNeighborhood(
+            cloudUser: state.cloudUser!,
+            isLoading: true,
+            loadingText: null,
+            exception: null,
+            neighborhood: state.neighborhood!,
+            household: state.household!,
+          ));
+        }
         final user = _authProvider.currentUser!;
         final cloudUser = await _cloudProvider.cachedCloudUser;
         final household = state.household;
         final neighborhood = state.neighborhood;
-        emit(AppStateViewingProfile(
-          cloudUser: cloudUser!,
-          household: household,
-          neighborhood: neighborhood,
-          user: user,
-          exception: null,
-          isLoading: true,
-          loadingText: 'Eliminando imagen...',
-        ));
-
+        //delete image
         try {
           await _storageProvider.deleteProfileImage(userId: user.uid!);
           await _cloudProvider.updateUserPhotoUrl(photoUrl: '');
         } catch (e) {
-          emit(AppStateViewingProfile(
-            cloudUser: cloudUser,
-            household: household,
-            neighborhood: neighborhood,
-            user: user,
-            exception: e,
-            isLoading: false,
-          ));
-          return;
+          //emit error
+          if (state is AppStateNoNeighborhood) {
+            emit(AppStateNoNeighborhood(
+              isLoading: false,
+              loadingText: null,
+              exception: e,
+              cloudUser: cloudUser!,
+              household: household!,
+            ));
+            return;
+          } else if (state is AppStateViewingNeighborhood) {
+            emit(AppStateViewingNeighborhood(
+              cloudUser: cloudUser!,
+              isLoading: false,
+              loadingText: null,
+              exception: e,
+              neighborhood: neighborhood!,
+              household: household!,
+            ));
+            return;
+          }
         }
         final newCloudUser = await _cloudProvider.currentCloudUser;
-        emit(AppStateViewingProfile(
-          cloudUser: newCloudUser!,
-          household: household,
-          neighborhood: neighborhood,
-          user: user,
-          exception: null,
-          isLoading: false,
-        ));
+        //emit success
+        if (state is AppStateNoNeighborhood) {
+          emit(AppStateNoNeighborhood(
+            isLoading: false,
+            loadingText: null,
+            exception: null,
+            cloudUser: newCloudUser!,
+            household: household!,
+          ));
+        } else if (state is AppStateViewingNeighborhood) {
+          emit(AppStateViewingNeighborhood(
+            cloudUser: newCloudUser!,
+            isLoading: false,
+            loadingText: null,
+            exception: null,
+            neighborhood: neighborhood!,
+            household: household!,
+          ));
+        }
       },
     );
 

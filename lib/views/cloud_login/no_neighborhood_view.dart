@@ -7,6 +7,7 @@ import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/widgets/centered_view.dart';
 import 'package:vecinapp/utilities/widgets/profile_picture.dart';
+import 'package:vecinapp/views/profile_view.dart';
 
 class NoNeighborhoodView extends HookWidget {
   const NoNeighborhoodView(
@@ -21,9 +22,13 @@ class NoNeighborhoodView extends HookWidget {
           Padding(
               padding: const EdgeInsets.only(right: 13.0),
               child: GestureDetector(
-                  onTap: () => context
-                      .read<AppBloc>()
-                      .add(const AppEventGoToProfileView()),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => ProfileView(
+                          cloudUser: cloudUser,
+                          household: household,
+                          neighborhood: null,
+                        ),
+                      )),
                   child: ProfilePicture(
                     radius: 16,
                     imageUrl: cloudUser.photoUrl,

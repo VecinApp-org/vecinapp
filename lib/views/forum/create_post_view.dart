@@ -20,7 +20,7 @@ class CreatePostView extends HookWidget {
           final loadingText = state.loadingText;
           final isLoading = state.isLoading;
           if (loadingText == loadingTextPostCreationSuccess && !isLoading) {
-            Navigator.of(context).pop(true);
+            Navigator.of(context).popUntil((route) => route.isFirst);
           }
         },
         child: DocView(

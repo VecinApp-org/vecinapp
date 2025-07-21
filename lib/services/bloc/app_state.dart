@@ -153,18 +153,21 @@ class AppStateConfirmingHomeAddress extends AppState with EquatableMixin {
 class AppStateNoNeighborhood extends AppState with EquatableMixin {
   const AppStateNoNeighborhood({
     required bool isLoading,
+    required String? loadingText,
     required exception,
     required CloudUser cloudUser,
     required Household household,
   }) : super(
           isLoading: isLoading,
+          loadingText: loadingText,
           exception: exception,
           cloudUser: cloudUser,
           household: household,
         );
 
   @override
-  List<Object?> get props => [exception, isLoading, cloudUser, household];
+  List<Object?> get props =>
+      [exception, isLoading, loadingText, cloudUser, household];
 }
 
 class AppStateWelcomeToNeighborhood extends AppState with EquatableMixin {
@@ -198,59 +201,7 @@ class AppStateViewingNeighborhood extends AppState with EquatableMixin {
       [exception, isLoading, loadingText, cloudUser, neighborhood, household];
 }
 
-class AppStateViewingProfile extends AppState with EquatableMixin {
-  const AppStateViewingProfile({
-    required bool isLoading,
-    required exception,
-    required AuthUser user,
-    required CloudUser cloudUser,
-    required Household? household,
-    required Neighborhood? neighborhood,
-    String? loadingText,
-  }) : super(
-          isLoading: isLoading,
-          exception: exception,
-          user: user,
-          loadingText: loadingText,
-          cloudUser: cloudUser,
-          household: household,
-          neighborhood: neighborhood,
-        );
-
-  @override
-  List<Object?> get props => [user, exception, isLoading, cloudUser];
-  @override
-  String toString() {
-    return 'AppStateViewingProfile{user: $user, isLoading: $isLoading, exception: $exception}';
-  }
-}
-
-class AppStateViewingSettings extends AppState with EquatableMixin {
-  const AppStateViewingSettings({
-    required bool isLoading,
-    required exception,
-  }) : super(isLoading: isLoading, exception: exception);
-
-  @override
-  List<Object?> get props => [exception, isLoading];
-}
-
-class AppStateDeletingAccount extends AppState with EquatableMixin {
-  const AppStateDeletingAccount({
-    required bool isLoading,
-    required exception,
-    loadingText,
-  }) : super(
-            isLoading: isLoading,
-            exception: exception,
-            loadingText: loadingText);
-
-  @override
-  List<Object?> get props => [exception, isLoading, loadingText];
-}
-
 //EXTENSIONS
-
 extension GetAddresses on AppState {
   List<Address>? get addresses {
     if (this is AppStateConfirmingHomeAddress) {

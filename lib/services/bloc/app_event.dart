@@ -34,10 +34,6 @@ class AppEventGoToLogin extends AppEvent {
   const AppEventGoToLogin();
 }
 
-class AppEventGoToNoNeighborhoodView extends AppEvent {
-  const AppEventGoToNoNeighborhoodView();
-}
-
 // AUTHENTICATION EVENTS
 class AppEventRegisterWithEmailAndPassword extends AppEvent {
   final String email;
@@ -127,19 +123,6 @@ class AppEventLookForNeighborhood extends AppEvent {
 class AppEventUpdateUserDisplayName extends AppEvent {
   final String displayName;
   const AppEventUpdateUserDisplayName({required this.displayName});
-}
-
-//NEIGHBORHOOD ROUTING EVENTS
-class AppEventGoToProfileView extends AppEvent {
-  const AppEventGoToProfileView();
-}
-
-class AppEventGoToSettingsView extends AppEvent {
-  const AppEventGoToSettingsView();
-}
-
-class AppEventGoToDeleteAccountView extends AppEvent {
-  const AppEventGoToDeleteAccountView();
 }
 
 // PROFILE PHOTO EVENTS

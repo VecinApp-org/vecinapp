@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vecinapp/constants/neighborhood_page_index.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
@@ -14,15 +13,12 @@ import 'package:vecinapp/views/cloud_login/confirm_address_view.dart';
 import 'package:vecinapp/views/cloud_login/select_address_view.dart';
 import 'package:vecinapp/views/cloud_login/no_neighborhood_view.dart';
 import 'package:vecinapp/views/cloud_login/register_cloud_user_view.dart';
-import 'package:vecinapp/views/delete_account_view.dart';
 import 'package:vecinapp/views/login/welcome_view.dart';
 import 'package:vecinapp/views/login/forgot_password_view.dart';
 import 'package:vecinapp/views/login/login_view.dart';
 import 'package:vecinapp/views/login/register_view.dart';
 import 'package:vecinapp/views/login/verify_email_view.dart';
 import 'package:vecinapp/views/neighborhood_view.dart';
-import 'package:vecinapp/views/profile_view.dart';
-import 'package:vecinapp/views/settings_view.dart';
 import 'dart:developer' as devtools show log; // ignore: unused_import
 
 import 'package:vecinapp/views/splash_view.dart';
@@ -83,24 +79,6 @@ class AppBlocRouter extends StatelessWidget {
             neighborhood: state.neighborhood!,
             household: state.household!,
           );
-        } else if (state is AppStateViewingProfile) {
-          if (state.neighborhood == null || state.household == null) {
-            return ProfileView(
-              cloudUser: state.cloudUser!,
-              neighborhood: state.neighborhood,
-              household: state.household,
-            );
-          } else {
-            return NeighborhoodView(
-                cloudUser: state.cloudUser!,
-                neighborhood: state.neighborhood!,
-                household: state.household!,
-                selectedIndex: NeighborhoodPageIndex.profile);
-          }
-        } else if (state is AppStateViewingSettings) {
-          return SettingsView();
-        } else if (state is AppStateDeletingAccount) {
-          return const DeleteAccountView();
         } else if (state is AppStateCreatingCloudUser) {
           return const RegisterCloudUserView();
         } else if (state is AppStateSelectingHomeAddress) {

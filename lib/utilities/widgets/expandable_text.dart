@@ -33,7 +33,6 @@ class ExpandableText extends HookWidget {
               textDirection: TextDirection.ltr,
             );
             textPainter.layout(maxWidth: constraints.maxWidth);
-            devtools.log(textPainter.maxLines.toString());
             final isTruncated = textPainter.didExceedMaxLines;
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
