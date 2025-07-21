@@ -50,27 +50,18 @@ class AppStateError extends AppState with EquatableMixin {
 class AppStateWelcomeViewing extends AppState with EquatableMixin {
   const AppStateWelcomeViewing({
     required bool isLoading,
+    required String? loadingText,
+    AuthUser? user,
     required exception,
   }) : super(
           isLoading: isLoading,
           exception: exception,
+          loadingText: loadingText,
+          user: user,
         );
 
   @override
-  List<Object?> get props => [exception, isLoading];
-}
-
-class AppStateRegistering extends AppState with EquatableMixin {
-  const AppStateRegistering({
-    required Exception? exception,
-    required bool isLoading,
-  }) : super(
-          isLoading: isLoading,
-          exception: exception,
-        );
-
-  @override
-  List<Object?> get props => [exception, isLoading];
+  List<Object?> get props => [exception, isLoading, loadingText, user];
 }
 
 class AppStateNeedsVerification extends AppState with EquatableMixin {
@@ -84,37 +75,6 @@ class AppStateNeedsVerification extends AppState with EquatableMixin {
 
   @override
   List<Object?> get props => [exception, isLoading];
-}
-
-class AppStateLoggingIn extends AppState with EquatableMixin {
-  const AppStateLoggingIn({
-    required Exception? exception,
-    required bool isLoading,
-    String? loadingText,
-  }) : super(
-          isLoading: isLoading,
-          exception: exception,
-        );
-
-  @override
-  List<Object?> get props => [exception, isLoading];
-}
-
-class AppStateResettingPassword extends AppState with EquatableMixin {
-  final bool hasSentEmail;
-  final String? email;
-  const AppStateResettingPassword({
-    required Exception? exception,
-    required this.hasSentEmail,
-    required bool isLoading,
-    this.email,
-  }) : super(
-          isLoading: isLoading,
-          exception: exception,
-        );
-
-  @override
-  List<Object?> get props => [exception, isLoading, hasSentEmail, email];
 }
 
 //CLOUD REGISTRATION STATES

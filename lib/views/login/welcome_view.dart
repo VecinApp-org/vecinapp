@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vecinapp/services/bloc/app_bloc.dart';
-import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/widgets/centered_view.dart';
+import 'package:vecinapp/views/login/login_view.dart';
+import 'package:vecinapp/views/login/register_view.dart';
 
 class WelcomeView extends StatelessWidget {
   const WelcomeView({super.key});
@@ -16,13 +15,16 @@ class WelcomeView extends StatelessWidget {
       ),
       const SizedBox(height: 55),
       FilledButton(
-          onPressed: () =>
-              context.read<AppBloc>().add(const AppEventGoToRegistration()),
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => const RegisterView(),
+            ));
+          },
           child: const Text('Crear cuenta nueva')),
       const SizedBox(height: 13),
       OutlinedButton(
-          onPressed: () =>
-              context.read<AppBloc>().add(const AppEventGoToLogin()),
+          onPressed: () => Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => const LoginView())),
           child: const Text('Ya tengo una cuenta')),
       TextButton(
         onPressed: () {},

@@ -44,6 +44,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     });
 
     on<AppEventReset>((event, emit) async {
+      emit(const AppStateUnInitalized(
+        isLoading: false,
+      ));
+
       try {
         //Get AuthUser
         final authUser = _authProvider.currentUser;
@@ -54,6 +58,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             const AppStateWelcomeViewing(
               exception: null,
               isLoading: false,
+              loadingText: null,
             ),
           );
           return;
@@ -175,45 +180,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
     });
 
-    //Authentication Routing
-    on<AppEventGoToWelcomeView>((event, emit) async {
-      emit(const AppStateWelcomeViewing(
-        exception: null,
-        isLoading: false,
-      ));
-    });
-
-    on<AppEventGoToRegistration>((event, emit) async {
-      emit(const AppStateRegistering(
-        exception: null,
-        isLoading: false,
-      ));
-    });
-
-    on<AppEventGoToForgotPassword>((event, emit) async {
-      emit(AppStateResettingPassword(
-        email: event.email,
-        exception: null,
-        hasSentEmail: false,
-        isLoading: false,
-      ));
-    });
-
-    on<AppEventGoToLogin>((event, emit) async {
-      emit(const AppStateLoggingIn(
-        exception: null,
-        isLoading: false,
-      ));
-    });
-
     //Authentication Events
     on<AppEventRegisterWithEmailAndPassword>((event, emit) async {
       //no validation required
 
       //start loading
-      emit(const AppStateRegistering(
+      emit(const AppStateWelcomeViewing(
         exception: null,
         isLoading: true,
+        loadingText: 'Registrando...',
       ));
       //create user
       try {
@@ -227,9 +202,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
         await _authProvider.sendEmailVerification();
       } on AuthException catch (e) {
-        emit(AppStateRegistering(
+        emit(AppStateWelcomeViewing(
           exception: e,
           isLoading: false,
+          loadingText: null,
         ));
         return;
       }
@@ -240,10 +216,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       //no validation required
 
       //show loading
-      emit(const AppStateLoggingIn(
+      emit(const AppStateWelcomeViewing(
         exception: null,
         isLoading: true,
-        loadingText: 'Entrando...',
+        loadingText: 'Iniciando sesión...',
       ));
       //log in
       try {
@@ -255,8 +231,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
       } on AuthException catch (e) {
         emit(
-          AppStateLoggingIn(
+          AppStateWelcomeViewing(
             exception: e,
+            loadingText: null,
             isLoading: false,
           ),
         );
@@ -270,27 +247,24 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       //send email
       try {
-        emit(AppStateResettingPassword(
+        emit(AppStateWelcomeViewing(
           exception: null,
-          hasSentEmail: false,
           isLoading: true,
-          email: event.email,
+          loadingText: 'Enviando correo...',
         ));
         await _authProvider.sendPasswordResetEmail(email: event.email);
-        emit(AppStateResettingPassword(
-          email: event.email,
-          exception: null,
-          hasSentEmail: true,
-          isLoading: false,
-        ));
       } on AuthException catch (e) {
-        emit(AppStateResettingPassword(
-          email: null,
+        emit(AppStateWelcomeViewing(
           exception: e,
-          hasSentEmail: false,
           isLoading: false,
+          loadingText: null,
         ));
       }
+      emit(AppStateWelcomeViewing(
+        exception: null,
+        isLoading: false,
+        loadingText: loadingTextPasswordResetEmailSent,
+      ));
     });
 
     on<AppEventLogOut>((event, emit) async {

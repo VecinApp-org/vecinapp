@@ -14,9 +14,6 @@ import 'package:vecinapp/views/cloud_login/select_address_view.dart';
 import 'package:vecinapp/views/cloud_login/no_neighborhood_view.dart';
 import 'package:vecinapp/views/cloud_login/register_cloud_user_view.dart';
 import 'package:vecinapp/views/login/welcome_view.dart';
-import 'package:vecinapp/views/login/forgot_password_view.dart';
-import 'package:vecinapp/views/login/login_view.dart';
-import 'package:vecinapp/views/login/register_view.dart';
 import 'package:vecinapp/views/login/verify_email_view.dart';
 import 'package:vecinapp/views/neighborhood_view.dart';
 import 'dart:developer' as devtools show log; // ignore: unused_import
@@ -65,20 +62,8 @@ class AppBlocRouter extends StatelessWidget {
           return const SplashView();
         } else if (state is AppStateWelcomeViewing) {
           return const WelcomeView();
-        } else if (state is AppStateRegistering) {
-          return const RegisterView();
-        } else if (state is AppStateLoggingIn) {
-          return const LoginView();
-        } else if (state is AppStateResettingPassword) {
-          return ForgotPasswordView(email: state.email);
         } else if (state is AppStateNeedsVerification) {
           return const VerifyEmailView();
-        } else if (state is AppStateViewingNeighborhood) {
-          return NeighborhoodView(
-            cloudUser: state.cloudUser!,
-            neighborhood: state.neighborhood!,
-            household: state.household!,
-          );
         } else if (state is AppStateCreatingCloudUser) {
           return const RegisterCloudUserView();
         } else if (state is AppStateSelectingHomeAddress) {
@@ -90,6 +75,12 @@ class AppBlocRouter extends StatelessWidget {
           );
         } else if (state is AppStateConfirmingHomeAddress) {
           return ConfirmAddressView(addresses: state.addresses);
+        } else if (state is AppStateViewingNeighborhood) {
+          return NeighborhoodView(
+            cloudUser: state.cloudUser!,
+            neighborhood: state.neighborhood!,
+            household: state.household!,
+          );
         } else if (state is AppStateError) {
           return const BadState();
         } else {

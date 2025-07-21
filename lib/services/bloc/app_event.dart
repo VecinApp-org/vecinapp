@@ -16,24 +16,6 @@ class AppEventReset extends AppEvent {
   const AppEventReset();
 }
 
-// AUTHENTICATION ROUTING EVENTS
-class AppEventGoToWelcomeView extends AppEvent {
-  const AppEventGoToWelcomeView();
-}
-
-class AppEventGoToRegistration extends AppEvent {
-  const AppEventGoToRegistration();
-}
-
-class AppEventGoToForgotPassword extends AppEvent {
-  final String? email;
-  const AppEventGoToForgotPassword({String? email}) : email = email ?? '';
-}
-
-class AppEventGoToLogin extends AppEvent {
-  const AppEventGoToLogin();
-}
-
 // AUTHENTICATION EVENTS
 class AppEventRegisterWithEmailAndPassword extends AppEvent {
   final String email;

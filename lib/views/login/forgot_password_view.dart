@@ -1,102 +1,78 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:vecinapp/extensions/string_extension.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
+import 'package:vecinapp/services/bloc/loading_messages_constants.dart';
 import 'package:vecinapp/utilities/dialogs/show_notification_dialog.dart';
+import 'package:vecinapp/utilities/widgets/centered_view.dart';
+import 'package:vecinapp/utilities/widgets/custom_form_field.dart';
 
-class ForgotPasswordView extends StatefulWidget {
-  const ForgotPasswordView({super.key, this.email});
-
-  final String? email;
-
-  @override
-  State<ForgotPasswordView> createState() => _ForgotPasswordViewState();
-}
-
-class _ForgotPasswordViewState extends State<ForgotPasswordView> {
-  late final TextEditingController _controller;
-
-  @override
-  void initState() {
-    if (widget.email != null) {
-      _controller = TextEditingController(text: widget.email);
-    } else {
-      _controller = TextEditingController();
-    }
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+class ForgotPasswordView extends HookWidget {
+  const ForgotPasswordView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final formKey = useMemoized(() => GlobalKey<FormState>());
+    final controller = useTextEditingController();
     return BlocListener<AppBloc, AppState>(
-      listener: (context, state) {
-        if (state is AppStateResettingPassword) {
-          if (state.hasSentEmail) {
-            _controller.clear();
-            showNotificationDialog(
-              context: context,
-              title: 'Revisa tu correo',
-              content: 'Enviamos un correo para restablecer tu contraseña.',
-            );
-          }
+      listener: (context, state) async {
+        if (!state.isLoading &&
+            state.loadingText == loadingTextPasswordResetEmailSent) {
+          controller.clear();
+          await showNotificationDialog(
+            context: context,
+            title: 'Revisa tu correo',
+            content:
+                'Sigue los pasos para restablecer tu contraseña y vuelve a ingresar.',
+          );
+          if (!context.mounted) return;
+          Navigator.of(context).pop();
         }
       },
       child: Scaffold(
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: SingleChildScrollView(
+        appBar: AppBar(title: const Text('Recuperar contraseña')),
+        body: CenteredView(
+          children: [
+            Form(
+              key: formKey,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
                 children: [
-                  //Title
-                  Text('Cambiar contraseña',
-                      style: Theme.of(context).textTheme.headlineLarge),
-                  const SizedBox(height: 55),
-                  //email textfield
-                  TextField(
-                    controller: _controller,
+                  CustomFormField(
                     enableSuggestions: false,
                     autocorrect: false,
                     autofocus: true,
+                    hintText: 'Email',
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      constraints: BoxConstraints(maxWidth: 377),
-                      icon: Icon(Icons.email),
-                      hintText: 'Email',
-                    ),
+                    onSaved: (val) => controller.text = val ?? '',
+                    validator: (val) {
+                      if (val == null || val.isEmpty) {
+                        return 'Email requerido';
+                      }
+                      if (!val.isValidEmail()) {
+                        return 'Email inválido';
+                      }
+                      return null;
+                    },
                   ),
-                  const SizedBox(height: 55),
                   //Reset password button
                   FilledButton(
                     onPressed: () {
-                      final email = _controller.text;
+                      formKey.currentState!.save();
+                      if (!formKey.currentState!.validate()) return;
+                      final email = controller.text;
                       context
                           .read<AppBloc>()
                           .add(AppEventSendPasswordResetEmail(email));
                     },
                     child: const Text('Enviar correo'),
                   ),
-                  const SizedBox(height: 13),
-                  //cancel button
-                  TextButton(
-                    onPressed: () {
-                      context.read<AppBloc>().add(const AppEventGoToLogin());
-                    },
-                    child: const Text('Regresar'),
-                  ),
                 ],
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

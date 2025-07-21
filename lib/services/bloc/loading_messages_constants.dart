@@ -1,4 +1,6 @@
 const String loadingTextDefault = '...';
+//registration
+const String loadingTextPasswordResetEmailSent = 'Correo enviado con éxito';
 //events
 const String loadingTextEventCreation = 'Creando evento';
 const String loadingTextEventEditing = 'Editando evento';
