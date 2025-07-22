@@ -33,11 +33,10 @@ class CreatePostView extends HookWidget {
               key: formKey,
               child: Column(children: [
                 CustomFormField(
-                  hintText: 'Escribe aquí.',
                   autofocus: true,
                   maxLength: 10000,
-                  minLines: 3,
                   maxLines: null,
+                  outlineBorder: false,
                   onSaved: (value) {
                     textController.text = value ?? '';
                   },
