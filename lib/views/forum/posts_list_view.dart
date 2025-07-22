@@ -9,7 +9,7 @@ import 'package:vecinapp/utilities/widgets/expandable_text.dart';
 import 'package:vecinapp/utilities/widgets/profile_picture.dart';
 import 'dart:developer' as devtools show log; // ignore: unused_import
 
-class PostsListView extends StatelessWidget {
+class PostsListView extends HookWidget {
   const PostsListView({
     super.key,
     required this.posts,
@@ -34,7 +34,8 @@ class PostCard extends HookWidget {
   final Post post;
   @override
   Widget build(BuildContext context) {
-    final futureUser = context.watch<AppBloc>().userFromId(post.authorId);
+    final futureUser =
+        useMemoized(() => context.watch<AppBloc>().userFromId(post.authorId));
     final resultUser = useFuture(futureUser);
     if (!resultUser.hasData) {
       return CustomCard();
@@ -67,7 +68,7 @@ class PostCard extends HookWidget {
   }
 }
 
-class PostCardFooter extends StatelessWidget {
+class PostCardFooter extends HookWidget {
   const PostCardFooter({super.key, required this.post});
 
   final Post post;
