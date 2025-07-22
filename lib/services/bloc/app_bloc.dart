@@ -164,7 +164,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         }
 
         //emit success
-        emit(AppStateViewingNeighborhood(
+        emit(AppStateNeighborhood(
           cloudUser: cloudUser,
           exception: null,
           isLoading: false,
@@ -325,8 +325,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
 
       //show loading
-      if (state is AppStateViewingNeighborhood) {
-        emit(AppStateViewingNeighborhood(
+      if (state is AppStateNeighborhood) {
+        emit(AppStateNeighborhood(
           isLoading: true,
           exception: null,
           loadingText: null,
@@ -359,8 +359,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         await _cloudProvider.deleteCloudUser();
         await _authProvider.deleteAccount();
       } catch (e) {
-        if (state is AppStateViewingNeighborhood) {
-          emit(AppStateViewingNeighborhood(
+        if (state is AppStateNeighborhood) {
+          emit(AppStateNeighborhood(
             isLoading: false,
             exception: e,
             loadingText: null,
@@ -505,7 +505,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final household = await _cloudProvider.currentHousehold;
       //if the user has a neighborhood, send to viewing neighborhood
       if (updatedCloudUser!.neighborhoodId != null) {
-        emit(AppStateViewingNeighborhood(
+        emit(AppStateNeighborhood(
           cloudUser: updatedCloudUser,
           isLoading: false,
           loadingText: null,
@@ -557,7 +557,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final updatedCloudUser = await _cloudProvider.currentCloudUser;
       final neighborhood = await _cloudProvider.currentNeighborhood;
       final household = await _cloudProvider.currentHousehold;
-      emit(AppStateViewingNeighborhood(
+      emit(AppStateNeighborhood(
         cloudUser: updatedCloudUser!,
         isLoading: false,
         loadingText: null,
@@ -574,8 +574,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //start loading indicator
-      if (state is AppStateViewingNeighborhood) {
-        emit(AppStateViewingNeighborhood(
+      if (state is AppStateNeighborhood) {
+        emit(AppStateNeighborhood(
           cloudUser: state.cloudUser!,
           isLoading: true,
           loadingText: null,
@@ -600,8 +600,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       try {
         await _cloudProvider.exitHousehold();
       } catch (e) {
-        if (state is AppStateViewingNeighborhood) {
-          emit(AppStateViewingNeighborhood(
+        if (state is AppStateNeighborhood) {
+          emit(AppStateNeighborhood(
             cloudUser: cloudUser!,
             isLoading: false,
             loadingText: null,
@@ -639,8 +639,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           cloudUser: state.cloudUser!,
           household: state.household!,
         ));
-      } else if (state is AppStateViewingNeighborhood) {
-        emit(AppStateViewingNeighborhood(
+      } else if (state is AppStateNeighborhood) {
+        emit(AppStateNeighborhood(
           cloudUser: state.cloudUser!,
           isLoading: true,
           loadingText: null,
@@ -668,8 +668,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             household: household!,
           ));
           return;
-        } else if (state is AppStateViewingNeighborhood) {
-          emit(AppStateViewingNeighborhood(
+        } else if (state is AppStateNeighborhood) {
+          emit(AppStateNeighborhood(
             cloudUser: cloudUser!,
             isLoading: false,
             loadingText: null,
@@ -691,8 +691,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           cloudUser: updatedUser!,
           household: household!,
         ));
-      } else if (state is AppStateViewingNeighborhood) {
-        emit(AppStateViewingNeighborhood(
+      } else if (state is AppStateNeighborhood) {
+        emit(AppStateNeighborhood(
           cloudUser: updatedUser!,
           isLoading: false,
           loadingText: null,
@@ -719,8 +719,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           cloudUser: state.cloudUser!,
           household: state.household!,
         ));
-      } else if (state is AppStateViewingNeighborhood) {
-        emit(AppStateViewingNeighborhood(
+      } else if (state is AppStateNeighborhood) {
+        emit(AppStateNeighborhood(
           cloudUser: state.cloudUser!,
           isLoading: true,
           loadingText: null,
@@ -753,8 +753,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             household: household!,
           ));
           return;
-        } else if (state is AppStateViewingNeighborhood) {
-          emit(AppStateViewingNeighborhood(
+        } else if (state is AppStateNeighborhood) {
+          emit(AppStateNeighborhood(
             cloudUser: cloudUser!,
             isLoading: false,
             loadingText: null,
@@ -775,8 +775,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           cloudUser: newCloudUser!,
           household: household!,
         ));
-      } else if (state is AppStateViewingNeighborhood) {
-        emit(AppStateViewingNeighborhood(
+      } else if (state is AppStateNeighborhood) {
+        emit(AppStateNeighborhood(
           cloudUser: newCloudUser!,
           isLoading: false,
           loadingText: null,
@@ -803,8 +803,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             cloudUser: state.cloudUser!,
             household: state.household!,
           ));
-        } else if (state is AppStateViewingNeighborhood) {
-          emit(AppStateViewingNeighborhood(
+        } else if (state is AppStateNeighborhood) {
+          emit(AppStateNeighborhood(
             cloudUser: state.cloudUser!,
             isLoading: true,
             loadingText: null,
@@ -832,8 +832,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
               household: household!,
             ));
             return;
-          } else if (state is AppStateViewingNeighborhood) {
-            emit(AppStateViewingNeighborhood(
+          } else if (state is AppStateNeighborhood) {
+            emit(AppStateNeighborhood(
               cloudUser: cloudUser!,
               isLoading: false,
               loadingText: null,
@@ -854,8 +854,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             cloudUser: newCloudUser!,
             household: household!,
           ));
-        } else if (state is AppStateViewingNeighborhood) {
-          emit(AppStateViewingNeighborhood(
+        } else if (state is AppStateNeighborhood) {
+          emit(AppStateNeighborhood(
             cloudUser: newCloudUser!,
             isLoading: false,
             loadingText: null,
@@ -875,7 +875,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //enable loading indicator
-      emit(AppStateViewingNeighborhood(
+      emit(AppStateNeighborhood(
         neighborhood: state.neighborhood!,
         cloudUser: state.cloudUser!,
         household: state.household!,
@@ -898,7 +898,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           );
         } catch (e) {
           //inform user of error
-          emit(AppStateViewingNeighborhood(
+          emit(AppStateNeighborhood(
             neighborhood: neighborhood!,
             cloudUser: cloudUser!,
             household: household!,
@@ -917,7 +917,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           );
         } catch (e) {
           //inform user of error
-          emit(AppStateViewingNeighborhood(
+          emit(AppStateNeighborhood(
             neighborhood: neighborhood!,
             cloudUser: cloudUser!,
             household: household!,
@@ -929,7 +929,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         }
       }
       //Send user to rulebook details view
-      emit(AppStateViewingNeighborhood(
+      emit(AppStateNeighborhood(
         neighborhood: neighborhood!,
         household: household!,
         cloudUser: cloudUser!,
@@ -947,7 +947,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       }
       //enable loading indicator
 
-      emit(AppStateViewingNeighborhood(
+      emit(AppStateNeighborhood(
         neighborhood: state.neighborhood!,
         household: state.household!,
         cloudUser: state.cloudUser!,
@@ -963,7 +963,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           rulebookId: event.rulebookId,
         );
       } on CloudException catch (e) {
-        emit(AppStateViewingNeighborhood(
+        emit(AppStateNeighborhood(
           neighborhood: neighborhood!,
           cloudUser: cloudUser!,
           household: household!,
@@ -973,7 +973,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
         return;
       } on Exception catch (e) {
-        emit(AppStateViewingNeighborhood(
+        emit(AppStateNeighborhood(
           neighborhood: neighborhood!,
           household: household!,
           cloudUser: cloudUser!,
@@ -984,7 +984,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //Send user to rulebooks view
-      emit(AppStateViewingNeighborhood(
+      emit(AppStateNeighborhood(
         neighborhood: neighborhood!,
         cloudUser: cloudUser!,
         household: household!,
@@ -1004,7 +1004,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       //check if event is provided
       if (event.eventId != null) {
         //enable loading indicator
-        emit(AppStateViewingNeighborhood(
+        emit(AppStateNeighborhood(
           cloudUser: state.cloudUser!,
           neighborhood: state.neighborhood!,
           household: state.household!,
@@ -1026,7 +1026,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           );
         } catch (e) {
           //inform user of error
-          emit(AppStateViewingNeighborhood(
+          emit(AppStateNeighborhood(
             cloudUser: state.cloudUser!,
             neighborhood: state.neighborhood!,
             household: state.household!,
@@ -1037,7 +1037,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           return;
         }
       } else {
-        emit(AppStateViewingNeighborhood(
+        emit(AppStateNeighborhood(
           cloudUser: state.cloudUser!,
           neighborhood: state.neighborhood!,
           household: state.household!,
@@ -1057,7 +1057,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           );
         } catch (e) {
           //inform user of error
-          emit(AppStateViewingNeighborhood(
+          emit(AppStateNeighborhood(
             cloudUser: state.cloudUser!,
             neighborhood: state.neighborhood!,
             household: state.household!,
@@ -1069,7 +1069,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         }
       }
       //emit success
-      emit(AppStateViewingNeighborhood(
+      emit(AppStateNeighborhood(
         neighborhood: state.neighborhood!,
         isLoading: false,
         loadingText: loadingTextEventEditSuccess,
@@ -1081,7 +1081,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     on<AppEventDeleteEvent>((event, emit) async {
       //enable loading indicator
-      emit(AppStateViewingNeighborhood(
+      emit(AppStateNeighborhood(
         neighborhood: state.neighborhood!,
         household: state.household!,
         isLoading: true,
@@ -1094,7 +1094,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           eventId: event.eventId,
         );
       } on Exception catch (e) {
-        emit(AppStateViewingNeighborhood(
+        emit(AppStateNeighborhood(
           neighborhood: state.neighborhood!,
           household: state.household!,
           cloudUser: state.cloudUser!,
@@ -1105,7 +1105,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //Send user to rulebooks view
-      emit(AppStateViewingNeighborhood(
+      emit(AppStateNeighborhood(
         neighborhood: state.neighborhood!,
         isLoading: false,
         loadingText: loadingTextEventDeleteSuccess,
@@ -1127,7 +1127,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final neighborhood = await _cloudProvider.cachedNeighborhood;
       final household = await _cloudProvider.cachedHousehold;
       //enable loading indicator
-      emit(AppStateViewingNeighborhood(
+      emit(AppStateNeighborhood(
         cloudUser: cloudUser!,
         neighborhood: neighborhood!,
         household: household!,
@@ -1139,7 +1139,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       try {
         await _cloudProvider.createNewPost(text: event.text);
       } on Exception catch (e) {
-        emit(AppStateViewingNeighborhood(
+        emit(AppStateNeighborhood(
           cloudUser: cloudUser,
           neighborhood: neighborhood,
           household: household,
@@ -1149,7 +1149,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         ));
         return;
       }
-      emit(AppStateViewingNeighborhood(
+      emit(AppStateNeighborhood(
         isLoading: false,
         exception: null,
         loadingText: loadingTextPostCreationSuccess,

@@ -75,7 +75,7 @@ class AppBlocRouter extends StatelessWidget {
           );
         } else if (state is AppStateConfirmingHomeAddress) {
           return ConfirmAddressView(addresses: state.addresses);
-        } else if (state is AppStateViewingNeighborhood) {
+        } else if (state is AppStateNeighborhood) {
           return NeighborhoodView(
             cloudUser: state.cloudUser!,
             neighborhood: state.neighborhood!,

@@ -139,8 +139,8 @@ class AppStateWelcomeToNeighborhood extends AppState with EquatableMixin {
 }
 
 //MAIN APP STATES
-class AppStateViewingNeighborhood extends AppState with EquatableMixin {
-  const AppStateViewingNeighborhood({
+class AppStateNeighborhood extends AppState with EquatableMixin {
+  const AppStateNeighborhood({
     required bool isLoading,
     required exception,
     required String? loadingText,
