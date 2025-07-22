@@ -20,6 +20,7 @@ class CustomFormField extends StatelessWidget {
     this.readOnly = false,
     this.onTap,
     this.controller,
+    this.initialValue,
   });
 
   final bool autofocus;
@@ -39,12 +40,14 @@ class CustomFormField extends StatelessWidget {
   final bool readOnly;
   final VoidCallback? onTap;
   final TextEditingController? controller;
+  final String? initialValue;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
+        initialValue: initialValue,
         controller: controller,
         maxLength: maxLength,
         maxLines: maxLines,

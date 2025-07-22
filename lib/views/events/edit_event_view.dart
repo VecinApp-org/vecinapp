@@ -32,13 +32,11 @@ class EditEventView extends HookWidget {
     if (event != null) {
       textController.text = event!.text ?? '';
       titleController.text = event!.title;
-      placeController.text = event!.placeName ?? '';
+      placeController.text = event!.placeName!;
       selectedStartDate.value = event!.dateStart;
       selectedEndDate.value = event!.dateEnd;
-      dateStartController.text =
-          DateFormat.MMMEd().format(selectedStartDate.value!);
-      dateEndController.text =
-          DateFormat.MMMEd().format(selectedEndDate.value!);
+      dateStartController.text = formatDate(event!.dateStart);
+      dateEndController.text = formatDate(event!.dateEnd);
     }
 
     return BlocListener<AppBloc, AppState>(
@@ -59,8 +57,9 @@ class EditEventView extends HookWidget {
             child: Column(
               children: [
                 CustomFormField(
+                  initialValue: event?.title,
                   hintText: 'Título',
-                  autofocus: true,
+                  autofocus: event == null,
                   keyboardType: TextInputType.multiline,
                   minLines: 1,
                   maxLines: null,
@@ -128,7 +127,7 @@ class EditEventView extends HookWidget {
                         newStartTime.minute);
                     //update text controllers
                     dateStartController.text =
-                        '${DateFormat.MMMd().format(selectedStartDate.value!)} ${DateFormat.jm().format(selectedStartDate.value!)}';
+                        formatDate(selectedStartDate.value!);
                   },
                 ),
                 CustomFormField(
@@ -155,7 +154,10 @@ class EditEventView extends HookWidget {
                       return null;
                     }
                     if (val.isBefore(startDate)) {
-                      return 'La fecha final no puede ser antes de la fecha inicial';
+                      return 'No puede ser antes de la fecha inicial';
+                    }
+                    if (val.isBefore(DateTime.now())) {
+                      return 'La fecha final no puede ser en el pasado';
                     }
                     return null;
                   },
@@ -189,13 +191,13 @@ class EditEventView extends HookWidget {
                       newEndTime.hour,
                       newEndTime.minute,
                     );
-                    dateEndController.text =
-                        '${DateFormat.MMMd().format(selectedEndDate.value!)} ${DateFormat.jm().format(selectedEndDate.value!)}';
+                    dateEndController.text = formatDate(selectedEndDate.value!);
                     FocusScope.of(context).nextFocus();
                   },
                 ),
                 CustomFormField(
                   hintText: 'Lugar',
+                  initialValue: event?.placeName,
                   validator: (val) =>
                       (val == null || val.isEmpty) ? 'Lugar requerido' : null,
                   onSaved: (val) => placeController.text = val ?? '',
@@ -205,6 +207,7 @@ class EditEventView extends HookWidget {
                   maxLines: 10,
                   minLines: 1,
                   hintText: 'Descripción',
+                  initialValue: event?.text,
                   validator: (val) => null,
                   onSaved: (val) => textController.text = val ?? '',
                 ),
@@ -229,4 +232,9 @@ class EditEventView extends HookWidget {
           ),
         ));
   }
+}
+
+String formatDate(DateTime? date) {
+  if (date == null) return '';
+  return '${DateFormat.MMMd().format(date)} ${DateFormat.jm().format(date)}';
 }
