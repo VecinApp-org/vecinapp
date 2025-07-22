@@ -9,7 +9,7 @@ import 'package:vecinapp/utilities/widgets/expandable_text.dart';
 import 'package:vecinapp/utilities/widgets/profile_picture.dart';
 import 'dart:developer' as devtools show log; // ignore: unused_import
 
-class PostsListView extends HookWidget {
+class PostsListView extends StatelessWidget {
   const PostsListView({
     super.key,
     required this.posts,
