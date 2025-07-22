@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
-import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/post.dart';
 import 'package:vecinapp/utilities/widgets/custom_card.dart';
 import 'package:vecinapp/utilities/widgets/expandable_text.dart';
@@ -19,79 +18,63 @@ class PostsListView extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userId = context.watch<AppBloc>().state.cloudUser!.id;
-    final Set<String> authorIds = posts.map((post) => post.authorId).toSet();
-    Map<String, CloudUser?> users = {};
-    for (String authorId in authorIds) {
-      // load users
-      final futureUser =
-          useMemoized(() => context.watch<AppBloc>().userFromId(authorId));
-      final resultUser = useFuture(futureUser);
-      if (resultUser.hasData) {
-        users[authorId] = resultUser.data as CloudUser;
-      } else {
-        if (resultUser.connectionState == ConnectionState.done) {
-          users[authorId] = CloudUser(
-              id: authorId,
-              displayName: '[Usuario no existe]',
-              householdId: null,
-              neighborhoodId: null,
-              photoUrl: null,
-              isNeighborhoodAdmin: false,
-              isSuperAdmin: false);
-        } else {
-          users[authorId] = null;
-        }
-      }
-    }
     return ListView.builder(
       shrinkWrap: true,
       itemCount: posts.length,
       itemBuilder: (context, index) {
         final post = posts.elementAt(index);
-        if (users[post.authorId] == null) {
-          return CustomCard();
-        }
-
-        return CustomCard(
-            child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ListTile(
-              leading: ProfilePicture(
-                radius: 16,
-                imageUrl: users[post.authorId]?.photoUrl,
-              ),
-              title: Text(
-                users[post.authorId]?.displayName ?? '[Usuario no existe]',
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: ExpandableText(
-                text: post.text,
-              ),
-            ),
-            PostCardFooter(
-              post: post,
-              userId: userId,
-            ),
-          ],
-        ));
+        return PostCard(post: post);
       },
     );
   }
 }
 
+class PostCard extends HookWidget {
+  const PostCard({super.key, required this.post});
+  final Post post;
+  @override
+  Widget build(BuildContext context) {
+    final futureUser = context.watch<AppBloc>().userFromId(post.authorId);
+    final resultUser = useFuture(futureUser);
+    if (!resultUser.hasData) {
+      return CustomCard();
+    }
+    return CustomCard(
+        child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListTile(
+          leading: ProfilePicture(
+            radius: 16,
+            imageUrl: resultUser.data?.photoUrl,
+          ),
+          title: Text(
+            resultUser.data?.displayName ?? '[Usuario no existe]',
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: ExpandableText(
+            text: post.text,
+          ),
+        ),
+        PostCardFooter(
+          post: post,
+        ),
+      ],
+    ));
+  }
+}
+
 class PostCardFooter extends StatelessWidget {
-  const PostCardFooter({super.key, required this.post, required this.userId});
+  const PostCardFooter({super.key, required this.post});
 
   final Post post;
-  final String userId;
 
   @override
   Widget build(BuildContext context) {
+    final userId = context.watch<AppBloc>().state.cloudUser?.id;
     final likes = post.likes?.length ?? 0;
     final isLiked = post.likes?.contains(userId) ?? false;
     return Padding(
