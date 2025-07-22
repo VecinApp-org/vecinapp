@@ -55,7 +55,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         if (authUser == null) {
           devtools.log('User is not logged in');
           emit(
-            const AppStateWelcomeViewing(
+            const AppStateLoggedOut(
               exception: null,
               isLoading: false,
               loadingText: null,
@@ -185,7 +185,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       //no validation required
 
       //start loading
-      emit(const AppStateWelcomeViewing(
+      emit(const AppStateLoggedOut(
         exception: null,
         isLoading: true,
         loadingText: 'Registrando...',
@@ -202,7 +202,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
         await _authProvider.sendEmailVerification();
       } on AuthException catch (e) {
-        emit(AppStateWelcomeViewing(
+        emit(AppStateLoggedOut(
           exception: e,
           isLoading: false,
           loadingText: null,
@@ -216,7 +216,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       //no validation required
 
       //show loading
-      emit(const AppStateWelcomeViewing(
+      emit(const AppStateLoggedOut(
         exception: null,
         isLoading: true,
         loadingText: 'Iniciando sesión...',
@@ -231,7 +231,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
       } on AuthException catch (e) {
         emit(
-          AppStateWelcomeViewing(
+          AppStateLoggedOut(
             exception: e,
             loadingText: null,
             isLoading: false,
@@ -247,20 +247,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       //send email
       try {
-        emit(AppStateWelcomeViewing(
+        emit(AppStateLoggedOut(
           exception: null,
           isLoading: true,
           loadingText: 'Enviando correo...',
         ));
         await _authProvider.sendPasswordResetEmail(email: event.email);
       } on AuthException catch (e) {
-        emit(AppStateWelcomeViewing(
+        emit(AppStateLoggedOut(
           exception: e,
           isLoading: false,
           loadingText: null,
         ));
       }
-      emit(AppStateWelcomeViewing(
+      emit(AppStateLoggedOut(
         exception: null,
         isLoading: false,
         loadingText: loadingTextPasswordResetEmailSent,

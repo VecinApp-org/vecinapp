@@ -47,8 +47,8 @@ class AppStateError extends AppState with EquatableMixin {
 }
 
 //AUTHENTICATION STATES
-class AppStateWelcomeViewing extends AppState with EquatableMixin {
-  const AppStateWelcomeViewing({
+class AppStateLoggedOut extends AppState with EquatableMixin {
+  const AppStateLoggedOut({
     required bool isLoading,
     required String? loadingText,
     AuthUser? user,

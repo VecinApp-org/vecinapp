@@ -60,7 +60,7 @@ class AppBlocRouter extends StatelessWidget {
         devtools.log(state.runtimeType.toString());
         if (state is AppStateUnInitalized) {
           return const SplashView();
-        } else if (state is AppStateWelcomeViewing) {
+        } else if (state is AppStateLoggedOut) {
           return const WelcomeView();
         } else if (state is AppStateNeedsVerification) {
           return const VerifyEmailView();
