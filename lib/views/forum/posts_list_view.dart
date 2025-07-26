@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/entities/post.dart';
+import 'package:vecinapp/utilities/entities/post_with_user.dart';
 import 'package:vecinapp/utilities/widgets/custom_card.dart';
 import 'package:vecinapp/utilities/widgets/expandable_text.dart';
 import 'package:vecinapp/utilities/widgets/profile_picture.dart';
@@ -14,32 +15,47 @@ class PostsListView extends HookWidget {
     super.key,
     required this.posts,
   });
-  final List<Post> posts;
+  final List<PostWithUser> posts;
 
   @override
   Widget build(BuildContext context) {
+    devtools.log('BUILD: PostsListView');
+    final controller = useScrollController();
+    const threshold = 300.0;
+
+    useEffect(() {
+      void onScroll() {
+        if (!controller.hasClients) return;
+        final maxScroll = controller.position.maxScrollExtent;
+        final currentScroll = controller.position.pixels;
+        if (maxScroll - currentScroll <= threshold) {
+          context.read<AppBloc>().add(AppEventFetchMorePosts());
+        }
+      }
+
+      controller.addListener(onScroll);
+      return () => controller.removeListener(onScroll);
+    }, [controller]);
+
     return ListView.builder(
-      shrinkWrap: true,
-      itemCount: posts.length,
-      itemBuilder: (context, index) {
-        final post = posts.elementAt(index);
-        return PostCard(post: post);
-      },
-    );
+        controller: controller,
+        shrinkWrap: true,
+        itemCount: posts.length + 1,
+        itemBuilder: (context, index) {
+          return index < posts.length
+              ? PostCard(postWithUser: posts[index])
+              : const Center(child: CircularProgressIndicator());
+        });
   }
 }
 
-class PostCard extends HookWidget {
-  const PostCard({super.key, required this.post});
-  final Post post;
+class PostCard extends StatelessWidget {
+  const PostCard({super.key, required this.postWithUser});
+  final PostWithUser postWithUser;
   @override
   Widget build(BuildContext context) {
-    final futureUser =
-        useMemoized(() => context.watch<AppBloc>().userFromId(post.authorId));
-    final resultUser = useFuture(futureUser);
-    if (!resultUser.hasData) {
-      return CustomCard();
-    }
+    final post = postWithUser.post;
+    final user = postWithUser.user;
     return CustomCard(
         child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,10 +63,10 @@ class PostCard extends HookWidget {
         ListTile(
           leading: ProfilePicture(
             radius: 16,
-            imageUrl: resultUser.data?.photoUrl,
+            imageUrl: user.photoUrl,
           ),
           title: Text(
-            resultUser.data?.displayName ?? '[Usuario no existe]',
+            user.displayName,
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -70,14 +86,12 @@ class PostCard extends HookWidget {
 
 class PostCardFooter extends HookWidget {
   const PostCardFooter({super.key, required this.post});
-
   final Post post;
-
   @override
   Widget build(BuildContext context) {
-    final userId = context.watch<AppBloc>().state.cloudUser?.id;
-    final likes = post.likes?.length ?? 0;
-    final isLiked = post.likes?.contains(userId) ?? false;
+    final userId = context.watch<AppBloc>().state.cloudUser!.id;
+    final likes = post.likeCount;
+    final isLiked = post.likes.contains(userId);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Row(

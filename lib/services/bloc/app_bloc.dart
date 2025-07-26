@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:bloc/bloc.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:vecinapp/extensions/geometry/is_point_in_polygon.dart';
 import 'package:vecinapp/extensions/geometry/point.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
@@ -13,6 +14,7 @@ import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:vecinapp/utilities/entities/post.dart';
+import 'package:vecinapp/utilities/entities/post_with_user.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 import 'package:vecinapp/services/geocoding/geocoding_exceptions.dart';
@@ -122,6 +124,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             isLoading: false,
             loadingText: null,
             exception: null,
+            authUser: authUser,
             cloudUser: cloudUser,
             household: household,
           ));
@@ -137,6 +140,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             isLoading: false,
             loadingText: null,
             exception: null,
+            authUser: authUser,
             cloudUser: cloudUser,
             household: household,
           ));
@@ -157,6 +161,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             isLoading: false,
             loadingText: null,
             exception: null,
+            authUser: authUser,
             cloudUser: cloudUser,
             household: household,
           ));
@@ -165,6 +170,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
         //emit success
         emit(AppStateNeighborhood(
+          authUser: authUser,
           cloudUser: cloudUser,
           exception: null,
           isLoading: false,
@@ -323,31 +329,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         add(const AppEventReset());
         return;
       }
-
       //show loading
-      if (state is AppStateNeighborhood) {
-        emit(AppStateNeighborhood(
-          isLoading: true,
-          exception: null,
-          loadingText: null,
-          cloudUser: state.cloudUser!,
-          household: state.household!,
-          neighborhood: state.neighborhood!,
-        ));
-      } else if (state is AppStateNoNeighborhood) {
-        emit(AppStateNoNeighborhood(
-          isLoading: true,
-          exception: null,
-          loadingText: null,
-          cloudUser: state.cloudUser!,
-          household: state.household!,
-        ));
-      }
-
+      emit(state.copyWith(
+        isLoading: true,
+        exception: null,
+      ));
       //delete account
-      final cloudUser = await _cloudProvider.currentCloudUser;
-      final household = await _cloudProvider.currentHousehold;
-      final neighborhood = await _cloudProvider.currentNeighborhood;
       try {
         final user = _authProvider.currentUser;
         final cloudUser = await _cloudProvider.currentCloudUser;
@@ -359,24 +346,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         await _cloudProvider.deleteCloudUser();
         await _authProvider.deleteAccount();
       } catch (e) {
-        if (state is AppStateNeighborhood) {
-          emit(AppStateNeighborhood(
-            isLoading: false,
-            exception: e,
-            loadingText: null,
-            cloudUser: cloudUser!,
-            household: household!,
-            neighborhood: neighborhood!,
-          ));
-        } else if (state is AppStateNoNeighborhood) {
-          emit(AppStateNoNeighborhood(
-            isLoading: false,
-            exception: e,
-            loadingText: null,
-            cloudUser: cloudUser!,
-            household: household!,
-          ));
-        }
+        emit(state.copyWith(
+          isLoading: false,
+          exception: e as AuthException,
+        ));
         return;
       }
       add(const AppEventReset());
@@ -506,6 +479,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       //if the user has a neighborhood, send to viewing neighborhood
       if (updatedCloudUser!.neighborhoodId != null) {
         emit(AppStateNeighborhood(
+          authUser: _authProvider.currentUser!,
           cloudUser: updatedCloudUser,
           isLoading: false,
           loadingText: null,
@@ -519,6 +493,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           isLoading: false,
           loadingText: null,
           exception: null,
+          authUser: _authProvider.currentUser!,
           cloudUser: updatedCloudUser,
           household: household!,
         ));
@@ -536,6 +511,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         isLoading: true,
         loadingText: 'Buscando vecindad',
         exception: null,
+        authUser: state.user!,
         cloudUser: state.cloudUser!,
         household: state.household!,
       ));
@@ -548,6 +524,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           isLoading: false,
           loadingText: null,
           exception: null,
+          authUser: state.user!,
           cloudUser: state.cloudUser!,
           household: state.household!,
         ));
@@ -558,6 +535,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final neighborhood = await _cloudProvider.currentNeighborhood;
       final household = await _cloudProvider.currentHousehold;
       emit(AppStateNeighborhood(
+        authUser: _authProvider.currentUser!,
         cloudUser: updatedCloudUser!,
         isLoading: false,
         loadingText: null,
@@ -574,52 +552,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //start loading indicator
-      if (state is AppStateNeighborhood) {
-        emit(AppStateNeighborhood(
-          cloudUser: state.cloudUser!,
-          isLoading: true,
-          loadingText: null,
-          exception: null,
-          neighborhood: state.neighborhood!,
-          household: state.household!,
-        ));
-      } else if (state is AppStateNoNeighborhood) {
-        emit(AppStateNoNeighborhood(
-          isLoading: true,
-          loadingText: null,
-          exception: null,
-          cloudUser: state.cloudUser!,
-          household: state.household!,
-        ));
-      }
-
+      emit(state.copyWith(
+        isLoading: true,
+        exception: null,
+      ));
       //exit household
-      final cloudUser = await _cloudProvider.currentCloudUser;
-      final household = await _cloudProvider.currentHousehold;
-      final neighborhood = await _cloudProvider.currentNeighborhood;
       try {
         await _cloudProvider.exitHousehold();
       } catch (e) {
-        if (state is AppStateNeighborhood) {
-          emit(AppStateNeighborhood(
-            cloudUser: cloudUser!,
-            isLoading: false,
-            loadingText: null,
-            exception: e,
-            neighborhood: neighborhood!,
-            household: household!,
-          ));
-          return;
-        } else if (state is AppStateNoNeighborhood) {
-          emit(AppStateNoNeighborhood(
-            isLoading: false,
-            loadingText: null,
-            exception: e,
-            cloudUser: cloudUser!,
-            household: household!,
-          ));
-          return;
-        }
+        //inform user of error
+        emit(state.copyWith(
+          isLoading: false,
+          exception: e as CloudException,
+        ));
+        return;
       }
       add(AppEventReset());
     });
@@ -631,27 +577,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //start loading
-      if (state is AppStateNoNeighborhood) {
-        emit(AppStateNoNeighborhood(
-          isLoading: true,
-          loadingText: null,
-          exception: null,
-          cloudUser: state.cloudUser!,
-          household: state.household!,
-        ));
-      } else if (state is AppStateNeighborhood) {
-        emit(AppStateNeighborhood(
-          cloudUser: state.cloudUser!,
-          isLoading: true,
-          loadingText: null,
-          exception: null,
-          neighborhood: state.neighborhood!,
-          household: state.household!,
-        ));
-      }
-      final cloudUser = await _cloudProvider.currentCloudUser;
-      final household = state.household;
-      final neighborhood = state.neighborhood;
+      emit(state.copyWith(
+        isLoading: true,
+        exception: null,
+      ));
       //update display name
       try {
         await _cloudProvider.updateUserDisplayName(
@@ -659,48 +588,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
       } catch (e) {
         //notify user of error
-        if (state is AppStateNoNeighborhood) {
-          emit(AppStateNoNeighborhood(
-            isLoading: false,
-            loadingText: null,
-            exception: e,
-            cloudUser: cloudUser!,
-            household: household!,
-          ));
-          return;
-        } else if (state is AppStateNeighborhood) {
-          emit(AppStateNeighborhood(
-            cloudUser: cloudUser!,
-            isLoading: false,
-            loadingText: null,
-            exception: e,
-            neighborhood: neighborhood!,
-            household: household!,
-          ));
-          return;
-        }
+        emit(state.copyWith(
+          isLoading: false,
+          exception: e as CloudException,
+        ));
         return;
       }
       //notify user of success
       final updatedUser = await _cloudProvider.currentCloudUser;
-      if (state is AppStateNoNeighborhood) {
-        emit(AppStateNoNeighborhood(
-          isLoading: false,
-          loadingText: null,
-          exception: null,
-          cloudUser: updatedUser!,
-          household: household!,
-        ));
-      } else if (state is AppStateNeighborhood) {
-        emit(AppStateNeighborhood(
-          cloudUser: updatedUser!,
-          isLoading: false,
-          loadingText: null,
-          exception: null,
-          neighborhood: neighborhood!,
-          household: household!,
-        ));
-      }
+      emit(state.copyWith(
+        isLoading: false,
+        exception: null,
+        cloudUser: updatedUser!,
+      ));
     });
 
     //Storage events
@@ -711,31 +611,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //start loading
-      if (state is AppStateNoNeighborhood) {
-        emit(AppStateNoNeighborhood(
-          isLoading: true,
-          loadingText: null,
-          exception: null,
-          cloudUser: state.cloudUser!,
-          household: state.household!,
-        ));
-      } else if (state is AppStateNeighborhood) {
-        emit(AppStateNeighborhood(
-          cloudUser: state.cloudUser!,
-          isLoading: true,
-          loadingText: null,
-          exception: null,
-          neighborhood: state.neighborhood!,
-          household: state.household!,
-        ));
-      }
-      final user = _authProvider.currentUser!;
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      final household = state.household;
-      final neighborhood = state.neighborhood;
+      emit(state.copyWith(
+        isLoading: true,
+        exception: null,
+      ));
 
       //upload image
       try {
+        final user = _authProvider.currentUser!;
         final File image = File(event.imagePath);
         final imageUrl = await _storageProvider.uploadProfileImage(
           image: image,
@@ -744,47 +627,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         //update user's photo url
         await _cloudProvider.updateUserPhotoUrl(photoUrl: imageUrl);
       } catch (e) {
-        if (state is AppStateNoNeighborhood) {
-          emit(AppStateNoNeighborhood(
-            isLoading: false,
-            loadingText: null,
-            exception: e,
-            cloudUser: cloudUser!,
-            household: household!,
-          ));
-          return;
-        } else if (state is AppStateNeighborhood) {
-          emit(AppStateNeighborhood(
-            cloudUser: cloudUser!,
-            isLoading: false,
-            loadingText: null,
-            exception: e,
-            neighborhood: neighborhood!,
-            household: household!,
-          ));
-          return;
-        }
+        //notify user of error
+        emit(state.copyWith(
+          isLoading: false,
+          exception: e as CloudException,
+        ));
         return;
       }
+      //notify user of success
       final newCloudUser = await _cloudProvider.currentCloudUser;
-      if (state is AppStateNoNeighborhood) {
-        emit(AppStateNoNeighborhood(
-          isLoading: false,
-          loadingText: null,
-          exception: null,
-          cloudUser: newCloudUser!,
-          household: household!,
-        ));
-      } else if (state is AppStateNeighborhood) {
-        emit(AppStateNeighborhood(
-          cloudUser: newCloudUser!,
-          isLoading: false,
-          loadingText: null,
-          exception: null,
-          neighborhood: neighborhood!,
-          household: household!,
-        ));
-      }
+      emit(state.copyWith(
+        isLoading: false,
+        exception: null,
+        cloudUser: newCloudUser!,
+      ));
     });
 
     on<AppEventDeleteProfilePhoto>(
@@ -795,75 +651,30 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           return;
         }
         //start loading
-        if (state is AppStateNoNeighborhood) {
-          emit(AppStateNoNeighborhood(
-            isLoading: true,
-            loadingText: null,
-            exception: null,
-            cloudUser: state.cloudUser!,
-            household: state.household!,
-          ));
-        } else if (state is AppStateNeighborhood) {
-          emit(AppStateNeighborhood(
-            cloudUser: state.cloudUser!,
-            isLoading: true,
-            loadingText: null,
-            exception: null,
-            neighborhood: state.neighborhood!,
-            household: state.household!,
-          ));
-        }
+        emit(state.copyWith(
+          isLoading: true,
+          exception: null,
+        ));
         final user = _authProvider.currentUser!;
-        final cloudUser = await _cloudProvider.cachedCloudUser;
-        final household = state.household;
-        final neighborhood = state.neighborhood;
         //delete image
         try {
           await _storageProvider.deleteProfileImage(userId: user.uid!);
           await _cloudProvider.updateUserPhotoUrl(photoUrl: '');
         } catch (e) {
           //emit error
-          if (state is AppStateNoNeighborhood) {
-            emit(AppStateNoNeighborhood(
-              isLoading: false,
-              loadingText: null,
-              exception: e,
-              cloudUser: cloudUser!,
-              household: household!,
-            ));
-            return;
-          } else if (state is AppStateNeighborhood) {
-            emit(AppStateNeighborhood(
-              cloudUser: cloudUser!,
-              isLoading: false,
-              loadingText: null,
-              exception: e,
-              neighborhood: neighborhood!,
-              household: household!,
-            ));
-            return;
-          }
+          emit(state.copyWith(
+            isLoading: false,
+            exception: e as CloudException,
+          ));
+          return;
         }
         final newCloudUser = await _cloudProvider.currentCloudUser;
         //emit success
-        if (state is AppStateNoNeighborhood) {
-          emit(AppStateNoNeighborhood(
-            isLoading: false,
-            loadingText: null,
-            exception: null,
-            cloudUser: newCloudUser!,
-            household: household!,
-          ));
-        } else if (state is AppStateNeighborhood) {
-          emit(AppStateNeighborhood(
-            cloudUser: newCloudUser!,
-            isLoading: false,
-            loadingText: null,
-            exception: null,
-            neighborhood: neighborhood!,
-            household: household!,
-          ));
-        }
+        emit(state.copyWith(
+          isLoading: false,
+          exception: null,
+          cloudUser: newCloudUser!,
+        ));
       },
     );
 
@@ -875,17 +686,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //enable loading indicator
-      emit(AppStateNeighborhood(
-        neighborhood: state.neighborhood!,
-        cloudUser: state.cloudUser!,
-        household: state.household!,
+      emit(state.copyWith(
         isLoading: true,
-        loadingText: loadingTextRulebookCreation,
         exception: null,
       ));
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      final household = await _cloudProvider.cachedHousehold;
-      final neighborhood = await _cloudProvider.cachedNeighborhood;
       //check if rulebook is provided
       final rulebookId = event.rulebookId;
       if (rulebookId != null) {
@@ -898,13 +702,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           );
         } catch (e) {
           //inform user of error
-          emit(AppStateNeighborhood(
-            neighborhood: neighborhood!,
-            cloudUser: cloudUser!,
-            household: household!,
+          emit(state.copyWith(
             isLoading: false,
-            loadingText: null,
-            exception: e,
+            exception: e as CloudException,
           ));
           return;
         }
@@ -917,24 +717,16 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           );
         } catch (e) {
           //inform user of error
-          emit(AppStateNeighborhood(
-            neighborhood: neighborhood!,
-            cloudUser: cloudUser!,
-            household: household!,
+          emit(state.copyWith(
             isLoading: false,
-            loadingText: null,
-            exception: e,
+            exception: e as CloudException,
           ));
           return;
         }
       }
       //Send user to rulebook details view
-      emit(AppStateNeighborhood(
-        neighborhood: neighborhood!,
-        household: household!,
-        cloudUser: cloudUser!,
+      emit(state.copyWith(
         isLoading: false,
-        loadingText: loadingTextRulebookCreationSuccess,
         exception: null,
       ));
     });
@@ -946,50 +738,31 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //enable loading indicator
-
-      emit(AppStateNeighborhood(
-        neighborhood: state.neighborhood!,
-        household: state.household!,
-        cloudUser: state.cloudUser!,
+      emit(state.copyWith(
         isLoading: true,
-        loadingText: loadingTextRulebookDeletion,
         exception: null,
       ));
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      final neighborhood = await _cloudProvider.cachedNeighborhood;
-      final household = await _cloudProvider.cachedHousehold;
+      //delete rulebook
       try {
         await _cloudProvider.deleteRulebook(
           rulebookId: event.rulebookId,
         );
       } on CloudException catch (e) {
-        emit(AppStateNeighborhood(
-          neighborhood: neighborhood!,
-          cloudUser: cloudUser!,
-          household: household!,
+        emit(state.copyWith(
           isLoading: false,
-          loadingText: null,
           exception: e,
         ));
         return;
       } on Exception catch (e) {
-        emit(AppStateNeighborhood(
-          neighborhood: neighborhood!,
-          household: household!,
-          cloudUser: cloudUser!,
+        emit(state.copyWith(
           isLoading: false,
-          loadingText: null,
           exception: e,
         ));
         return;
       }
       //Send user to rulebooks view
-      emit(AppStateNeighborhood(
-        neighborhood: neighborhood!,
-        cloudUser: cloudUser!,
-        household: household!,
+      emit(state.copyWith(
         isLoading: false,
-        loadingText: loadingTextRulebookDeletionSuccess,
         exception: null,
       ));
     });
@@ -1001,17 +774,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         add(const AppEventReset());
         return;
       }
+      //enable loading indicator
+      emit(state.copyWith(
+        isLoading: true,
+        exception: null,
+      ));
       //check if event is provided
       if (event.eventId != null) {
-        //enable loading indicator
-        emit(AppStateNeighborhood(
-          cloudUser: state.cloudUser!,
-          neighborhood: state.neighborhood!,
-          household: state.household!,
-          isLoading: true,
-          loadingText: loadingTextEventEditing,
-          exception: null,
-        ));
         try {
           //update existing event
           final eventId = event.eventId!;
@@ -1026,25 +795,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           );
         } catch (e) {
           //inform user of error
-          emit(AppStateNeighborhood(
-            cloudUser: state.cloudUser!,
-            neighborhood: state.neighborhood!,
-            household: state.household!,
+          emit(state.copyWith(
             isLoading: false,
-            loadingText: null,
-            exception: e,
+            exception: e as CloudException,
           ));
           return;
         }
       } else {
-        emit(AppStateNeighborhood(
-          cloudUser: state.cloudUser!,
-          neighborhood: state.neighborhood!,
-          household: state.household!,
-          isLoading: true,
-          loadingText: loadingTextEventCreation,
-          exception: null,
-        ));
         //create new event
         try {
           await _cloudProvider.createNewEvent(
@@ -1057,110 +814,193 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           );
         } catch (e) {
           //inform user of error
-          emit(AppStateNeighborhood(
-            cloudUser: state.cloudUser!,
-            neighborhood: state.neighborhood!,
-            household: state.household!,
+          emit(state.copyWith(
             isLoading: false,
-            loadingText: null,
-            exception: e,
+            exception: e as CloudException,
           ));
           return;
         }
       }
       //emit success
-      emit(AppStateNeighborhood(
-        neighborhood: state.neighborhood!,
+      emit(state.copyWith(
         isLoading: false,
-        loadingText: loadingTextEventEditSuccess,
         exception: null,
-        cloudUser: state.cloudUser!,
-        household: state.household!,
       ));
     });
 
     on<AppEventDeleteEvent>((event, emit) async {
-      //enable loading indicator
-      emit(AppStateNeighborhood(
-        neighborhood: state.neighborhood!,
-        household: state.household!,
-        isLoading: true,
-        loadingText: loadingTextDefault,
-        exception: null,
-        cloudUser: state.cloudUser!,
-      ));
-      try {
-        await _cloudProvider.deleteEvent(
-          eventId: event.eventId,
-        );
-      } on Exception catch (e) {
-        emit(AppStateNeighborhood(
-          neighborhood: state.neighborhood!,
-          household: state.household!,
-          cloudUser: state.cloudUser!,
-          isLoading: false,
-          loadingText: null,
-          exception: e,
-        ));
-        return;
-      }
-      //Send user to rulebooks view
-      emit(AppStateNeighborhood(
-        neighborhood: state.neighborhood!,
-        isLoading: false,
-        loadingText: loadingTextEventDeleteSuccess,
-        exception: null,
-        cloudUser: state.cloudUser!,
-        household: state.household!,
-      ));
-    });
-
-    //Posts Events
-    on<AppEventCreatePost>((event, emit) async {
       //validate access
       if (!await _isValidNeighborhoodAccess()) {
         add(const AppEventReset());
         return;
       }
-      //get credentials
-      final cloudUser = await _cloudProvider.cachedCloudUser;
-      final neighborhood = await _cloudProvider.cachedNeighborhood;
-      final household = await _cloudProvider.cachedHousehold;
       //enable loading indicator
-      emit(AppStateNeighborhood(
-        cloudUser: cloudUser!,
-        neighborhood: neighborhood!,
-        household: household!,
+      emit(state.copyWith(
         isLoading: true,
-        loadingText: loadingTextPostCreation,
+        exception: null,
+      ));
+      //delete event
+      try {
+        await _cloudProvider.deleteEvent(
+          eventId: event.eventId,
+        );
+      } on Exception catch (e) {
+        emit(state.copyWith(
+          isLoading: false,
+          exception: e,
+        ));
+        return;
+      }
+      //Send user to rulebooks view
+      emit(state.copyWith(
+        isLoading: false,
+        exception: null,
+      ));
+    });
+
+    //Posts Events
+    on<AppEventCreatePost>((event, emit) async {
+      devtools.log('BLOC: AppEventCreatePost');
+      //validate access
+      if (!await _isValidNeighborhoodAccess()) {
+        add(const AppEventReset());
+        return;
+      }
+      //enable loading indicator
+      emit(state.copyWith(
+        isLoading: true,
         exception: null,
       ));
       //create post
       try {
         await _cloudProvider.createNewPost(text: event.text);
       } on Exception catch (e) {
-        emit(AppStateNeighborhood(
-          cloudUser: cloudUser,
-          neighborhood: neighborhood,
-          household: household,
+        emit(state.copyWith(
           isLoading: false,
-          loadingText: null,
           exception: e,
         ));
         return;
       }
-      emit(AppStateNeighborhood(
+      emit(state.copyWith(
         isLoading: false,
         exception: null,
         loadingText: loadingTextPostCreationSuccess,
-        cloudUser: cloudUser,
-        neighborhood: neighborhood,
-        household: household,
       ));
     });
 
+    on<AppEventRefreshPosts>((event, emit) async {
+      devtools.log('BLOC: AppEventRefreshPosts');
+      //validate access
+      if (!await _isValidNeighborhoodAccess()) {
+        add(const AppEventReset());
+        return;
+      }
+      //enable loading indicator
+      if (state.postsStatus == PostsStatus.loading) return;
+      emit(state.copyWith(
+        isLoading: false,
+        exception: null,
+        postsStatus: PostsStatus.loading,
+        posts: null,
+      ));
+      //refresh posts
+      List<Post>? posts;
+      try {
+        final iterablePosts = await _cloudProvider.fetchInitialPosts();
+        posts = iterablePosts.toList();
+        posts.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      } on Exception catch (e) {
+        emit(state.copyWith(
+          isLoading: false,
+          exception: e,
+          postsStatus: PostsStatus.failure,
+        ));
+        return;
+      }
+      //get list of users to refresh
+      final userIds = posts.map((post) => post.authorId).toSet();
+      //refresh users
+      Iterable<CloudUser> users;
+      try {
+        users = await _cloudProvider.usersFromIds(userIds: userIds.toList());
+      } on Exception catch (e) {
+        emit(state.copyWith(
+          isLoading: false,
+          exception: e,
+          postsStatus: PostsStatus.failure,
+        ));
+        return;
+      }
+      //map users to posts
+      List<PostWithUser> postsWithUsers = [];
+      for (var post in posts) {
+        final userr = users.firstWhere((user) => user.id == post.authorId);
+        postsWithUsers.add(PostWithUser(post: post, user: userr));
+      }
+      //update state
+      emit(state.copyWith(
+        isLoading: false,
+        exception: null,
+        posts: postsWithUsers,
+        postsStatus: PostsStatus.success,
+      ));
+    }, transformer: droppable());
+
+    on<AppEventFetchMorePosts>((event, emit) async {
+      devtools.log('BLOC: AppEventFetchMorePosts');
+      //validate access
+      if (!await _isValidNeighborhoodAccess()) {
+        add(const AppEventReset());
+        return;
+      }
+      if (state.postsStatus != PostsStatus.success) return;
+
+      //fetch more posts
+      final List<Post> morePosts;
+      try {
+        final lastPost = state.posts!.last.post;
+        final iterablePosts =
+            await _cloudProvider.fetchMorePosts(timestamp: lastPost.timestamp);
+        morePosts = iterablePosts.toList();
+        morePosts.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      } on Exception catch (e) {
+        emit(state.copyWith(
+          isLoading: false,
+          exception: e,
+          postsStatus: PostsStatus.failure,
+        ));
+        return;
+      }
+      //get list of users to refresh
+      final userIds = morePosts.map((post) => post.authorId).toSet();
+      //refresh users
+      Iterable<CloudUser> moreUsers;
+      try {
+        moreUsers = await _cloudProvider.usersFromIds(userIds: userIds);
+      } on Exception catch (e) {
+        emit(state.copyWith(
+          isLoading: false,
+          exception: e,
+          postsStatus: PostsStatus.failure,
+        ));
+        return;
+      }
+      //map users to posts
+      List<PostWithUser> morePostsWithUsers = [];
+      for (var post in morePosts) {
+        final userr = moreUsers.firstWhere((user) => user.id == post.authorId);
+        morePostsWithUsers.add(PostWithUser(post: post, user: userr));
+      }
+      emit(state.copyWith(
+        isLoading: false,
+        exception: null,
+        posts: [...state.posts!, ...morePostsWithUsers],
+      ));
+    }, transformer: droppable());
+
     on<AppEventLikePost>(
       (event, emit) async {
+        devtools.log('BLOC: AppEventLikePost');
         //validate access
         if (!await _isValidNeighborhoodAccess()) {
           add(const AppEventReset());
@@ -1170,13 +1010,37 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         try {
           await _cloudProvider.likePost(postId: event.postId);
         } on Exception catch (_) {
+          devtools.log('BLOC: Post like failed');
           return;
         }
+
+        //replace post
+        final previousPostsWithUsers = state.posts!;
+        final newPostsWithUsers = previousPostsWithUsers.map((post) {
+          if (post.post.id == event.postId) {
+            return PostWithUser(
+              post: post.post.copyWith(
+                  likes: post.post.likes..add(_authProvider.currentUser!.uid!)),
+              user: post.user,
+            );
+          } else {
+            return post;
+          }
+        }).toList();
+        //update state
+        devtools.log('BLOC: Post like success');
+        emit(state.copyWith(
+          isLoading: false,
+          exception: null,
+          posts: newPostsWithUsers,
+        ));
       },
+      transformer: droppable(),
     );
 
     on<AppEventUnlikePost>(
       (event, emit) async {
+        devtools.log('BLOC: AppEventUnlikePost');
         //validate access
         if (!await _isValidNeighborhoodAccess()) {
           add(const AppEventReset());
@@ -1186,9 +1050,33 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         try {
           await _cloudProvider.unlikePost(postId: event.postId);
         } on Exception catch (_) {
+          devtools.log('BLOC: Post unlike failed');
           return;
         }
+        //replace post
+        final previousPostsWithUsers = state.posts!;
+        final previousPost = previousPostsWithUsers
+            .firstWhere((post) => post.post.id == event.postId);
+        final newPost = previousPost.post.copyWith(
+          likes: previousPost.post.likes
+            ..remove(_authProvider.currentUser!.uid!),
+        );
+        final newPostsWithUsers = previousPostsWithUsers.map((post) {
+          if (post.post.id == event.postId) {
+            return PostWithUser(post: newPost, user: post.user);
+          } else {
+            return post;
+          }
+        }).toList();
+        //update state
+        devtools.log('BLOC: Post unlike success');
+        emit(state.copyWith(
+          isLoading: false,
+          exception: null,
+          posts: newPostsWithUsers,
+        ));
       },
+      transformer: droppable(),
     );
   }
 
@@ -1309,13 +1197,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   Stream<Iterable<Event>> get events async* {
     final cloudUSer = await _cloudProvider.cachedCloudUser;
     yield* _cloudProvider.neighborhoodEvents(
-      neighborhoodId: cloudUSer!.neighborhoodId!,
-    );
-  }
-
-  Stream<Iterable<Post>> get posts async* {
-    final cloudUSer = await _cloudProvider.cachedCloudUser;
-    yield* _cloudProvider.neighborhoodPosts(
       neighborhoodId: cloudUSer!.neighborhoodId!,
     );
   }

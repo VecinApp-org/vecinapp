@@ -184,3 +184,11 @@ class AppEventUnlikePost extends AppEvent {
   final String postId;
   const AppEventUnlikePost({required this.postId});
 }
+
+class AppEventRefreshPosts extends AppEvent {
+  const AppEventRefreshPosts();
+}
+
+class AppEventFetchMorePosts extends AppEvent {
+  const AppEventFetchMorePosts();
+}

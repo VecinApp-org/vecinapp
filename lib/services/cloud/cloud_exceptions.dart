@@ -146,6 +146,20 @@ class CouldNotDeletePostException extends CloudException {
       : super(message: 'No se pudo borrar la publicación');
 }
 
+class CouldNotFetchPostsException extends CloudException {
+  const CouldNotFetchPostsException()
+      : super(message: 'No se pudo obtener las publicaciones');
+}
+
+class CouldNotLikePostException extends CloudException {
+  const CouldNotLikePostException() : super(message: 'No se pudo dar like');
+}
+
+class CouldNotUnlikePostException extends CloudException {
+  const CouldNotUnlikePostException()
+      : super(message: 'No se pudo quitar like');
+}
+
 // Admin
 class PermissionDeniedCloudException extends CloudException {
   const PermissionDeniedCloudException() : super(message: 'Permiso denegado');

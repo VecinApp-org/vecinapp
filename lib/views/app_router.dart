@@ -26,6 +26,11 @@ class AppBlocRouter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AppBloc, AppState>(
+      listenWhen: (previous, current) {
+        return (previous.isLoading != current.isLoading ||
+            previous.loadingText != current.loadingText ||
+            previous.exception != current.exception);
+      },
       listener: (context, state) {
         if (!state.isLoading) {
           LoadingScreen().hide();
@@ -56,8 +61,10 @@ class AppBlocRouter extends StatelessWidget {
           );
         }
       },
+      buildWhen: (previous, current) {
+        return (previous.runtimeType != current.runtimeType);
+      },
       builder: (context, state) {
-        devtools.log(state.runtimeType.toString());
         if (state is AppStateUnInitalized) {
           return const SplashView();
         } else if (state is AppStateLoggedOut) {

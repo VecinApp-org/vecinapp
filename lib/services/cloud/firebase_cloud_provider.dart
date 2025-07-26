@@ -12,7 +12,6 @@ import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/services/cloud/cloud_constants.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
 import 'package:vecinapp/extensions/geometry/is_point_in_polygon.dart';
-import 'dart:developer' as devtools show log;
 import 'package:vecinapp/utilities/entities/address.dart';
 
 class FirebaseCloudProvider implements CloudProvider {
@@ -330,31 +329,55 @@ class FirebaseCloudProvider implements CloudProvider {
       _posts(neighborhoodId: neighborhoodId).doc(postId);
 
   @override
-  Stream<Iterable<Post>> neighborhoodPosts({required String neighborhoodId}) {
-    return _posts(neighborhoodId: neighborhoodId)
-        .limit(10)
-        .orderBy(postTimeCreatedFieldName, descending: true)
-        .snapshots()
-        .map(
-      (post) {
-        return post.docs.map((doc) {
-          return Post.fromSnapshot(snapshot: doc);
-        });
-      },
-    );
+  Future<Iterable<Post>> fetchInitialPosts() async {
+    final neighborhood = await currentNeighborhood;
+    final neighborhoodId = neighborhood!.id;
+    Future<Iterable<Post>> posts;
+    try {
+      posts = _posts(neighborhoodId: neighborhoodId)
+          .limit(10)
+          .orderBy(postTimeCreatedFieldName, descending: true)
+          .get()
+          .then((post) =>
+              post.docs.map((doc) => Post.fromSnapshot(snapshot: doc)));
+    } catch (e) {
+      throw CouldNotFetchPostsException();
+    }
+    return posts;
+  }
+
+  @override
+  Future<Iterable<Post>> fetchMorePosts({required DateTime timestamp}) async {
+    final neighborhood = await currentNeighborhood;
+    final neighborhoodId = neighborhood!.id;
+    Future<Iterable<Post>> posts;
+    try {
+      posts = _posts(neighborhoodId: neighborhoodId)
+          .orderBy(postTimeCreatedFieldName, descending: true)
+          .startAfter([timestamp])
+          .limit(10)
+          .get()
+          .then((post) =>
+              post.docs.map((doc) => Post.fromSnapshot(snapshot: doc)));
+    } catch (e) {
+      throw CouldNotFetchPostsException();
+    }
+    return posts;
   }
 
   @override
   Future<void> likePost({required String postId}) async {
     try {
       final user = await currentCloudUser;
-      await _post(
+      return await _post(
         neighborhoodId: user!.neighborhoodId!,
         postId: postId,
       ).update({
         postLikesFieldName: FieldValue.arrayUnion([user.id]),
-      });
-    } catch (_) {}
+      }).timeout(Duration(seconds: 1));
+    } catch (_) {
+      throw CouldNotLikePostException();
+    }
   }
 
   @override
@@ -366,8 +389,10 @@ class FirebaseCloudProvider implements CloudProvider {
         postId: postId,
       ).update({
         postLikesFieldName: FieldValue.arrayRemove([user.id]),
-      });
-    } catch (_) {}
+      }).timeout(Duration(seconds: 1));
+    } catch (_) {
+      throw CouldNotUnlikePostException();
+    }
   }
 
   @override
@@ -453,10 +478,27 @@ class FirebaseCloudProvider implements CloudProvider {
 
   @override
   Future<CloudUser?> userFromId({required String userId}) async {
-    final doc = await _users.doc(userId).get();
-    if (!doc.exists) return null;
-    if (doc.data() == null) return null;
-    return CloudUser.fromFirebase(doc: doc);
+    try {
+      final doc = await _users.doc(userId).get();
+      if (!doc.exists) return null;
+      if (doc.data() == null) return null;
+      return CloudUser.fromFirebase(doc: doc);
+    } catch (e) {
+      throw CloudException();
+    }
+  }
+
+  @override
+  Future<Iterable<CloudUser>> usersFromIds(
+      {required Iterable<String> userIds}) async {
+    try {
+      if (userIds.isEmpty) return [];
+      final docss =
+          await _users.where(FieldPath.documentId, whereIn: userIds).get();
+      return docss.docs.map((dox) => CloudUser.fromFirebase(doc: dox));
+    } catch (e) {
+      throw CloudException();
+    }
   }
 
   @override
@@ -481,13 +523,7 @@ class FirebaseCloudProvider implements CloudProvider {
       await _users.doc(userId).set({
         userDisplayNameFieldName: displayName,
       });
-    } on CloudException catch (e) {
-      devtools.log(
-          'Could not create cloud user ${e.runtimeType}/${e.hashCode}/${e.toString()}');
-      throw CouldNotCreateCloudUserException();
     } catch (e) {
-      devtools.log(
-          'Could not create cloud user ${e.runtimeType}/${e.hashCode}/${e.toString()}');
       throw CouldNotCreateCloudUserException();
     }
   }
@@ -711,8 +747,6 @@ class FirebaseCloudProvider implements CloudProvider {
             userNeighborhoodIdFieldName:
                 householdData[householdNeighborhoodIdFieldName],
           });
-          devtools
-              .log('The household already had a neighborhood and was updated');
         } else {
           //Search for nearby neighborhoods
           //todo optimize by searching by distance
@@ -744,7 +778,6 @@ class FirebaseCloudProvider implements CloudProvider {
                 ),
                 polygon,
               )) {
-                devtools.log('The point is in the neighborhood');
                 // update the household's neighborhood id
                 await _households.doc(cloudUser.householdId).update({
                   householdNeighborhoodIdFieldName: neighborhood.id,
@@ -759,18 +792,15 @@ class FirebaseCloudProvider implements CloudProvider {
             }
             if (!found) {
               // throw an error if the point is not in a neighborhood
-              devtools.log('The point is not in a neighborhood');
               throw CouldNotAssignNeighborhoodException();
             }
           } else {
             // throw an error if the point is not in a neighborhood
-            devtools.log('Empty list of neighborhoods');
             throw CouldNotAssignNeighborhoodException();
           }
         }
       });
     } catch (e) {
-      devtools.log(e.toString());
       throw CouldNotAssignNeighborhoodException();
     }
   }

@@ -17,9 +17,9 @@ class CreatePostView extends HookWidget {
     final textController = useTextEditingController();
     return BlocListener<AppBloc, AppState>(
         listener: (context, state) {
-          final loadingText = state.loadingText;
-          final isLoading = state.isLoading;
-          if (loadingText == loadingTextPostCreationSuccess && !isLoading) {
+          if (state.loadingText == loadingTextPostCreationSuccess &&
+              !state.isLoading) {
+            context.read<AppBloc>().add(const AppEventRefreshPosts());
             Navigator.of(context).popUntil((route) => route.isFirst);
           }
         },

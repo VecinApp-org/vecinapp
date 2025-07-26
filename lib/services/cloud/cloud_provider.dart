@@ -50,6 +50,8 @@ abstract class CloudProvider {
 
   Future<CloudUser?> userFromId({required String userId});
 
+  Future<Iterable<CloudUser>> usersFromIds({required Iterable<String> userIds});
+
   Future<Household> otherHousehold({required String householdId});
 
   // RULEBOOKS
@@ -105,10 +107,6 @@ abstract class CloudProvider {
   Future<Event> getEvent({required String eventId});
 
   // POSTS
-  Stream<Iterable<Post>> neighborhoodPosts({
-    required String neighborhoodId,
-  });
-
   Future<void> createNewPost({
     required String? text,
   });
@@ -126,4 +124,6 @@ abstract class CloudProvider {
   Future<void> unlikePost({
     required String postId,
   });
+  Future<Iterable<Post>> fetchInitialPosts();
+  Future<Iterable<Post>> fetchMorePosts({required DateTime timestamp});
 }

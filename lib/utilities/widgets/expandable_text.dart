@@ -25,6 +25,7 @@ class ExpandableText extends HookWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         LayoutBuilder(
+          key: UniqueKey(),
           builder: (context, constraints) {
             final textSpan = TextSpan(text: text, style: textStyle);
             final textPainter = TextPainter(
