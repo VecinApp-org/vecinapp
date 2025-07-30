@@ -896,7 +896,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //enable loading indicator
-      if (state.postsStatus == PostsStatus.loading) return;
       emit(state.copyWith(
         isLoading: false,
         exception: null,
@@ -905,8 +904,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       ));
       //refresh posts
       List<Post>? posts;
+      int limit = 10;
       try {
-        final iterablePosts = await _cloudProvider.fetchInitialPosts();
+        final iterablePosts =
+            await _cloudProvider.fetchInitialPosts(limit: limit);
         posts = iterablePosts.toList();
         posts.sort((a, b) => b.timestamp.compareTo(a.timestamp));
       } on Exception catch (e) {
@@ -943,6 +944,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         exception: null,
         posts: postsWithUsers,
         postsStatus: PostsStatus.success,
+        hasReachedMaxPosts: posts.length < limit,
       ));
     }, transformer: droppable());
 
@@ -953,14 +955,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         add(const AppEventReset());
         return;
       }
-      if (state.postsStatus != PostsStatus.success) return;
-
+      //don't do anything if there are no more posts
+      if (state.hasReachedMaxPosts!) return;
       //fetch more posts
       final List<Post> morePosts;
+      const limit = 10;
       try {
         final lastPost = state.posts!.last.post;
-        final iterablePosts =
-            await _cloudProvider.fetchMorePosts(timestamp: lastPost.timestamp);
+        final iterablePosts = await _cloudProvider.fetchMorePosts(
+            timestamp: lastPost.timestamp, limit: limit);
         morePosts = iterablePosts.toList();
         morePosts.sort((a, b) => b.timestamp.compareTo(a.timestamp));
       } on Exception catch (e) {
@@ -994,6 +997,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       emit(state.copyWith(
         isLoading: false,
         exception: null,
+        hasReachedMaxPosts: morePosts.length < limit,
         posts: [...state.posts!, ...morePostsWithUsers],
       ));
     }, transformer: droppable());

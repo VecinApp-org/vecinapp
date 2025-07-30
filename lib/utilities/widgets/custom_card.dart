@@ -10,7 +10,8 @@ class CustomCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       clipBehavior: Clip.antiAlias,
-      elevation: 5,
+      elevation: 2,
+      color: Theme.of(context).colorScheme.surfaceContainer,
       child: child ??
           const SizedBox(
             height: 100,

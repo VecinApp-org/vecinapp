@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:vecinapp/extensions/formatting/format_date_time.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/utilities/entities/post.dart';
 import 'package:vecinapp/utilities/entities/post_with_user.dart';
+import 'package:vecinapp/utilities/widgets/Infinite_list_builder.dart';
 import 'package:vecinapp/utilities/widgets/custom_card.dart';
 import 'package:vecinapp/utilities/widgets/expandable_text.dart';
 import 'package:vecinapp/utilities/widgets/profile_picture.dart';
 import 'dart:developer' as devtools show log; // ignore: unused_import
 
-class PostsListView extends HookWidget {
+class PostsListView extends StatelessWidget {
   const PostsListView({
     super.key,
     required this.posts,
@@ -19,32 +21,26 @@ class PostsListView extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasReachedMax = context.watch<AppBloc>().state.hasReachedMaxPosts!;
     devtools.log('BUILD: PostsListView');
-    final controller = useScrollController();
-    const threshold = 300.0;
-
-    useEffect(() {
-      void onScroll() {
-        if (!controller.hasClients) return;
-        final maxScroll = controller.position.maxScrollExtent;
-        final currentScroll = controller.position.pixels;
-        if (maxScroll - currentScroll <= threshold) {
-          context.read<AppBloc>().add(AppEventFetchMorePosts());
-        }
-      }
-
-      controller.addListener(onScroll);
-      return () => controller.removeListener(onScroll);
-    }, [controller]);
-
-    return ListView.builder(
-        controller: controller,
-        shrinkWrap: true,
+    return InfiniteListBuilder(
+        onRefresh: () async {
+          Future block = context.read<AppBloc>().stream.first;
+          context.read<AppBloc>().add(AppEventRefreshPosts());
+          await block;
+        },
+        fetchmore: () => context.read<AppBloc>().add(AppEventFetchMorePosts()),
         itemCount: posts.length + 1,
         itemBuilder: (context, index) {
           return index < posts.length
               ? PostCard(postWithUser: posts[index])
-              : const Center(child: CircularProgressIndicator());
+              : Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                      child: (hasReachedMax)
+                          ? Text('No hay más posts')
+                          : CircularProgressIndicator()),
+                );
         });
   }
 }
@@ -68,7 +64,16 @@ class PostCard extends StatelessWidget {
           title: Text(
             user.displayName,
             overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.titleSmall,
           ),
+          subtitle: Text(
+            formatDateTime(post.timestamp),
+            style: TextStyle(fontSize: 10, color: Colors.grey),
+          ),
+          dense: true,
+          visualDensity: VisualDensity(
+              vertical: VisualDensity.minimumDensity,
+              horizontal: VisualDensity.minimumDensity),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),

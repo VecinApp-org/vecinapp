@@ -124,6 +124,7 @@ abstract class CloudProvider {
   Future<void> unlikePost({
     required String postId,
   });
-  Future<Iterable<Post>> fetchInitialPosts();
-  Future<Iterable<Post>> fetchMorePosts({required DateTime timestamp});
+  Future<Iterable<Post>> fetchInitialPosts({int limit = 10});
+  Future<Iterable<Post>> fetchMorePosts(
+      {required DateTime timestamp, int limit = 10});
 }

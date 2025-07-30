@@ -28,8 +28,10 @@ dependencies:
   flutter_image_compress: ^2.3.0
   flutter_localizations:
     sdk: flutter
+  http: ^1.4.0
   image_picker: ^1.0.0
   intl: ^0.20.0
+  path_provider: ^2.1.5
   share_plus: ^11.0.0
 
 dev_dependencies:

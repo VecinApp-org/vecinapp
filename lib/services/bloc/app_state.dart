@@ -206,6 +206,7 @@ extension CopyWith on AppState {
     String? loadingText,
     List<PostWithUser>? posts,
     PostsStatus? postsStatus,
+    bool? hasReachedMaxPosts,
     CloudUser? cloudUser,
   }) {
     if (this is AppStateNeighborhood) {
@@ -219,6 +220,7 @@ extension CopyWith on AppState {
         household: household!,
         posts: posts ?? this.posts!,
         postsStatus: postsStatus ?? this.postsStatus!,
+        hasReachedMaxPosts: hasReachedMaxPosts ?? this.hasReachedMaxPosts!,
       );
     } else if (this is AppStateNoNeighborhood) {
       return AppStateNoNeighborhood(

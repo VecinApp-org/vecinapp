@@ -329,13 +329,13 @@ class FirebaseCloudProvider implements CloudProvider {
       _posts(neighborhoodId: neighborhoodId).doc(postId);
 
   @override
-  Future<Iterable<Post>> fetchInitialPosts() async {
+  Future<Iterable<Post>> fetchInitialPosts({int limit = 10}) async {
     final neighborhood = await currentNeighborhood;
     final neighborhoodId = neighborhood!.id;
     Future<Iterable<Post>> posts;
     try {
       posts = _posts(neighborhoodId: neighborhoodId)
-          .limit(10)
+          .limit(limit)
           .orderBy(postTimeCreatedFieldName, descending: true)
           .get()
           .then((post) =>
@@ -347,7 +347,8 @@ class FirebaseCloudProvider implements CloudProvider {
   }
 
   @override
-  Future<Iterable<Post>> fetchMorePosts({required DateTime timestamp}) async {
+  Future<Iterable<Post>> fetchMorePosts(
+      {required DateTime timestamp, int limit = 10}) async {
     final neighborhood = await currentNeighborhood;
     final neighborhoodId = neighborhood!.id;
     Future<Iterable<Post>> posts;
@@ -355,7 +356,7 @@ class FirebaseCloudProvider implements CloudProvider {
       posts = _posts(neighborhoodId: neighborhoodId)
           .orderBy(postTimeCreatedFieldName, descending: true)
           .startAfter([timestamp])
-          .limit(10)
+          .limit(limit)
           .get()
           .then((post) =>
               post.docs.map((doc) => Post.fromSnapshot(snapshot: doc)));

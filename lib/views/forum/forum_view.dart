@@ -28,15 +28,21 @@ class ForumView extends HookWidget {
           ],
         ),
         body: BlocBuilder<AppBloc, AppState>(
+          buildWhen: (previous, current) =>
+              previous.postsStatus != current.postsStatus ||
+              previous.posts != current.posts,
           builder: (context, state) {
             switch (state.postsStatus!) {
               case PostsStatus.initial:
+                devtools.log('BUILD: Posts initial');
                 return Container();
               case PostsStatus.loading:
+                devtools.log('BUILD: Posts loading');
                 return const Center(child: CircularProgressIndicator());
               case PostsStatus.success:
                 switch (state.posts!.isEmpty) {
                   case true:
+                    devtools.log('BUILD: Empty posts');
                     return const Center(child: Text('No hay publicaciones'));
                   case false:
                     return PostsListView(posts: state.posts!);

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vecinapp/extensions/formatting/format_event_date_time.dart';
+import 'package:vecinapp/extensions/formatting/format_date_time.dart';
 import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:vecinapp/utilities/widgets/custom_card.dart';
 import 'package:vecinapp/views/events/event_details_view.dart';
@@ -41,7 +41,7 @@ class EventListView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '📅  ${formatEventDateTime(event.dateStart, endTime: event.dateEnd)}',
+                    '📅  ${formatDateTime(event.dateStart, endTime: event.dateEnd)}',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   const SizedBox(height: 3),

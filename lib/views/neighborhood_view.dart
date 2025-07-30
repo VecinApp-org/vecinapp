@@ -14,18 +14,18 @@ class NeighborhoodView extends HookWidget {
   const NeighborhoodView(
       {super.key,
       required this.neighborhood,
-      this.selectedIndex,
+      this.selectedIndex = 0,
       required this.household,
       required this.cloudUser});
-  final int? selectedIndex;
+  final int selectedIndex;
   final Neighborhood neighborhood;
   final Household household;
   final CloudUser cloudUser;
 
   @override
   Widget build(BuildContext context) {
-    final pageController = usePageController(initialPage: selectedIndex ?? 0);
-    final currentPageIndex = useState(selectedIndex ?? 0);
+    final pageController = usePageController(initialPage: selectedIndex);
+    final currentPageIndex = useState(selectedIndex);
     return Scaffold(
         key: const Key('neighborhoodView'),
         bottomNavigationBar: NavigationBar(
