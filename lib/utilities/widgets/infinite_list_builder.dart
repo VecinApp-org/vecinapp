@@ -5,7 +5,6 @@ class InfiniteListBuilder extends HookWidget {
   const InfiniteListBuilder({
     super.key,
     required this.fetchmore,
-    required this.onRefresh,
     required this.itemBuilder,
     required this.itemCount,
     this.threshold = 300,
@@ -13,7 +12,6 @@ class InfiniteListBuilder extends HookWidget {
   final Widget? Function(BuildContext, int) itemBuilder;
   final int itemCount;
   final Function fetchmore;
-  final Function onRefresh;
   final double threshold;
 
   @override
@@ -33,16 +31,11 @@ class InfiniteListBuilder extends HookWidget {
       return () => controller.removeListener(onScroll);
     }, [controller]);
 
-    return RefreshIndicator(
-      onRefresh: () async {
-        await onRefresh();
-      },
-      child: ListView.builder(
-        shrinkWrap: true,
-        controller: controller,
-        itemCount: itemCount,
-        itemBuilder: itemBuilder,
-      ),
+    return ListView.builder(
+      shrinkWrap: true,
+      controller: controller,
+      itemCount: itemCount,
+      itemBuilder: itemBuilder,
     );
   }
 }

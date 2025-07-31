@@ -895,13 +895,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         add(const AppEventReset());
         return;
       }
-      //enable loading indicator
-      emit(state.copyWith(
-        isLoading: false,
-        exception: null,
-        postsStatus: PostsStatus.loading,
-        posts: null,
-      ));
+      if (state.postsStatus == LoadStatus.initial) {
+        emit(state.copyWith(
+          postsStatus: LoadStatus.loading,
+        ));
+      }
       //refresh posts
       List<Post>? posts;
       int limit = 10;
@@ -914,7 +912,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         emit(state.copyWith(
           isLoading: false,
           exception: e,
-          postsStatus: PostsStatus.failure,
+          postsStatus: LoadStatus.failure,
         ));
         return;
       }
@@ -928,7 +926,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         emit(state.copyWith(
           isLoading: false,
           exception: e,
-          postsStatus: PostsStatus.failure,
+          postsStatus: LoadStatus.failure,
         ));
         return;
       }
@@ -943,7 +941,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         isLoading: false,
         exception: null,
         posts: postsWithUsers,
-        postsStatus: PostsStatus.success,
+        postsStatus: LoadStatus.success,
         hasReachedMaxPosts: posts.length < limit,
       ));
     }, transformer: droppable());
@@ -955,6 +953,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         add(const AppEventReset());
         return;
       }
+      //dont do anything if loading
+      if (state.postsStatus != LoadStatus.success) return;
       //don't do anything if there are no more posts
       if (state.hasReachedMaxPosts!) return;
       //fetch more posts
@@ -970,7 +970,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         emit(state.copyWith(
           isLoading: false,
           exception: e,
-          postsStatus: PostsStatus.failure,
+          postsStatus: LoadStatus.failure,
         ));
         return;
       }
@@ -984,7 +984,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         emit(state.copyWith(
           isLoading: false,
           exception: e,
-          postsStatus: PostsStatus.failure,
+          postsStatus: LoadStatus.failure,
         ));
         return;
       }

@@ -23,25 +23,28 @@ class PostsListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasReachedMax = context.watch<AppBloc>().state.hasReachedMaxPosts!;
     devtools.log('BUILD: PostsListView');
-    return InfiniteListBuilder(
-        onRefresh: () async {
-          Future block = context.read<AppBloc>().stream.first;
-          context.read<AppBloc>().add(AppEventRefreshPosts());
-          await block;
-        },
-        fetchmore: () => context.read<AppBloc>().add(AppEventFetchMorePosts()),
-        itemCount: posts.length + 1,
-        itemBuilder: (context, index) {
-          return index < posts.length
-              ? PostCard(postWithUser: posts[index])
-              : Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
-                      child: (hasReachedMax)
-                          ? Text('No hay más posts')
-                          : CircularProgressIndicator()),
-                );
-        });
+    return RefreshIndicator(
+      onRefresh: () {
+        Future block = context.read<AppBloc>().stream.first;
+        context.read<AppBloc>().add(AppEventRefreshPosts());
+        return block;
+      },
+      child: InfiniteListBuilder(
+          fetchmore: () =>
+              context.read<AppBloc>().add(AppEventFetchMorePosts()),
+          itemCount: posts.length + 1,
+          itemBuilder: (context, index) {
+            return index < posts.length
+                ? PostCard(postWithUser: posts[index])
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(
+                        child: (hasReachedMax)
+                            ? Text('No hay más posts')
+                            : CircularProgressIndicator()),
+                  );
+          }),
+    );
   }
 }
 
