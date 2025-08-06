@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:vecinapp/extensions/geometry/point.dart';
+import 'package:vecinapp/utilities/extensions/geometry/point.dart';
 import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
@@ -11,7 +11,7 @@ import 'package:vecinapp/utilities/entities/post.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/services/cloud/cloud_constants.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
-import 'package:vecinapp/extensions/geometry/is_point_in_polygon.dart';
+import 'package:vecinapp/utilities/extensions/geometry/is_point_in_polygon.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 
 class FirebaseCloudProvider implements CloudProvider {

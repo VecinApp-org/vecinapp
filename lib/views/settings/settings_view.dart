@@ -6,7 +6,7 @@ import 'package:vecinapp/services/bloc/app_state.dart';
 import 'package:vecinapp/utilities/dialogs/show_confirmation_dialog.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:vecinapp/services/settings/settings_controller.dart';
-import 'package:vecinapp/views/delete_account_view.dart';
+import 'package:vecinapp/views/settings/delete_account_view.dart';
 
 class SettingsView extends HookWidget {
   SettingsView({super.key});

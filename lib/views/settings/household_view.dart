@@ -5,7 +5,7 @@ import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
 import 'package:vecinapp/utilities/entities/cloud_household.dart';
-import 'package:vecinapp/views/user_list_view.dart';
+import 'package:vecinapp/utilities/widgets/user_list_view.dart';
 
 class HouseholdView extends HookWidget {
   const HouseholdView({super.key, required this.household});

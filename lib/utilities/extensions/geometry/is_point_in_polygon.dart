@@ -1,4 +1,4 @@
-import 'package:vecinapp/extensions/geometry/point.dart';
+import 'package:vecinapp/utilities/extensions/geometry/point.dart';
 
 class Poly {
   /// Check if a Point [point] is inside a polygon representing by a List of Point [vertices]

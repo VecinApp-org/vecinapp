@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:vecinapp/extensions/geometry/point.dart';
+import 'package:vecinapp/utilities/extensions/geometry/point.dart';
 import 'package:vecinapp/services/cloud/cloud_constants.dart';
 
 @immutable

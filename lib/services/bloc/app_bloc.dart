@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
-import 'package:vecinapp/extensions/geometry/is_point_in_polygon.dart';
-import 'package:vecinapp/extensions/geometry/point.dart';
+import 'package:vecinapp/utilities/extensions/geometry/is_point_in_polygon.dart';
+import 'package:vecinapp/utilities/extensions/geometry/point.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
 import 'package:vecinapp/services/auth/auth_provider.dart';

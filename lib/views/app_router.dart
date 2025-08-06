@@ -15,7 +15,7 @@ import 'package:vecinapp/views/cloud_login/no_neighborhood_view.dart';
 import 'package:vecinapp/views/cloud_login/register_cloud_user_view.dart';
 import 'package:vecinapp/views/login/welcome_view.dart';
 import 'package:vecinapp/views/login/verify_email_view.dart';
-import 'package:vecinapp/views/neighborhood_view.dart';
+import 'package:vecinapp/views/settings/neighborhood_view.dart';
 import 'dart:developer' as devtools show log; // ignore: unused_import
 
 import 'package:vecinapp/views/splash_view.dart';

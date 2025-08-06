@@ -7,7 +7,7 @@ import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/widgets/centered_view.dart';
 import 'package:vecinapp/utilities/widgets/profile_picture.dart';
-import 'package:vecinapp/views/profile_view.dart';
+import 'package:vecinapp/views/settings/profile_view.dart';
 
 class NoNeighborhoodView extends HookWidget {
   const NoNeighborhoodView(

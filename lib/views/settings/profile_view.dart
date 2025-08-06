@@ -10,9 +10,9 @@ import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/utilities/widgets/profile_picture.dart';
-import 'package:vecinapp/views/household_view.dart';
-import 'package:vecinapp/views/neighborhood_details_view.dart';
-import 'package:vecinapp/views/settings_view.dart';
+import 'package:vecinapp/views/settings/household_view.dart';
+import 'package:vecinapp/views/settings/neighborhood_details_view.dart';
+import 'package:vecinapp/views/settings/settings_view.dart';
 
 class ProfileView extends HookWidget {
   const ProfileView(

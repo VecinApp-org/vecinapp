@@ -6,7 +6,7 @@ import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/views/events/events_view.dart';
 import 'package:vecinapp/views/forum/forum_view.dart';
 import 'package:vecinapp/views/pooling/pooling_view.dart';
-import 'package:vecinapp/views/profile_view.dart';
+import 'package:vecinapp/views/settings/profile_view.dart';
 import 'package:vecinapp/views/reports/reports_view.dart';
 import 'package:vecinapp/views/rulebooks/rulebooks_view.dart';
 
