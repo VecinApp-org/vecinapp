@@ -7,7 +7,7 @@ class DocView extends StatelessWidget {
     this.appBarTitle,
     required this.title,
     required this.text,
-    required this.appBarActions,
+    this.appBarActions,
     this.child,
   });
   final String? appBarTitle;
@@ -20,7 +20,6 @@ class DocView extends StatelessWidget {
   Widget build(BuildContext context) {
     final titlee = title ?? '';
     final textt = text ?? '';
-    final children = child ?? Container();
     return Scaffold(
       appBar: AppBar(
         title: Text(appBarTitle ?? ''),
@@ -28,27 +27,34 @@ class DocView extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: CustomCard(
-          child: ListTile(
-            //contentPadding:
-            //  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            title: (titlee.isNotEmpty)
-                ? Text(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (titlee.isNotEmpty)
+                ListTile(
+                  title: Text(
                     titlee,
                     style: Theme.of(context).textTheme.headlineSmall,
-                  )
-                : null,
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 8,
-              children: [
-                if (textt.isNotEmpty)
-                  Text(
+                  ),
+                  visualDensity:
+                      VisualDensity(vertical: VisualDensity.minimumDensity),
+                ),
+              if (textt.isNotEmpty)
+                ListTile(
+                  title: Text(
                     textt,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
-                children,
-              ],
-            ),
+                  visualDensity:
+                      VisualDensity(vertical: VisualDensity.minimumDensity),
+                ),
+              if (child != null)
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: child!,
+                ),
+            ],
           ),
         ),
       ),
