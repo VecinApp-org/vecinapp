@@ -933,7 +933,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       //map users to posts
       List<PostWithUser> postsWithUsers = [];
       for (var post in posts) {
-        final userr = users.firstWhere((user) => user.id == post.authorId);
+        late final CloudUser userr;
+        try {
+          userr = users.firstWhere((user) => user.id == post.authorId);
+        } catch (e) {
+          if (e is StateError) {
+            userr = CloudUser.deleted();
+          }
+        }
         postsWithUsers.add(PostWithUser(post: post, user: userr));
       }
       //update state
@@ -991,7 +998,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       //map users to posts
       List<PostWithUser> morePostsWithUsers = [];
       for (var post in morePosts) {
-        final userr = moreUsers.firstWhere((user) => user.id == post.authorId);
+        late final CloudUser userr;
+        try {
+          userr = moreUsers.firstWhere((user) => user.id == post.authorId);
+        } catch (e) {
+          if (e is StateError) {
+            userr = CloudUser.deleted();
+          }
+        }
         morePostsWithUsers.add(PostWithUser(post: post, user: userr));
       }
       emit(state.copyWith(

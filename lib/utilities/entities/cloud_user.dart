@@ -83,6 +83,18 @@ class CloudUser {
         isSuperAdmin: isSuperAdmin);
   }
 
+  factory CloudUser.deleted() {
+    return const CloudUser(
+      id: 'deleted',
+      displayName: '[Usuario Eliminado]',
+      householdId: null,
+      neighborhoodId: null,
+      photoUrl: null,
+      isNeighborhoodAdmin: false,
+      isSuperAdmin: false,
+    );
+  }
+
   @override
   String toString() {
     return 'CloudUser(displayName: $displayName, homeId: $householdId, neighborhoodId: $neighborhoodId photoUrl: $photoUrl, isNeighborhoodAdmin: $isNeighborhoodAdmin, isSuperAdmin: $isSuperAdmin)';
