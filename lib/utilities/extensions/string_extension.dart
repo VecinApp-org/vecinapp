@@ -4,4 +4,9 @@ extension StringExtension on String {
       .hasMatch(this);
   bool isValidPassword() =>
       RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$').hasMatch(this);
+
+  String capitalize() {
+    if (isEmpty) return this;
+    return "${this[0].toUpperCase()}${substring(1)}";
+  }
 }
