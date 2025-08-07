@@ -813,16 +813,6 @@ class FirebaseCloudProvider implements CloudProvider {
 
   // NEIGHBORS
   @override
-  Future<Household> otherHousehold({required String householdId}) async {
-    try {
-      final doc = await _households.doc(householdId).get();
-      return Household.fromSnapshot(doc);
-    } catch (e) {
-      throw CouldNotGetHouseholdException();
-    }
-  }
-
-  @override
   Stream<Iterable<CloudUser>> householdNeighbors({
     required String householdId,
   }) {

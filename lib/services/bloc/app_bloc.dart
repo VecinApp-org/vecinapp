@@ -12,7 +12,6 @@ import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/bloc/loading_messages_constants.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_exceptions.dart';
-import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:vecinapp/utilities/entities/post.dart';
@@ -1230,30 +1229,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   //Public methods
-
-  Stream<bool> get userVerificationStream async* {
-    final user = _authProvider.currentUser!;
-    if (user.isEmailVerified) yield true;
-    _authProvider.userChanges().listen((user) {
-      if (user.isEmailVerified) {
-        true;
-      } else {
-        false;
-      }
-    });
-  }
-
-  Future<Household?> otherHousehold(String? householdId) async {
-    if (householdId == null || householdId.isEmpty) {
-      return null;
-    }
-    try {
-      return await _cloudProvider.otherHousehold(householdId: householdId);
-    } catch (e) {
-      return null;
-    }
-  }
-
   Stream<Iterable<CloudUser>> householdNeighbors(
       {required String householdId}) async* {
     yield* _cloudProvider.householdNeighbors(

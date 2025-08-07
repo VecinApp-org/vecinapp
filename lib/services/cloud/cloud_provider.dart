@@ -51,8 +51,6 @@ abstract class CloudProvider {
 
   Future<Iterable<CloudUser>> usersFromIds({required Iterable<String> userIds});
 
-  Future<Household> otherHousehold({required String householdId});
-
   // RULEBOOKS
   Stream<Iterable<Rulebook>> neighborhoodRulebooks({
     required String neighborhoodId,

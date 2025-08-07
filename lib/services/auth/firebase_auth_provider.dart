@@ -141,13 +141,6 @@ class FirebaseAuthProvider implements AuthProvider {
   }
 
   @override
-  Stream<AuthUser> userChanges() {
-    return FirebaseAuth.instance.userChanges().map(
-          (user) => AuthUser.fromFirebase(user!),
-        );
-  }
-
-  @override
   Future<void> deleteAccount() async {
     final user = currentUser;
     if (user != null) {
