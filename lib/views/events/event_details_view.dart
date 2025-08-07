@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
@@ -8,6 +7,7 @@ import 'package:vecinapp/services/bloc/app_state.dart';
 import 'package:vecinapp/services/bloc/loading_messages_constants.dart';
 import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:vecinapp/utilities/extensions/formatting/format_date_time.dart';
 import 'package:vecinapp/utilities/widgets/doc_view.dart';
 import 'package:vecinapp/utilities/widgets/edit_or_delete_popup.dart';
 import 'package:vecinapp/views/events/edit_event_view.dart';
@@ -56,7 +56,7 @@ class EventDetailsView extends HookWidget {
             spacing: 4,
             children: [
               Text(
-                '📅  ${DateFormat.EEEE().add_d().add_MMMM().add_jm().format(event.dateStart)}',
+                '📅  ${formatDateTime(event.dateStart, endTime: event.dateEnd)}',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               Text(
