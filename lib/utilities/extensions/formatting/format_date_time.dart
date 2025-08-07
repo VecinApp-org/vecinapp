@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:vecinapp/utilities/extensions/string_extension.dart';
 
 /// Formats a DateTime into a human-readable string based on its relation to the current time.
 ///
@@ -47,7 +48,7 @@ String formatDateTime(
         return '${now.difference(startTime).inDays}d';
       }
       //show the date "Enero 1 2023 20:00"
-      return DateFormat('MMMM dd yyyy HH:mm', locale).format(startTime);
+      return DateFormat('MMMM dd, yyyy HH:mm', locale).format(startTime);
     } else {
       //in the future
       //in the next hour
@@ -75,7 +76,7 @@ String formatDateTime(
         return '${dayFormat.format(startTime)} a las ${timeFormat.format(startTime)}';
       }
       //show the date "Enero 1 2023 20:00"
-      return DateFormat('MMMM dd yyyy HH:mm', locale).format(startTime);
+      return DateFormat('MMMM dd, yyyy HH:mm', locale).format(startTime);
     }
   } else {
     //with end time
@@ -84,12 +85,12 @@ String formatDateTime(
       //started and ended in different days
       if (!isSameDay(startTime, endTime)) {
         //show the date "Enero 1 2023 a Enero 2 2023"
-        final startDateFormat = DateFormat('MMMM dd yyyy', locale);
-        final endDateFormat = DateFormat('MMMM dd yyyy', locale);
+        final startDateFormat = DateFormat('MMMM dd, yyyy', locale);
+        final endDateFormat = DateFormat('MMMM dd, yyyy', locale);
         return '${startDateFormat.format(startTime)} a ${endDateFormat.format(endTime)}';
       }
       //show the date "Enero 1 2023 20:00 - 21:00"
-      final startDateFormat = DateFormat('MMMM dd yyyy HH:mm', locale);
+      final startDateFormat = DateFormat('MMMM dd, yyyy HH:mm', locale);
       final endDateFormat = DateFormat('HH:mm', locale);
       return '${startDateFormat.format(startTime)} - ${endDateFormat.format(endTime)}';
     } else {
@@ -106,7 +107,7 @@ String formatDateTime(
               'ayer ${DateFormat('HH:mm', locale).format(startTime)}';
         } else {
           //started in the past
-          initialString = DateFormat('MMMM dd yyyy', locale).format(startTime);
+          initialString = DateFormat('MMMM dd, yyyy', locale).format(startTime);
         }
         late final String endingString;
         if (isSameDay(endTime, now)) {
@@ -118,7 +119,7 @@ String formatDateTime(
               'mañana ${DateFormat('HH:mm', locale).format(endTime)}';
         } else {
           //ended in the future
-          endingString = DateFormat('MMMM dd yyyy', locale).format(endTime);
+          endingString = DateFormat('MMMM dd, yyyy', locale).format(endTime);
         }
         return 'Comenzó $initialString - Termina $endingString';
       } else {
@@ -137,8 +138,8 @@ String formatDateTime(
             final endDateFormat = DateFormat('HH:mm', locale);
             return '${dayFormat.format(startTime)} de ${startDateFormat.format(startTime)} a ${endDateFormat.format(endTime)}';
           }
-          //show the date "Enero 1 2023 20:00 - 21:00"
-          final startDateFormat = DateFormat('MMMM dd yyyy HH:mm', locale);
+          //show the date "Enero 1 2023 20:00 a 21:00"
+          final startDateFormat = DateFormat('MMMM dd, yyyy HH:mm', locale);
           final endDateFormat = DateFormat('HH:mm', locale);
           return '${startDateFormat.format(startTime)} - ${endDateFormat.format(endTime)}';
         } else {
@@ -161,7 +162,7 @@ String formatDateTime(
           //starts in the future
           else {
             initialString =
-                DateFormat('MMMM dd yyyy', locale).format(startTime);
+                DateFormat('MMMM dd, yyyy', locale).format(startTime);
           }
           late final String endingString;
           //ends tomorrow
@@ -177,9 +178,9 @@ String formatDateTime(
           }
           //ends in the future
           else {
-            endingString = DateFormat('MMMM dd yyyy', locale).format(endTime);
+            endingString = DateFormat('MMMM dd, yyyy', locale).format(endTime);
           }
-          return '$initialString - $endingString';
+          return '${initialString.capitalize()} - ${endingString.capitalize()}';
         }
       }
     }
