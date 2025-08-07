@@ -197,3 +197,23 @@ class AppEventFetchPostComments extends AppEvent {
   final String postId;
   const AppEventFetchPostComments({required this.postId});
 }
+
+class AppEventCreatePostComment extends AppEvent {
+  final String postId;
+  final String text;
+  const AppEventCreatePostComment({required this.postId, required this.text});
+}
+
+class AppEventLikePostComment extends AppEvent {
+  final String postId;
+  final String commentId;
+  const AppEventLikePostComment(
+      {required this.postId, required this.commentId});
+}
+
+class AppEventUnlikePostComment extends AppEvent {
+  final String postId;
+  final String commentId;
+  const AppEventUnlikePostComment(
+      {required this.postId, required this.commentId});
+}

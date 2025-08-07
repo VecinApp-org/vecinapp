@@ -6,7 +6,6 @@ import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
 import 'package:vecinapp/utilities/entities/comment_plus.dart';
 import 'package:vecinapp/utilities/widgets/comment_list_tile.dart';
-import 'dart:developer' as devtools show log;
 
 Future<void> showPostComments({
   required BuildContext context,
@@ -35,9 +34,13 @@ Future<void> showPostComments({
                 labelText: 'Comentar',
                 border: OutlineInputBorder(),
               ),
+              keyboardType: TextInputType.text,
+              minLines: 1,
+              maxLines: 5,
               autofocus: autofocus,
               onSubmitted: (text) {
-                devtools.log('onSubmitted');
+                context.read<AppBloc>().add(
+                    AppEventCreatePostComment(postId: post.id, text: text));
               },
             ),
           ],
@@ -68,8 +71,22 @@ class CommentListView extends HookWidget {
                 final commentPlus = state.elementAt(index);
                 return CommentListTile(
                   commentPlus: commentPlus,
-                  onLiked: () {},
-                  onUnliked: () {},
+                  onLiked: () {
+                    context.read<AppBloc>().add(
+                          AppEventLikePostComment(
+                            postId: postId,
+                            commentId: commentPlus.comment.id,
+                          ),
+                        );
+                  },
+                  onUnliked: () {
+                    context.read<AppBloc>().add(
+                          AppEventUnlikePostComment(
+                            postId: postId,
+                            commentId: commentPlus.comment.id,
+                          ),
+                        );
+                  },
                 );
               },
             )

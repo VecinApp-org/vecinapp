@@ -125,4 +125,19 @@ abstract class CloudProvider {
   Future<Iterable<Post>> fetchMorePosts(
       {required DateTime timestamp, int limit = 10});
   Future<Iterable<Comment>> fetchPostComments({required String postId});
+
+  Future<void> createPostComment({
+    required String postId,
+    required String text,
+  });
+
+  Future<void> likePostComment({
+    required String postId,
+    required String commentId,
+  });
+
+  Future<void> unlikePostComment({
+    required String postId,
+    required String commentId,
+  });
 }

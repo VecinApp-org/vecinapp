@@ -460,6 +460,62 @@ class FirebaseCloudProvider implements CloudProvider {
     }
   }
 
+  // POST COMMENTS
+  @override
+  Future<void> createPostComment(
+      {required String postId, required String text}) async {
+    try {
+      final user = await currentCloudUser;
+      final neighborhoodId = user!.neighborhoodId!;
+      await _posts(neighborhoodId: neighborhoodId)
+          .doc(postId)
+          .collection(commentsCollectionName)
+          .add({
+        commentCreatorIdFieldName: user.id,
+        commentTextFieldName: text,
+        commentDateFieldName: DateTime.now(),
+      });
+    } catch (e) {
+      throw CloudException();
+    }
+  }
+
+  @override
+  Future<void> likePostComment(
+      {required String postId, required String commentId}) async {
+    try {
+      final user = await currentCloudUser;
+      final neighborhoodId = user!.neighborhoodId!;
+      await _posts(neighborhoodId: neighborhoodId)
+          .doc(postId)
+          .collection(commentsCollectionName)
+          .doc(commentId)
+          .update({
+        commentLikesFieldName: FieldValue.arrayUnion([user.id]),
+      });
+    } catch (e) {
+      throw CloudException();
+    }
+  }
+
+  @override
+  Future<void> unlikePostComment(
+      {required String postId, required String commentId}) async {
+    try {
+      final user = await currentCloudUser;
+      final neighborhoodId = user!.neighborhoodId!;
+      await _posts(neighborhoodId: neighborhoodId)
+          .doc(postId)
+          .collection(commentsCollectionName)
+          .doc(commentId)
+          .update({
+        commentLikesFieldName: FieldValue.arrayRemove([user.id]),
+      });
+    } catch (e) {
+      throw CloudException();
+    }
+  }
+
   // USER
   @override
   Future<CloudUser?> get currentCloudUser async {

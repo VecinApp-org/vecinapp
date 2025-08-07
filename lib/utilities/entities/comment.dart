@@ -48,6 +48,21 @@ class Comment extends Equatable {
     );
   }
 
+  Comment copyWith({
+    String? text,
+    Set<String>? likes,
+  }) {
+    final likeCount = likes?.length ?? this.likeCount;
+    return Comment(
+      id: id,
+      text: text ?? this.text,
+      authorId: authorId,
+      timestamp: timestamp,
+      likes: likes ?? this.likes,
+      likeCount: likeCount,
+    );
+  }
+
   @override
-  List<Object?> get props => [id, text, authorId, timestamp];
+  List<Object?> get props => [id, text, authorId, timestamp, likes, likeCount];
 }

@@ -1098,6 +1098,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       transformer: droppable(),
     );
 
+    //Post Comments
     on<AppEventFetchPostComments>((event, emit) async {
       //validate access
       if (!await _isValidNeighborhoodAccess()) {
@@ -1159,6 +1160,136 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         exception: null,
         loadingText: null,
         posts: newPostsWithUsers,
+      ));
+    });
+
+    on<AppEventCreatePostComment>((event, emit) async {
+      //validate access
+      if (!await _isValidNeighborhoodAccess()) {
+        add(const AppEventReset());
+        return;
+      }
+      //update state
+      emit(state.copyWith(
+        isLoading: true,
+        exception: null,
+        loadingText: 'Creating comment',
+      ));
+      //create comment
+      try {
+        await _cloudProvider.createPostComment(
+          text: event.text,
+          postId: event.postId,
+        );
+      } on Exception catch (e) {
+        emit(state.copyWith(
+          isLoading: false,
+          exception: e,
+        ));
+        return;
+      }
+      //update comment list
+      add(AppEventFetchPostComments(postId: event.postId));
+    });
+
+    on<AppEventLikePostComment>((event, emit) async {
+      //validate access
+      if (!await _isValidNeighborhoodAccess()) {
+        add(const AppEventReset());
+        return;
+      }
+      //like comment
+      try {
+        await _cloudProvider.likePostComment(
+          postId: event.postId,
+          commentId: event.commentId,
+        );
+      } on Exception catch (e) {
+        emit(state.copyWith(
+          isLoading: false,
+          exception: e,
+        ));
+        return;
+      }
+      //replace with liked comment
+      final previousPostsPlus = state.posts!;
+      final updatedPosts = previousPostsPlus.map((post) {
+        if (post.post.id == event.postId) {
+          return post.copyWith(
+            commentsPlus: post.commentsPlus.map((commentPlus) {
+              if (commentPlus.comment.id == event.commentId) {
+                return commentPlus.copyWith(
+                  comment: commentPlus.comment.copyWith(
+                    likes: commentPlus.comment.likes
+                      ..add(_authProvider.currentUser!.uid!),
+                  ),
+                );
+              } else {
+                return commentPlus;
+              }
+            }).toList(),
+          );
+        } else {
+          return post;
+        }
+      }).toList();
+      updatedPosts.sort((a, b) => b.post.timestamp.compareTo(a.post.timestamp));
+      //update state
+      emit(state.copyWith(
+        isLoading: false,
+        exception: null,
+        loadingText: null,
+        posts: updatedPosts,
+      ));
+    });
+
+    on<AppEventUnlikePostComment>((event, emit) async {
+      //validate access
+      if (!await _isValidNeighborhoodAccess()) {
+        add(const AppEventReset());
+        return;
+      }
+      //unlike comment
+      try {
+        await _cloudProvider.unlikePostComment(
+          postId: event.postId,
+          commentId: event.commentId,
+        );
+      } on Exception catch (e) {
+        emit(state.copyWith(
+          isLoading: false,
+          exception: e,
+        ));
+        return;
+      }
+      //replace with unliked comment
+      final previousPostsPlus = state.posts!;
+      final updatedPosts = previousPostsPlus.map((post) {
+        if (post.post.id == event.postId) {
+          return post.copyWith(
+            commentsPlus: post.commentsPlus.map((commentPlus) {
+              if (commentPlus.comment.id == event.commentId) {
+                return commentPlus.copyWith(
+                  comment: commentPlus.comment.copyWith(
+                    likes: commentPlus.comment.likes
+                      ..remove(_authProvider.currentUser!.uid!),
+                  ),
+                );
+              } else {
+                return commentPlus;
+              }
+            }).toList(),
+          );
+        } else {
+          return post;
+        }
+      });
+      //update state
+      emit(state.copyWith(
+        isLoading: false,
+        exception: null,
+        loadingText: null,
+        posts: updatedPosts.toList(),
       ));
     });
   }

@@ -12,4 +12,13 @@ class CommentPlus extends Equatable {
 
   @override
   List<Object?> get props => [comment, author];
+
+  CommentPlus copyWith({
+    Comment? comment,
+  }) {
+    return CommentPlus(
+      comment: comment ?? this.comment,
+      author: author,
+    );
+  }
 }

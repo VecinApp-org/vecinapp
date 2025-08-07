@@ -19,13 +19,11 @@ class PostPlus extends Equatable {
   List<Object?> get props => [post, user, commentsPlus];
 
   PostPlus copyWith({
-    Post? post,
-    CloudUser? user,
     Iterable<CommentPlus>? commentsPlus,
   }) {
     return PostPlus(
-      post: post ?? this.post,
-      user: user ?? this.user,
+      post: post,
+      user: user,
       commentsPlus: commentsPlus ?? this.commentsPlus,
     );
   }
