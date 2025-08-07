@@ -49,8 +49,6 @@ abstract class CloudProvider {
     required String householdId,
   });
 
-  Future<CloudUser?> userFromId({required String userId});
-
   Future<Iterable<CloudUser>> usersFromIds({required Iterable<String> userIds});
 
   Future<Household> otherHousehold({required String householdId});
