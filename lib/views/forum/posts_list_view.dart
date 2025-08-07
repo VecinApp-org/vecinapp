@@ -4,20 +4,20 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:vecinapp/utilities/extensions/formatting/format_date_time.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
-import 'package:vecinapp/utilities/entities/post.dart';
-import 'package:vecinapp/utilities/entities/post_with_user.dart';
+import 'package:vecinapp/utilities/entities/post_plus.dart';
 import 'package:vecinapp/utilities/widgets/Infinite_list_builder.dart';
 import 'package:vecinapp/utilities/widgets/custom_card.dart';
 import 'package:vecinapp/utilities/widgets/expandable_text.dart';
 import 'package:vecinapp/utilities/widgets/profile_picture.dart';
-import 'dart:developer' as devtools show log; // ignore: unused_import
+import 'dart:developer' as devtools show log;
+import 'package:vecinapp/views/forum/show_post_comments.dart'; // ignore: unused_import
 
 class PostsListView extends StatelessWidget {
   const PostsListView({
     super.key,
     required this.posts,
   });
-  final List<PostWithUser> posts;
+  final List<PostPlus> posts;
 
   @override
   Widget build(BuildContext context) {
@@ -50,53 +50,61 @@ class PostsListView extends StatelessWidget {
 
 class PostCard extends StatelessWidget {
   const PostCard({super.key, required this.postWithUser});
-  final PostWithUser postWithUser;
+  final PostPlus postWithUser;
   @override
   Widget build(BuildContext context) {
     final post = postWithUser.post;
-    final user = postWithUser.user;
     return CustomCard(
         child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ListTile(
-          leading: ProfilePicture(
-            radius: 16,
-            imageUrl: user.photoUrl,
-          ),
-          title: Text(
-            user.displayName,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          subtitle: Text(
-            formatDateTime(post.timestamp),
-            style: TextStyle(fontSize: 10, color: Colors.grey),
-          ),
-          dense: true,
-          visualDensity: VisualDensity(
-              vertical: VisualDensity.minimumDensity,
-              horizontal: VisualDensity.minimumDensity),
-        ),
+        PostCardHeader(postWithUser: postWithUser),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: ExpandableText(
             text: post.text,
           ),
         ),
-        PostCardFooter(
-          post: post,
-        ),
+        PostCardFooter(postWithUser: postWithUser),
       ],
     ));
   }
 }
 
-class PostCardFooter extends HookWidget {
-  const PostCardFooter({super.key, required this.post});
-  final Post post;
+class PostCardHeader extends HookWidget {
+  const PostCardHeader({super.key, required this.postWithUser});
+  final PostPlus postWithUser;
   @override
   Widget build(BuildContext context) {
+    final post = postWithUser.post;
+    final user = postWithUser.user;
+    return ListTile(
+      leading: ProfilePicture(
+        radius: 16,
+        imageUrl: user.photoUrl,
+      ),
+      title: Text(
+        user.displayName,
+        overflow: TextOverflow.ellipsis,
+        style: Theme.of(context).textTheme.titleSmall,
+      ),
+      subtitle: Text(
+        formatDateTime(post.timestamp),
+      ),
+      dense: true,
+      visualDensity: VisualDensity(
+          vertical: VisualDensity.minimumDensity,
+          horizontal: VisualDensity.minimumDensity),
+    );
+  }
+}
+
+class PostCardFooter extends HookWidget {
+  const PostCardFooter({super.key, required this.postWithUser});
+  final PostPlus postWithUser;
+  @override
+  Widget build(BuildContext context) {
+    final post = postWithUser.post;
     final userId = context.watch<AppBloc>().state.cloudUser!.id;
     final likes = post.likeCount;
     final isLiked = post.likes.contains(userId);
@@ -106,7 +114,9 @@ class PostCardFooter extends HookWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              showPostComments(context: context, post: post);
+            },
             icon: const Icon(Icons.chat_bubble_outline),
           ),
           Text('${post.commentCount}',

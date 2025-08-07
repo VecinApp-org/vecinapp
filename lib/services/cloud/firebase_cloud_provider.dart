@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:vecinapp/utilities/entities/comment.dart';
 import 'package:vecinapp/utilities/extensions/geometry/point.dart';
 import 'package:vecinapp/services/auth/auth_provider.dart';
 import 'package:vecinapp/services/cloud/cloud_provider.dart';
@@ -440,6 +441,22 @@ class FirebaseCloudProvider implements CloudProvider {
           .delete();
     } catch (e) {
       throw CouldNotDeletePostException();
+    }
+  }
+
+  @override
+  Future<Iterable<Comment>> fetchPostComments({required String postId}) async {
+    try {
+      final user = await currentCloudUser;
+      final neighborhoodId = user!.neighborhoodId!;
+      final comments = await _posts(neighborhoodId: neighborhoodId)
+          .doc(postId)
+          .collection(commentsCollectionName)
+          .orderBy(commentDateFieldName, descending: true)
+          .get();
+      return comments.docs.map((doc) => Comment.fromDocument(doc));
+    } catch (e) {
+      throw CouldNotGetCommentsException();
     }
   }
 

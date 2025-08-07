@@ -160,6 +160,12 @@ class CouldNotUnlikePostException extends CloudException {
       : super(message: 'No se pudo quitar like');
 }
 
+//Post Comments
+class CouldNotGetCommentsException extends CloudException {
+  const CouldNotGetCommentsException()
+      : super(message: 'No se pudo obtener los comentarios');
+}
+
 // Admin
 class PermissionDeniedCloudException extends CloudException {
   const PermissionDeniedCloudException() : super(message: 'Permiso denegado');

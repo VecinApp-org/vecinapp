@@ -192,3 +192,8 @@ class AppEventRefreshPosts extends AppEvent {
 class AppEventFetchMorePosts extends AppEvent {
   const AppEventFetchMorePosts();
 }
+
+class AppEventFetchPostComments extends AppEvent {
+  final String postId;
+  const AppEventFetchPostComments({required this.postId});
+}

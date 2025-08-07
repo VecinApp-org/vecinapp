@@ -6,6 +6,7 @@ import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:vecinapp/utilities/entities/latlng.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/utilities/entities/post.dart';
+import 'package:vecinapp/utilities/entities/comment.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 
@@ -127,4 +128,5 @@ abstract class CloudProvider {
   Future<Iterable<Post>> fetchInitialPosts({int limit = 10});
   Future<Iterable<Post>> fetchMorePosts(
       {required DateTime timestamp, int limit = 10});
+  Future<Iterable<Comment>> fetchPostComments({required String postId});
 }

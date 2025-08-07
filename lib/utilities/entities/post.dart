@@ -51,7 +51,7 @@ class Post extends Equatable {
         text: data?[postTextFieldName] as String,
         authorId: data?[postCreatorIdFieldName] as String,
         timestamp: data?[postTimeCreatedFieldName].toDate() as DateTime,
-        likes: Set<String>.from(data?[postLikesFieldName] ?? []),
+        likes: likes,
         likeCount: likes.length,
         commentCount: data?[postCommentsCountFieldName] ?? 0);
   }

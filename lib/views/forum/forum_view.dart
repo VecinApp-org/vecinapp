@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vecinapp/services/bloc/app_bloc.dart';
 import 'package:vecinapp/services/bloc/app_event.dart';
 import 'package:vecinapp/services/bloc/app_state.dart';
-import 'package:vecinapp/utilities/entities/post_with_user.dart';
+import 'package:vecinapp/utilities/entities/post_plus.dart';
 import 'package:vecinapp/views/forum/create_post_view.dart';
 import 'dart:developer' as devtools show log; // ignore: unused_import
 import 'package:vecinapp/views/forum/posts_list_view.dart';
@@ -37,7 +37,7 @@ class ForumView extends StatelessWidget {
                 devtools.log('BUILD: Posts loading');
                 return const Center(child: CircularProgressIndicator());
               case LoadStatus.success:
-                return BlocSelector<AppBloc, AppState, List<PostWithUser>?>(
+                return BlocSelector<AppBloc, AppState, List<PostPlus>?>(
                     selector: (state) => state.posts,
                     builder: (context, state) {
                       switch (state!.isEmpty) {

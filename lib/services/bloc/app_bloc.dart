@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:vecinapp/utilities/entities/comment.dart';
+import 'package:vecinapp/utilities/entities/comment_plus.dart';
 import 'package:vecinapp/utilities/extensions/geometry/is_point_in_polygon.dart';
 import 'package:vecinapp/utilities/extensions/geometry/point.dart';
 import 'package:vecinapp/services/auth/auth_exceptions.dart';
@@ -14,7 +16,7 @@ import 'package:vecinapp/utilities/entities/cloud_household.dart';
 import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/event.dart';
 import 'package:vecinapp/utilities/entities/post.dart';
-import 'package:vecinapp/utilities/entities/post_with_user.dart';
+import 'package:vecinapp/utilities/entities/post_plus.dart';
 import 'package:vecinapp/utilities/entities/rulebook.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 import 'package:vecinapp/services/geocoding/geocoding_exceptions.dart';
@@ -931,7 +933,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //map users to posts
-      List<PostWithUser> postsWithUsers = [];
+      List<PostPlus> postsWithUsers = [];
       for (var post in posts) {
         late final CloudUser userr;
         try {
@@ -941,7 +943,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             userr = CloudUser.deleted();
           }
         }
-        postsWithUsers.add(PostWithUser(post: post, user: userr));
+        postsWithUsers.add(PostPlus(post: post, user: userr));
       }
       //update state
       emit(state.copyWith(
@@ -996,7 +998,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return;
       }
       //map users to posts
-      List<PostWithUser> morePostsWithUsers = [];
+      List<PostPlus> morePostsWithUsers = [];
       for (var post in morePosts) {
         late final CloudUser userr;
         try {
@@ -1006,7 +1008,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             userr = CloudUser.deleted();
           }
         }
-        morePostsWithUsers.add(PostWithUser(post: post, user: userr));
+        morePostsWithUsers.add(PostPlus(post: post, user: userr));
       }
       emit(state.copyWith(
         isLoading: false,
@@ -1036,7 +1038,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         final previousPostsWithUsers = state.posts!;
         final newPostsWithUsers = previousPostsWithUsers.map((post) {
           if (post.post.id == event.postId) {
-            return PostWithUser(
+            return PostPlus(
               post: post.post.copyWith(
                   likes: post.post.likes..add(_authProvider.currentUser!.uid!)),
               user: post.user,
@@ -1081,7 +1083,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         );
         final newPostsWithUsers = previousPostsWithUsers.map((post) {
           if (post.post.id == event.postId) {
-            return PostWithUser(post: newPost, user: post.user);
+            return PostPlus(post: newPost, user: post.user);
           } else {
             return post;
           }
@@ -1096,6 +1098,70 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       },
       transformer: droppable(),
     );
+
+    on<AppEventFetchPostComments>((event, emit) async {
+      //validate access
+      if (!await _isValidNeighborhoodAccess()) {
+        add(const AppEventReset());
+        return;
+      }
+      //fetch comments
+      late final Iterable<Comment> comments;
+      try {
+        comments = await _cloudProvider.fetchPostComments(postId: event.postId);
+      } on Exception catch (e) {
+        emit(state.copyWith(
+          isLoading: false,
+          exception: e,
+        ));
+        return;
+      }
+      //fetch users
+      late final Iterable<CloudUser> users;
+      try {
+        final userIds = comments.map((comment) => comment.authorId);
+        users = await _cloudProvider.usersFromIds(userIds: userIds);
+      } on Exception catch (e) {
+        emit(state.copyWith(
+          isLoading: false,
+          exception: e,
+        ));
+        return;
+      }
+      //map users to comments
+      late final List<CommentPlus> commentsPlus = [];
+      for (var comment in comments) {
+        late final CloudUser userr;
+        try {
+          userr = users.firstWhere((user) => user.id == comment.authorId);
+        } catch (e) {
+          if (e is StateError) {
+            userr = CloudUser.deleted();
+          }
+        }
+        commentsPlus.add(CommentPlus(comment: comment, author: userr));
+      }
+      //place comments in state.postsPlus[postId].commentsplus
+      final previousPostsPlus = state.posts!;
+      final previousPost =
+          previousPostsPlus.firstWhere((post) => post.post.id == event.postId);
+      final newPost = previousPost.copyWith(commentsPlus: commentsPlus);
+      List<PostPlus> newPostsWithUsers = [];
+      for (var post in previousPostsPlus) {
+        if (post.post.id == event.postId) {
+          newPostsWithUsers.add(newPost);
+        } else {
+          newPostsWithUsers.add(post);
+        }
+      }
+      //update state
+      emit(state.copyWith(
+        isLoading: false,
+        exception: null,
+        loadingText: null,
+        posts: newPostsWithUsers,
+      ));
+    });
   }
 
   //Private methods

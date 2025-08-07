@@ -57,6 +57,6 @@ const postCommentsCountFieldName = 'comments';
 // comments
 const commentsCollectionName = 'comments';
 const commentCreatorIdFieldName = 'creator_id';
-const commentCreatorNameFieldName = 'creator_name';
 const commentTextFieldName = 'text';
 const commentDateFieldName = 'time_created';
+const commentLikesFieldName = 'likes';

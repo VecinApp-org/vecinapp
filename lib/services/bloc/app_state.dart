@@ -6,7 +6,7 @@ import 'package:vecinapp/utilities/entities/cloud_user.dart';
 import 'package:vecinapp/utilities/entities/neighborhood.dart';
 import 'package:vecinapp/utilities/entities/address.dart';
 
-import 'package:vecinapp/utilities/entities/post_with_user.dart'; // ignore: unused_import
+import 'package:vecinapp/utilities/entities/post_plus.dart'; // ignore: unused_import
 
 enum LoadStatus { initial, loading, success, failure }
 
@@ -31,7 +31,7 @@ abstract class AppState {
   final CloudUser? cloudUser;
   final Household? household;
   final Neighborhood? neighborhood;
-  final List<PostWithUser>? posts;
+  final List<PostPlus>? posts;
   final LoadStatus? postsStatus;
   final bool? hasReachedMaxPosts;
 }
@@ -160,7 +160,7 @@ class AppStateNeighborhood extends AppState with EquatableMixin {
     required CloudUser cloudUser,
     required Household household,
     required Neighborhood neighborhood,
-    List<PostWithUser> posts = const [],
+    List<PostPlus> posts = const [],
     LoadStatus postsStatus = LoadStatus.initial,
     bool hasReachedMaxPosts = false,
   }) : super(
@@ -206,7 +206,7 @@ extension CopyWith on AppState {
     bool? isLoading,
     Exception? exception,
     String? loadingText,
-    List<PostWithUser>? posts,
+    List<PostPlus>? posts,
     LoadStatus? postsStatus,
     bool? hasReachedMaxPosts,
     CloudUser? cloudUser,
